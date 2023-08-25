@@ -103,10 +103,10 @@ function Modal(props: ModalProps) {
               </Button>
             </Show>
 
-            <div class="ant-text-[rgba(0,0,0,.88)] ant-text-16px ant-font-600">{props.title}</div>
-            <div class='ant-grow ant-my-8px'>{props.children}</div>
+            <div class="ant-text-[rgba(0,0,0,.88)] ant-text-16px ant-font-600 ant-mb-8px">{props.title}</div>
+            <div class='ant-grow'>{props.children}</div>
 
-            <div class="ant-text-right">
+            <div class="ant-text-right ant-mt-12px">
               <Button onClick={close}>取消</Button>
               <Button
                 type="primary"
