@@ -1,34 +1,49 @@
 import { defineConfig } from 'vitepress'
 import UnocssPlugin from '@unocss/vite'
+import solidPlugin from 'vite-plugin-solid'
+import path from 'path'
 
-// https://vitepress.dev/reference/site-config
 export default defineConfig({
-  title: "antd-solid",
+  title: "Antd-solid",
   description: "UI 库",
   cleanUrls: true,
+  head: [['link', { rel: 'shortcut icon', href: 'https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png' }]],
   themeConfig: {
-    // https://vitepress.dev/reference/default-theme-config
+    logo: 'https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png',
     nav: [
       { text: '首页', link: '/' },
-      { text: '组件', link: '/components/table' }
+      { text: '组件', link: '/components/button' }
     ],
-
     sidebar: [
       {
-        text: '组件',
+        text: '通用组件',
         items: [
-          { text: '表格 Table', link: '/components/table' },
+          { text: 'Button 按钮', link: '/components/button' },
         ]
-      }
+      },
+      {
+        text: '数据展示',
+        items: [
+          { text: 'Table 表格', link: '/components/table' },
+        ]
+      },
     ],
-
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
-    ]
+      { icon: 'github', link: 'https://github.com/Reinhard2019/antd-solid' }
+    ],
+    footer: {
+      copyright: 'Released under the MIT License. Copyright © 2023-present 丁磊',
+    },
   },
   vite: {
+    resolve: {
+      alias: {
+        'antd-solid': path.resolve(__dirname, '../../src'),
+      },
+    },
     plugins: [
       UnocssPlugin(),
+      solidPlugin(),
     ],
   }
 })

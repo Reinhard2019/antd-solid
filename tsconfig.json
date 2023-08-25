@@ -11,5 +11,13 @@
     "jsx": "preserve",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-  }
+    "baseUrl": ".",
+    "paths": {
+      "antd-solid": ["src/index"],
+    },
+  },
+  "include": [
+    "./src/**/*",
+    "./docs/**/*",
+  ],
 }

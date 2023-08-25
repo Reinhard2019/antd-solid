@@ -1,0 +1,21 @@
+body {
+  --primary-color: #52c41a;
+  --light-primary-color: #95de64;
+  --dark-primary-color: #237804;
+  --active-bg-color: #d9f7be;
+
+  --error-color: #ff4d4f;
+  --warning-color: #faad14;
+
+  --border-color: #d9d9d9;
+  --secondary-border-color: #f0f0f0;
+
+  --light-color: rgba(0, 0, 0, 0.45);
+  --dark-color: rgba(0, 0, 0, 0.88);
+
+  --light-bg-color: #fafafa;
+  
+  --secondary-border-color: #f0f0f0;
+
+  font-size: 14px;
+}

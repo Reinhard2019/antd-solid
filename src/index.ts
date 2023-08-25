@@ -32,5 +32,6 @@ export { default as Skeleton } from './Skeleton'
 export { default as Spin } from './Spin'
 export { default as Image } from './Image'
 export { default as Table } from './Table'
+export type { TableProps, Column } from './Table'
 
 export { message } from 'antd'

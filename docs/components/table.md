@@ -1,11 +1,23 @@
 ---
-footer: false
+outline: deep
 ---
 
-# 快速上手 {#quick-start}
+# Table 表格 {#title}
 
-## 安装引入
+展示行列数据。
 
-### 通过 npm 引入 {#npm-import}
+## 代码演示
 
-<Demo />
+
+### 基本用法
+
+简单的表格
+
+<!-- The following frontmatter options are only applicable when using the default theme. -->
+
+<script lang="ts" setup>
+import component from './Table.tsx'
+import code from './Table.tsx?raw'
+</script>
+
+<Code :component="component" :code="code" />

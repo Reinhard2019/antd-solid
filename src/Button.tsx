@@ -32,10 +32,10 @@ const sizeClassMap = {
 
 const typeClassMap = {
   default:
-    'ant-[border:1px_solid_rgb(217,217,217)] ant-bg-white hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)]',
+    'ant-[border:1px_solid_rgb(217,217,217)] ant-bg-white ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)]',
   primary:
     'ant-border-none ant-bg-[var(--primary-color)] hover:ant-bg-[var(--light-primary-color)] ant-text-white',
-  text: 'ant-border-none ant-bg-transparent hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
+  text: 'ant-border-none ant-bg-transparent ant-text-[var(--dark-color)] hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
   link: 'ant-border-none ant-bg-transparent ant-text-[var(--primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-text-[var(--dark-primary-color)]',
 } as const
 

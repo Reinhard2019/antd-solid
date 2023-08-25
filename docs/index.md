@@ -3,23 +3,26 @@
 layout: home
 
 hero:
-  name: "antd-solid"
+  name: "Antd-solid"
   text: "UI 库"
-  tagline: My great project tagline
+  tagline: Ant Design 的 solid 版本
+  image:
+    src: https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png
+    alt: Antd-solid
   actions:
     - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
-    - theme: alt
-      text: API Examples
-      link: /api-examples
+      text: 开始使用
+      link: /components/button
+    # - theme: alt
+    #   text: API Examples
+    #   link: /api-examples
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: 支持 solid
+    details: Ant Design 的 solid 版本
+  - title: 定制主题，随心所欲
+    details: 使用 css 变量，让你定制主题更简单
+  - title: 组件丰富，选用自如
+    details: 大量实用组件满足你的需求，灵活定制与拓展
 ---
 

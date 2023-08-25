@@ -1,11 +1,13 @@
 import 'uno.css'
 import DefaultTheme from 'vitepress/theme'
-import Demo from '../components/Demo.vue'
+import 'antd-solid/index.css'
+import './index.css'
+import Code from '../components/Code.vue'
 
 export default {
   ...DefaultTheme,
   enhanceApp(ctx) {
     DefaultTheme.enhanceApp(ctx)
-    ctx.app.component('Demo', Demo)
+    ctx.app.component('Code', Code)
   },
 }
