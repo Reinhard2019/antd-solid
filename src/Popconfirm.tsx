@@ -1,8 +1,8 @@
-import { Component, JSXElement, createSignal, mergeProps, untrack } from 'solid-js'
+import { type Component, type JSXElement, createSignal, mergeProps, untrack, splitProps } from 'solid-js'
 import Button from './Button'
-import Tooltip from './Tooltip'
+import Tooltip, { type TooltipProps } from './Tooltip'
 
-interface PopconfirmProps {
+interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow'> {
   title?: JSXElement
   content?: JSXElement
   children: JSXElement
@@ -22,6 +22,7 @@ interface PopconfirmProps {
 
 const Popconfirm: Component<PopconfirmProps> = props => {
   const mergedProps = mergeProps({ okText: '确定', cancelText: '取消' }, props)
+  const [tooltipProps] = splitProps(props, ['placement', 'arrow'])
   const [open, setOpen] = createSignal(false)
 
   return (
@@ -64,6 +65,7 @@ const Popconfirm: Component<PopconfirmProps> = props => {
           </div>
         </div>
       }
+      {...tooltipProps}
     >
       {mergedProps.children}
     </Tooltip>

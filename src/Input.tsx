@@ -22,7 +22,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
 }
 
 export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(props: CommonInputProps<T> &
-  Omit<JSX.InputHTMLAttributes<T>, 'onChange' | 'onInput' | 'onKeyDown'>) {
+Omit<JSX.InputHTMLAttributes<T>, 'onChange' | 'onInput' | 'onKeyDown'>) {
   const [{ onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
@@ -41,7 +41,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   return (
     <div class="ant-flex ant-w-full">
       <Show when={props.addonBefore}>
-        <div class="ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_#d9d9d9] ant-border-r-0 ant-rounded-l-6px ant-text-14px">
+        <div class="ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--border-color)] ant-border-r-0 ant-rounded-l-6px ant-text-14px">
           {props.addonBefore}
         </div>
       </Show>
@@ -50,12 +50,12 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         <Dynamic<Component<JSX.InputHTMLAttributes<HTMLInputElement>>>
           component={
             (props.textarea ? 'textarea' : 'input') as unknown as Component<
-              JSX.InputHTMLAttributes<HTMLInputElement>
+            JSX.InputHTMLAttributes<HTMLInputElement>
             >
           }
           {...inputProps as JSX.InputHTMLAttributes<HTMLInputElement>}
           class={cs(
-            'ant-w-full ant-py-0 ant-px-11px ant-[outline:none] ant-text-14px ant-rounded-6px ant-[border:1px_solid_#d9d9d9] focus:ant-border-[var(--primary-color)] focus:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)] ant-py-8px',
+            'ant-w-full ant-py-0 ant-px-11px ant-[outline:none] ant-text-14px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] focus:ant-border-[var(--primary-color)] focus:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)] ant-py-8px',
             !props.textarea && 'ant-h-32px',
             props.class,
             props.addonBefore && 'ant-rounded-l-0',
@@ -83,7 +83,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       </div>
 
       <Show when={props.addonAfter}>
-        <div class="ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_#d9d9d9] ant-border-l-0 ant-rounded-r-6px ant-text-14px">
+        <div class="ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--border-color)] ant-border-l-0 ant-rounded-r-6px ant-text-14px">
           {props.addonAfter}
         </div>
       </Show>
@@ -92,10 +92,10 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
 }
 
 export type InputProps = Omit<CommonInputProps, 'inputAfter' | 'textarea'> &
-  Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onInput' | 'onKeyDown'>
+Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onInput' | 'onKeyDown'>
 
 export type TextAreaProps = Omit<CommonInputProps<HTMLTextAreaElement>, 'inputAfter' | 'textarea'> &
-  Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onInput' | 'onKeyDown'>
+Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'onChange' | 'onInput' | 'onKeyDown'>
 
 const Input: Component<InputProps> & {
   TextArea: Component<TextAreaProps>

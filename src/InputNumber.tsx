@@ -81,11 +81,11 @@ const InputNumber: Component<InputNumberProps> = props => {
     <CommonInput
       {...inputProps}
       inputAfter={
-        <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_#d9d9d9]">
+        <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_var(--border-color)]">
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />
           </div>
-          <div class={`ant-[border-top:1px_solid_#d9d9d9] ${actionBtnClass}`} onClick={down}>
+          <div class={`ant-[border-top:1px_solid_var(--border-color)] ${actionBtnClass}`} onClick={down}>
             <div class="i-ant-design:down-outlined" />
           </div>
         </div>

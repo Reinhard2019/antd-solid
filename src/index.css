@@ -3,6 +3,7 @@ body {
   --light-primary-color: #95de64;
   --dark-primary-color: #237804;
   --active-bg-color: #d9f7be;
+  --hover-bg-color: rgba(0,0,0,.04);
 
   --error-color: #ff4d4f;
   --warning-color: #faad14;

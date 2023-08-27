@@ -25,6 +25,7 @@ export default defineConfig({
         text: '数据展示',
         items: [
           { text: 'Table 表格', link: '/components/table' },
+          { text: 'Select 选择器', link: '/components/select' },
         ]
       },
     ],

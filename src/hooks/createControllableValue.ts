@@ -1,4 +1,4 @@
-import { Setter, Signal, createSignal } from 'solid-js'
+import { type Setter, type Signal, createSignal } from 'solid-js'
 import createUpdateEffect from './createUpdateEffect'
 
 export interface Options<T> {

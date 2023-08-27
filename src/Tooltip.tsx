@@ -2,6 +2,7 @@ import { compact } from 'lodash-es'
 import {
   type Component,
   type JSXElement,
+  type JSX,
   children,
   createEffect,
   Show,
@@ -13,6 +14,7 @@ import { Portal } from 'solid-js/web'
 import cs from 'classnames'
 import createControllableValue from './hooks/createControllableValue'
 import { useClickAway } from './hooks'
+import { toArray } from './utils/array'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -33,11 +35,12 @@ export interface TooltipProps {
   /**
    * 默认: hover
    */
-  trigger?: ActionType
+  trigger?: ActionType | ActionType[]
   /**
    * 默认: top
    */
   placement?: TooltipPlacement
+  contentWrapStyle?: JSX.CSSProperties
   content?: JSXElement | ((close: () => void) => JSXElement)
   children?: JSXElement
   open?: boolean
@@ -86,30 +89,37 @@ const Tooltip: Component<TooltipProps> = _props => {
 
   createEffect(() => {
     const _children = resolvedChildren() as Element
-    switch (props.trigger) {
-      case 'hover':
-        _children.addEventListener('mouseenter', reverseOpen)
-        onCleanup(() => {
-          _children.removeEventListener('mouseenter', reverseOpen)
-        })
-
-        _children.addEventListener('mouseleave', reverseOpen)
-        onCleanup(() => {
-          _children.removeEventListener('mouseleave', reverseOpen)
-        })
-        break
-      case 'click':
-        _children.addEventListener('click', reverseOpen)
-        onCleanup(() => {
-          _children.removeEventListener('click', reverseOpen)
-        })
-
-        useClickAway(
-          () => setOpen(false),
-          () => compact([contentWrap, _children]),
-        )
-        break
-    }
+    toArray(props.trigger).forEach(trigger => {
+      switch (trigger) {
+        case 'hover':
+          _children.addEventListener('mouseenter', reverseOpen)
+          _children.addEventListener('mouseleave', reverseOpen)
+          onCleanup(() => {
+            _children.removeEventListener('mouseenter', reverseOpen)
+            _children.removeEventListener('mouseleave', reverseOpen)
+          })
+          break
+        case 'click':
+          _children.addEventListener('click', reverseOpen)
+          onCleanup(() => {
+            _children.removeEventListener('click', reverseOpen)
+          })
+  
+          useClickAway(
+            () => setOpen(false),
+            () => compact([contentWrap, _children]),
+          )
+          break
+        case 'focus':
+          _children.addEventListener('focus', reverseOpen)
+          _children.addEventListener('blur', reverseOpen)
+          onCleanup(() => {
+            _children.removeEventListener('focus', reverseOpen)
+            _children.removeEventListener('blur', reverseOpen)
+          })
+          break
+      }
+    })
   })
 
   createEffect(() => {
@@ -179,9 +189,10 @@ const Tooltip: Component<TooltipProps> = _props => {
           >
             <div
               class={cs(
-                'ant-p-12px ant-rounded-8px ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
+                'ant-p-12px ant-rounded-8px ant-box-content ant-overflow-hidden ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
                 props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)] ant-text-white' : 'ant-bg-white',
               )}
+              style={props.contentWrapStyle}
             >
               <Content content={props.content} close={() => setOpen(false)} />
             </div>
