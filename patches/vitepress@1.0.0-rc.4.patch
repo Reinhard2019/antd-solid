@@ -1,0 +1,60 @@
+diff --git a/dist/client/theme-default/styles/components/vp-doc.css b/dist/client/theme-default/styles/components/vp-doc.css
+index 12c5bf2d6a69f0d63c34b636985984b4ddb067db..fae415af1cf2800f435bab6fa1cb81ee07f95ef3 100644
+--- a/dist/client/theme-default/styles/components/vp-doc.css
++++ b/dist/client/theme-default/styles/components/vp-doc.css
+@@ -151,29 +151,30 @@
+  * Table
+  * -------------------------------------------------------------------------- */
+ 
+-.vp-doc table {
+-  display: block;
++.vp-table table {
++  width: 100%;
++  display: table;
+   border-collapse: collapse;
+   margin: 20px 0;
+   overflow-x: auto;
+ }
+ 
+-.vp-doc tr {
++.vp-table tr {
+   border-top: 1px solid var(--vp-c-divider);
+   transition: background-color 0.5s;
+ }
+ 
+-.vp-doc tr:nth-child(2n) {
++.vp-table tr:nth-child(2n) {
+   background-color: var(--vp-c-bg-soft);
+ }
+ 
+-.vp-doc th,
+-.vp-doc td {
++.vp-table th,
++.vp-table td {
+   border: 1px solid var(--vp-c-divider);
+   padding: 8px 16px;
+ }
+ 
+-.vp-doc th {
++.vp-table th {
+   text-align: left;
+   font-size: 14px;
+   font-weight: 600;
+@@ -181,7 +182,7 @@
+   background-color: var(--vp-c-bg-soft);
+ }
+ 
+-.vp-doc td {
++.vp-table td {
+   font-size: 14px;
+ }
+ 
+@@ -189,7 +190,7 @@
+  * Decorational elements
+  * -------------------------------------------------------------------------- */
+ 
+-.vp-doc hr {
++.vp-table hr {
+   margin: 16px 0;
+   border: none;
+   border-top: 1px solid var(--vp-c-divider);

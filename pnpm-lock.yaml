@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  vitepress@1.0.0-rc.4:
+    hash: jhyffk4hh4v5rceklryrcj4zee
+    path: patches/vitepress@1.0.0-rc.4.patch
+
 importers:
 
   .:
@@ -125,7 +130,7 @@ importers:
         version: 2.7.0(solid-js@1.7.8)(vite@4.4.9)
       vitepress:
         specifier: 1.0.0-rc.4
-        version: 1.0.0-rc.4(@algolia/client-search@4.19.1)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.7.0)
+        version: 1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.19.1)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.7.0)
       vitest:
         specifier: ^0.30.1
         version: 0.30.1(jsdom@21.1.1)
@@ -6191,7 +6196,7 @@ packages:
       vite: 4.4.9
     dev: true
 
-  /vitepress@1.0.0-rc.4(@algolia/client-search@4.19.1)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.7.0):
+  /vitepress@1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.19.1)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.7.0):
     resolution: {integrity: sha512-JCQ89Bm6ECUTnyzyas3JENo00UDJeK8q1SUQyJYou+4Yz5BKEc/F3O21cu++DnUT2zXc0kvQ2Aj4BZCc/nioXQ==}
     hasBin: true
     dependencies:
@@ -6234,6 +6239,7 @@ packages:
       - terser
       - universal-cookie
     dev: true
+    patched: true
 
   /vitest@0.30.1(jsdom@21.1.1):
     resolution: {integrity: sha512-y35WTrSTlTxfMLttgQk4rHcaDkbHQwDP++SNwPb+7H8yb13Q3cu2EixrtHzF27iZ8v0XCciSsLg00RkPAzB/aA==}

@@ -21,3 +21,16 @@ import code from './Table.tsx?raw'
 </script>
 
 <Code :component="component" :code="code" />
+
+## API
+
+### Table
+
+<div class="vp-table">
+
+| 参数      | 说明 | 类型 | 默认值
+| ----------- | ----------- | ----------- | ----------- |
+| columns      | 表格列的配置描述，具体项见下表	       | Column[] | - |
+| dataSource   | 数据数组        | object[] | - |
+
+</div>

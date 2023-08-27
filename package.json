@@ -58,5 +58,10 @@
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "solid-js": "^1.7.8"
+  },
+  "pnpm": {
+    "patchedDependencies": {
+      "vitepress@1.0.0-rc.4": "patches/vitepress@1.0.0-rc.4.patch"
+    }
   }
 }
