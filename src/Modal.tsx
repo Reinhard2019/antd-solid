@@ -1,4 +1,4 @@
-import { type JSXElement, Show, createSignal, untrack, Ref } from 'solid-js'
+import { type JSXElement, Show, createSignal, untrack, type Ref, mergeProps } from 'solid-js'
 import { Portal, render } from 'solid-js/web'
 import Button from './Button'
 import cs from 'classnames'
@@ -29,17 +29,23 @@ export interface ModalProps {
    * 设置为 false 时隐藏关闭按钮
    */
   closeIcon?: boolean
+  footer?: boolean
   /**
    * 返回 true，会自动关闭 modal
    */
-  onOk?: () => (boolean | Promise<boolean>)
+  onOk?: () => boolean | Promise<boolean>
   afterClose?: () => void
+  /**
+   * 自定义渲染对话框
+   */
+  modalRender?: () => JSXElement
 }
 
 export interface MethodProps
   extends Pick<ModalProps, 'title' | 'children' | 'onOk' | 'afterClose'> {}
 
-function Modal(props: ModalProps) {
+function Modal(_props: ModalProps) {
+  const props = mergeProps({ footer: true }, _props)
   const [open, setOpen] = createSignal(props.initialOpen ?? false)
   const close = () => {
     setOpen(false)
@@ -76,60 +82,66 @@ function Modal(props: ModalProps) {
             }
           }}
         >
-          <div
-            class={cs(
-              'ant-absolute ant-px-24px ant-py-20px ant-rounded-8px ant-overflow-hidden ant-bg-white ant-flex ant-flex-col',
-              // '!ant-[animation-duration:.5s]',
-              !props.centered && 'ant-top-100px',
-            )}
-            onClick={e => {
-              e.stopPropagation()
-            }}
-            style={{
-              width: props.width ?? '520px',
-              height: props.height,
-            }}
-          >
-            {/* 关闭按钮 */}
-            <Show when={props.closeIcon !== false}>
-              <Button
-                type="text"
-                class={cs(
-                  'ant-rm-size-btn !ant-w-22px !ant-h-22px !ant-flex !ant-justify-center !ant-items-center ant-text-center ant-text-18px !ant-absolute !ant-top-16px !ant-right-16px ant-z-1000 ant-text-[rgba(0,0,0,.45)] hover:!ant-text-[rgba(0,0,0,.88)]',
-                )}
-                onClick={close}
-              >
-                <span class="i-ant-design:close-outlined" />
-              </Button>
-            </Show>
+          <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
+            <div
+              class={cs(
+                'ant-absolute ant-px-24px ant-py-20px ant-rounded-8px ant-overflow-hidden ant-bg-white ant-flex ant-flex-col',
+                // '!ant-[animation-duration:.5s]',
+                !props.centered && 'ant-top-100px',
+              )}
+              onClick={e => {
+                e.stopPropagation()
+              }}
+              style={{
+                width: props.width ?? '520px',
+                height: props.height,
+              }}
+            >
+              {/* 关闭按钮 */}
+              <Show when={props.closeIcon !== false}>
+                <Button
+                  type="text"
+                  class={cs(
+                    'ant-rm-size-btn !ant-w-22px !ant-h-22px !ant-flex !ant-justify-center !ant-items-center ant-text-center ant-text-18px !ant-absolute !ant-top-16px !ant-right-16px ant-z-1000 ant-text-[rgba(0,0,0,.45)] hover:!ant-text-[rgba(0,0,0,.88)]',
+                  )}
+                  onClick={close}
+                >
+                  <span class="i-ant-design:close-outlined" />
+                </Button>
+              </Show>
 
-            <div class="ant-text-[rgba(0,0,0,.88)] ant-text-16px ant-font-600 ant-mb-8px">{props.title}</div>
-            <div class='ant-grow'>{props.children}</div>
+              <div class="ant-text-[rgba(0,0,0,.88)] ant-text-16px ant-font-600 ant-mb-8px">
+                {props.title}
+              </div>
+              <div class="ant-grow">{props.children}</div>
 
-            <div class="ant-text-right ant-mt-12px">
-              <Button onClick={close}>取消</Button>
-              <Button
-                type="primary"
-                class="!ant-ml-8px"
-                loading={confirmLoading()}
-                // eslint-disable-next-line solid/reactivity, @typescript-eslint/no-misused-promises
-                onClick={async () => {
-                  if (!props.onOk) return
+              <Show when={props.footer}>
+                <div class="ant-text-right ant-mt-12px">
+                  <Button onClick={close}>取消</Button>
+                  <Button
+                    type="primary"
+                    class="!ant-ml-8px"
+                    loading={confirmLoading()}
+                    // eslint-disable-next-line solid/reactivity, @typescript-eslint/no-misused-promises
+                    onClick={async () => {
+                      if (!props.onOk) return
 
-                  let res = props.onOk?.()
-                  if (res instanceof Promise) {
-                    setConfirmLoading(true)
-                    res = await res.finally(() => setConfirmLoading(false))
-                  }
-                  if (res) {
-                    instance.close()
-                  }
-                }}
-              >
-                确定
-              </Button>
+                      let res = props.onOk?.()
+                      if (res instanceof Promise) {
+                        setConfirmLoading(true)
+                        res = await res.finally(() => setConfirmLoading(false))
+                      }
+                      if (res) {
+                        instance.close()
+                      }
+                    }}
+                  >
+                    确定
+                  </Button>
+                </div>
+              </Show>
             </div>
-          </div>
+          </Show>
         </div>
       </Portal>
     </Show>
