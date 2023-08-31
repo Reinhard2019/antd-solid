@@ -29,7 +29,7 @@ export interface ModalProps {
    * 设置为 false 时隐藏关闭按钮
    */
   closeIcon?: boolean
-  footer?: boolean | JSXElement
+  footer?: boolean | ((modal: ModalInstance) => JSXElement)
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -117,7 +117,7 @@ function Modal(_props: ModalProps) {
 
               <Show when={props.footer !== false}>
                 <div class="ant-mt-12px">
-                  <Show when={typeof props.footer === 'boolean'} fallback={props.footer}>
+                  <Show when={typeof props.footer !== 'function'} fallback={typeof props.footer === 'function' && props.footer(instance)}>
                     <div class='ant-flex ant-gap-8px ant-justify-end'>
                       <Button onClick={close}>取消</Button>
                       <Button
