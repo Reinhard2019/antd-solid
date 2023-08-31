@@ -11,7 +11,7 @@ import cs from 'classnames'
 import './Button.css'
 
 interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElement> {
-  type?: 'default' | 'primary' | 'text' | 'link'
+  type?: 'default' | 'primary' | 'dashed' | 'text' | 'link'
   onClick?: ((e: MouseEvent) => void) | ((e: MouseEvent) => Promise<unknown>)
   /**
    * 默认: middle
@@ -21,6 +21,10 @@ interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElemen
   class?: string
   style?: JSX.CSSProperties
   loading?: boolean
+  /**
+   * 设置危险按钮
+   */
+  danger?: boolean
 }
 
 const sizeClassMap = {
@@ -31,12 +35,41 @@ const sizeClassMap = {
 } as const
 
 const typeClassMap = {
-  default:
-    'ant-[border:1px_solid_rgb(217,217,217)] ant-bg-white ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)]',
-  primary:
-    'ant-border-none ant-bg-[var(--primary-color)] hover:ant-bg-[var(--light-primary-color)] ant-text-white',
-  text: 'ant-border-none ant-bg-transparent ant-text-[var(--dark-color)] hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
-  link: 'ant-border-none ant-bg-transparent ant-text-[var(--primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+  default: (danger: boolean) =>
+    cs(
+      'ant-bg-white',
+      danger
+        ? 'ant-[border:1px_solid_var(--error-color)] ant-text-[var(--error-color)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
+        : 'ant-[border:1px_solid_var(--border-color)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+    ),
+  primary: (danger: boolean) =>
+    cs(
+      'ant-border-none ant-text-white',
+      danger
+        ? 'ant-bg-[var(--error-color)] hover:ant-bg-[var(--light-error-color)] active:ant-bg-[var(--dark-error-color)]'
+        : 'ant-bg-[var(--primary-color)] hover:ant-bg-[var(--light-primary-color)] active:ant-bg-[var(--dark-primary-color)]',
+    ),
+  dashed: (danger: boolean) =>
+    cs(
+      ' ant-bg-white',
+      danger
+        ? 'ant-[border:1px_dashed_var(--error-color)] ant-text-[var(--error-color)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
+        : 'ant-[border:1px_dashed_var(--border-color)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+    ),
+  text: (danger: boolean) =>
+    cs(
+      'ant-border-none ant-bg-transparent',
+      danger
+        ? 'ant-text-[var(--error-color)] hover:ant-bg-[var(--error-bg-color)] active:ant-bg-[var(--error-bg-color)]'
+        : 'ant-text-[var(--dark-color)] hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
+    ),
+  link: (danger: boolean) =>
+    cs(
+      'ant-border-none ant-bg-transparent',
+      danger
+        ? 'ant-text-[var(--error-color)] hover:ant-text-[var(--light-error-color)] active:ant-text-[var(--dark-error-color)]'
+        : 'ant-text-[var(--primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+    ),
 } as const
 
 const Button: Component<ButtonProps> = props => {
@@ -51,7 +84,7 @@ const Button: Component<ButtonProps> = props => {
         'ant-relative ant-cursor-pointer',
         mergedProps.class,
         sizeClassMap[mergedProps.size!],
-        typeClassMap[mergedProps.type!],
+        typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'ant-opacity-65',
       )}
       style={mergedProps.style}
@@ -62,10 +95,18 @@ const Button: Component<ButtonProps> = props => {
           res.finally(() => setLoading(false))
         }
 
-        if (mergedProps.type === 'default' || mergedProps.type === 'primary') {
+        if (
+          mergedProps.type === 'default' ||
+          mergedProps.type === 'primary' ||
+          mergedProps.type === 'dashed'
+        ) {
           const div = document.createElement('div')
-          div.className =
-            'ant-absolute ant-inset-0 ant-rounded-inherit ant-[border:1px_solid_var(--light-primary-color)] ant-[animation:button-border_linear_1s]'
+          div.className = cs(
+            'ant-absolute ant-inset-0 ant-rounded-inherit ant-[animation:button-border_linear_1s]',
+            props.danger
+              ? 'ant-[border:1px_solid_var(--light-error-color)]'
+              : 'ant-[border:1px_solid_var(--light-primary-color)]',
+          )
           const onAnimationEnd = () => {
             div.remove()
             div.removeEventListener('animationend', onAnimationEnd)

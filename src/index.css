@@ -6,6 +6,12 @@ body {
   --hover-bg-color: rgba(0,0,0,.04);
 
   --error-color: #ff4d4f;
+  --light-error-color: #ff7875;
+  --dark-error-color: #d9363e;
+
+  --error-bg-color: #fff2f0;
+  --error-bg-hover-color: #fff1f0;
+
   --warning-color: #faad14;
 
   --border-color: #d9d9d9;
@@ -16,7 +22,5 @@ body {
 
   --light-bg-color: #fafafa;
   
-  --secondary-border-color: #f0f0f0;
-
   font-size: 14px;
 }
