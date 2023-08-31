@@ -29,7 +29,7 @@ export interface ModalProps {
    * 设置为 false 时隐藏关闭按钮
    */
   closeIcon?: boolean
-  footer?: boolean
+  footer?: boolean | JSXElement
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -115,29 +115,32 @@ function Modal(_props: ModalProps) {
               </div>
               <div class="ant-grow">{props.children}</div>
 
-              <Show when={props.footer}>
-                <div class="ant-text-right ant-mt-12px">
-                  <Button onClick={close}>取消</Button>
-                  <Button
-                    type="primary"
-                    class="!ant-ml-8px"
-                    loading={confirmLoading()}
-                    // eslint-disable-next-line solid/reactivity, @typescript-eslint/no-misused-promises
-                    onClick={async () => {
-                      if (!props.onOk) return
+              <Show when={props.footer !== false}>
+                <div class="ant-mt-12px">
+                  <Show when={typeof props.footer === 'boolean'} fallback={props.footer}>
+                    <div class='ant-flex ant-gap-8px ant-justify-end'>
+                      <Button onClick={close}>取消</Button>
+                      <Button
+                        type="primary"
+                        loading={confirmLoading()}
+                        // eslint-disable-next-line solid/reactivity, @typescript-eslint/no-misused-promises
+                        onClick={async () => {
+                          if (!props.onOk) return
 
-                      let res = props.onOk?.()
-                      if (res instanceof Promise) {
-                        setConfirmLoading(true)
-                        res = await res.finally(() => setConfirmLoading(false))
-                      }
-                      if (res) {
-                        instance.close()
-                      }
-                    }}
-                  >
-                    确定
-                  </Button>
+                          let res = props.onOk?.()
+                          if (res instanceof Promise) {
+                            setConfirmLoading(true)
+                            res = await res.finally(() => setConfirmLoading(false))
+                          }
+                          if (res) {
+                            instance.close()
+                          }
+                        }}
+                      >
+                      确定
+                      </Button>
+                    </div>
+                  </Show>
                 </div>
               </Show>
             </div>
