@@ -28,6 +28,13 @@ export default defineConfig({
           { text: 'Select 选择器', link: '/components/select' },
         ]
       },
+      {
+        text: '数据录入',
+        items: [
+          { text: 'Table 表格', link: '/components/table' },
+          { text: 'InputNumber 数字输入框', link: '/components/input-number' },
+        ]
+      },
     ],
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Reinhard2019/antd-solid' }

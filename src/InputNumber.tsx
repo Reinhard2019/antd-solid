@@ -1,14 +1,19 @@
-import { type Component, createEffect, on, splitProps } from 'solid-js'
+import { type Component, createEffect, on, splitProps, untrack } from 'solid-js'
 import { CommonInput, type InputProps } from './Input'
-import { isNil } from 'lodash-es'
+import { clamp, isNil } from 'lodash-es'
 import createControllableValue from './hooks/createControllableValue'
 import { dispatchEventHandlerUnion } from './utils/solid'
 
 export interface InputNumberProps
-  extends Omit<InputProps, 'defaultValue' | 'value' | 'onChange' | 'inputAfter' | 'onKeyDown'> {
+  extends Omit<
+  InputProps,
+  'defaultValue' | 'value' | 'onChange' | 'inputAfter' | 'onKeyDown' | 'min' | 'max'
+  > {
   defaultValue?: number | null | undefined
   value?: number | null | undefined
   onChange?: (value: number | null) => void
+  min?: number
+  max?: number
 }
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
@@ -40,6 +45,11 @@ const InputNumber: Component<InputNumberProps> = props => {
     'onBlur',
   ])
 
+  const clampValue = (v: number | string | null | undefined) =>
+    untrack(() =>
+      typeof v === 'number' ? clamp(v, props.min ?? -Infinity, props.max ?? Infinity) : v,
+    )
+
   const [_, controllableProps] = splitProps(props, ['onChange'])
   const [value, setValue] = createControllableValue<number | string | null | undefined>(
     controllableProps,
@@ -47,18 +57,22 @@ const InputNumber: Component<InputNumberProps> = props => {
   const add = (addon: number) => {
     setValue(v => {
       if (isEmptyValue(v)) {
-        return addon
+        return clampValue(addon)
       }
 
       const num = Number(v)
       if (Number.isNaN(num)) {
         return v
       }
-      return num + addon
+      return clampValue(num + addon)
     })
   }
-  const up = () => { add(1); }
-  const down = () => { add(-1); }
+  const up = () => {
+    add(1)
+  }
+  const down = () => {
+    add(-1)
+  }
 
   createEffect(
     on(
@@ -85,7 +99,10 @@ const InputNumber: Component<InputNumberProps> = props => {
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />
           </div>
-          <div class={`ant-[border-top:1px_solid_var(--border-color)] ${actionBtnClass}`} onClick={down}>
+          <div
+            class={`ant-[border-top:1px_solid_var(--border-color)] ${actionBtnClass}`}
+            onClick={down}
+          >
             <div class="i-ant-design:down-outlined" />
           </div>
         </div>
@@ -103,12 +120,12 @@ const InputNumber: Component<InputNumberProps> = props => {
         }
       }}
       onChange={e => {
-        const newValue = e.target.value || null
+        const newValue = e.target.value ?? null
         setValue(newValue)
       }}
       onBlur={e => {
-        const newValue = e.target.value || null
-        setValue(formatNum(newValue))
+        const newValue = e.target.value ?? null
+        setValue(clampValue(formatNum(newValue)))
 
         dispatchEventHandlerUnion(onBlur, e)
       }}
