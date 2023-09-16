@@ -12,6 +12,7 @@ import { type ID } from './types'
 import createControllableValue from './hooks/createControllableValue'
 import cs from 'classnames'
 import { useClickAway } from './hooks'
+import { isNil } from 'lodash-es'
 
 interface SelectOption {
   label: JSXElement
@@ -24,18 +25,15 @@ interface SelectProps {
   options: SelectOption[]
   placeholder?: string
   allowClear?: boolean
+  class?: string
 }
 
 const Select: Component<SelectProps> = props => {
   let select: HTMLDivElement
 
   const [value, setValue] = createControllableValue<ID | undefined>(props)
-  const [option, _setOption] = createSignal<SelectOption>()
-  const setOption = (_option: SelectOption | undefined) => {
-    setValue(_option?.value)
-    _setOption(_option)
-  }
   const selectedValue = createSelector(value)
+  const selectedOption = createMemo(() => !isNil(value()) ? props.options.find(option => option.value === value()) : undefined)
 
   const [open, setOpen] = createSignal(false)
   useClickAway(
@@ -45,7 +43,7 @@ const Select: Component<SelectProps> = props => {
 
   const [width, setWidth] = createSignal(0)
   const [hover, setHover] = createSignal(false)
-  const showClearBtn = createMemo(() => props.allowClear && hover() && option())
+  const showClearBtn = createMemo(() => props.allowClear && hover() && !isNil(value()))
 
   return (
     <Tooltip
@@ -68,7 +66,7 @@ const Select: Component<SelectProps> = props => {
                   selectedValue(item.value) ? '!ant-bg-[var(--active-bg-color)]' : '',
                 )}
                 onClick={() => {
-                  setOption(item)
+                  setValue(item.value)
                   close()
                 }}
               >
@@ -81,7 +79,7 @@ const Select: Component<SelectProps> = props => {
     >
       <div
         ref={select!}
-        class="ant-h-30px ant-leading-30px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] ant-box-content ant-px-11px focus:ant-[border-color:var(--primary-color)]"
+        class={cs('ant-h-30px ant-leading-30px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] ant-box-content ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
         tabIndex="0"
         onClick={e => {
           setOpen(true)
@@ -98,16 +96,16 @@ const Select: Component<SelectProps> = props => {
       >
         <div class="ant-relative ant-h-full">
           <Show
-            when={option()}
+            when={!isNil(value())}
             fallback={
               <input
-                class="ant-h-full ant-w-full ant-float-left"
+                class="ant-h-full ant-w-full ant-float-left ant-[outline:none]"
                 readOnly
                 placeholder={props.placeholder}
               />
             }
           >
-            <div>{option()!.label}</div>
+            <div>{selectedOption()!.label ?? value()}</div>
           </Show>
 
           <div class="ant-absolute ant-top-0 ant-bottom-0 ant-right-0">
@@ -116,7 +114,7 @@ const Select: Component<SelectProps> = props => {
                 class="i-ant-design:close-circle-filled ant-cursor-pointer ant-text-[var(--ant-clear-color)] hover:ant-text-[var(--ant-clear-color-hover)]"
                 onClick={e => {
                   e.stopPropagation()
-                  setOption(undefined)
+                  setValue(undefined)
                 }}
               />
             </Show>
