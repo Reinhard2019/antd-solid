@@ -1,7 +1,6 @@
-import { type Component, createEffect, on, splitProps, untrack } from 'solid-js'
+import { type Component, createEffect, on, splitProps, untrack, createSignal, mergeProps } from 'solid-js'
 import { CommonInput, type InputProps } from './Input'
 import { clamp, isNil } from 'lodash-es'
-import createControllableValue from './hooks/createControllableValue'
 import { dispatchEventHandlerUnion } from './utils/solid'
 
 export interface InputNumberProps
@@ -18,26 +17,14 @@ export interface InputNumberProps
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
 
-const formatNum = (
-  v: number | string | null | undefined,
-  prev?: number | null | undefined,
-): number | null => {
-  if (isEmptyValue(v)) {
-    return null
-  }
-
-  const num = Number(v)
-  if (prev !== undefined && Number.isNaN(num)) {
-    return prev
-  }
-
-  return num
-}
-
 const actionBtnClass =
   'ant-text-12px ant-flex ant-justify-center ant-items-center ant-h-1/2 ant-cursor-pointer ant-opacity-70 hover:ant-h-100% hover:ant-text-[var(--primary-color)] ant-transition-color ant-transition-height ant-transition-duration-500'
 
-const InputNumber: Component<InputNumberProps> = props => {
+const InputNumber: Component<InputNumberProps> = _props => {
+  const props = mergeProps({
+    min: -Infinity,
+    max: Infinity,
+  }, _props)
   const [{ onChange, onBlur }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
@@ -45,17 +32,25 @@ const InputNumber: Component<InputNumberProps> = props => {
     'onBlur',
   ])
 
-  const clampValue = (v: number | string | null | undefined) =>
-    untrack(() =>
-      typeof v === 'number' ? clamp(v, props.min ?? -Infinity, props.max ?? Infinity) : v,
-    )
+  const clampValue = (v: number) => untrack(() => clamp(v, props.min, props.max))
+    
+  let prev: number | null = null
+  const updatePrev = (v: number | null) => {
+    if (prev === v) return
 
-  const [_, controllableProps] = splitProps(props, ['onChange'])
-  const [value, setValue] = createControllableValue<number | string | null | undefined>(
-    controllableProps,
-  )
+    prev = v
+    onChange?.(prev)
+  }
+
+  const [value, setValue] = createSignal<number | string | null | undefined>(untrack(() => props.value ?? props.defaultValue))
+  createEffect(on(() => props.value, () => {
+    setValue(props.value)
+  }, {
+    defer: true
+  }))
+
   const add = (addon: number) => {
-    setValue(v => {
+    const newValue = setValue(v => {
       if (isEmptyValue(v)) {
         return clampValue(addon)
       }
@@ -66,6 +61,7 @@ const InputNumber: Component<InputNumberProps> = props => {
       }
       return clampValue(num + addon)
     })
+    updatePrev(newValue as number | null)
   }
   const up = () => {
     add(1)
@@ -73,23 +69,6 @@ const InputNumber: Component<InputNumberProps> = props => {
   const down = () => {
     add(-1)
   }
-
-  createEffect(
-    on(
-      value,
-      (input, __, prev: number | null | undefined) => {
-        const num = formatNum(input, prev)
-        if (num !== prev) {
-          prev = num
-          onChange?.(num)
-        }
-        return num
-      },
-      {
-        defer: true,
-      },
-    ),
-  )
 
   return (
     <CommonInput
@@ -120,12 +99,22 @@ const InputNumber: Component<InputNumberProps> = props => {
         }
       }}
       onChange={e => {
-        const newValue = e.target.value ?? null
+        const newValue = e.target.value
         setValue(newValue)
+
+        let newValueNum: number | null = Number(newValue)
+        if (Number.isNaN(newValueNum)) return
+        
+        if (isEmptyValue(newValue)) {
+          newValueNum = null
+        } else {
+          newValueNum = clampValue(newValueNum)
+        }
+
+        updatePrev(newValueNum)
       }}
       onBlur={e => {
-        const newValue = e.target.value ?? null
-        setValue(clampValue(formatNum(newValue)))
+        setValue(prev)
 
         dispatchEventHandlerUnion(onBlur, e)
       }}

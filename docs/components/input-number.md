@@ -29,7 +29,7 @@ import minMaxCode from './input-number/MinMax.tsx?raw'
 
 ## API
 
-### Table
+### InputNumber
 
 <div class="vp-table">
 

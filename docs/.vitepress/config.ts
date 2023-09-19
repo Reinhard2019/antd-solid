@@ -31,7 +31,6 @@ export default defineConfig({
       {
         text: '数据录入',
         items: [
-          { text: 'Table 表格', link: '/components/table' },
           { text: 'InputNumber 数字输入框', link: '/components/input-number' },
         ]
       },
