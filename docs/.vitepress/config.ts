@@ -25,7 +25,6 @@ export default defineConfig({
         text: '数据展示',
         items: [
           { text: 'Table 表格', link: '/components/table' },
-          { text: 'Select 选择器', link: '/components/select' },
         ]
       },
       {
@@ -34,6 +33,7 @@ export default defineConfig({
           { text: 'Input 输入框', link: '/components/input' },
           { text: 'InputNumber 数字输入框', link: '/components/input-number' },
           { text: 'Form 表单', link: '/components/form' },
+          { text: 'Select 选择器', link: '/components/select' },
         ]
       },
     ],
