@@ -42,8 +42,7 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
   createUpdateEffect(getValue, () => {
     if (!isControlled()) return
 
-    // @ts-expect-error
-    _setValue(getValue())
+    _setValue(getValue() as any)
   })
 
   const setValue: Setter<T> = (v => {

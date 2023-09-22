@@ -6,7 +6,7 @@ import { dispatchEventHandlerUnion } from './utils/solid'
 export interface InputNumberProps
   extends Omit<
   InputProps,
-  'defaultValue' | 'value' | 'onChange' | 'inputAfter' | 'onKeyDown' | 'min' | 'max'
+  'defaultValue' | 'value' | 'onChange' | 'inputAfter' | 'onKeyDown' | 'min' | 'max' | 'suffix'
   > {
   defaultValue?: number | null | undefined
   value?: number | null | undefined
@@ -73,7 +73,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
   return (
     <CommonInput
       {...inputProps}
-      inputAfter={
+      actions={
         <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_var(--border-color)]">
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />

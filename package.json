@@ -58,7 +58,8 @@
     "react": "^18.2.0",
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
-    "solid-js": "^1.7.8"
+    "solid-js": "^1.7.8",
+    "yup": "^1.2.0"
   },
   "pnpm": {
     "patchedDependencies": {

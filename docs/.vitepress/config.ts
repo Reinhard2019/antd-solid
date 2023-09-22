@@ -31,7 +31,9 @@ export default defineConfig({
       {
         text: '数据录入',
         items: [
+          { text: 'Input 输入框', link: '/components/input' },
           { text: 'InputNumber 数字输入框', link: '/components/input-number' },
+          { text: 'Form 表单', link: '/components/form' },
         ]
       },
     ],
