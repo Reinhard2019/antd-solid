@@ -50,7 +50,7 @@ const FormItem: Component<FormItemProps> = props => {
 
   return (
     <div class={cs('ant-[display:table-row]', props.class)} style={props.style}>
-      <span class="ant-[display:table-cell] ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-pb-16px ant-text-right">
+      <span class="ant-[display:table-cell] ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-pb-16px ant-text-right ant-[white-space:nowrap]">
         <Show when={!isNil(props.required)}>
           <span class="ant-mr-4px ant-text-[var(--error-color)]">*</span>
         </Show>
@@ -59,7 +59,8 @@ const FormItem: Component<FormItemProps> = props => {
         </Show>
       </span>
 
-      <div class="ant-[display:table-cell] ant-w-full ant-pb-16px">
+      {/* TODO vertical-align:middle 并不是严格居中 */}
+      <div class="ant-[display:table-cell] ant-w-full ant-pb-16px ant-[vertical-align:middle]">
         <Dynamic
           component={props.component}
           defaultValue={props.initialValue ?? get(initialValues, props.name!)}

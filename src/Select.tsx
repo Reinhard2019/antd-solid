@@ -79,7 +79,7 @@ const Select: Component<SelectProps> = props => {
     >
       <div
         ref={select!}
-        class={cs('ant-h-30px ant-leading-30px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] ant-box-content ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
+        class={cs('ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
         tabIndex="0"
         onClick={e => {
           setOpen(true)
