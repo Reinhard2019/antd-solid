@@ -11,10 +11,9 @@ export interface ModalInstance {
 export interface ModalProps {
   ref?: Ref<ModalInstance>
   title?: JSXElement
-  initialOpen?: boolean
+  defaultOpen?: boolean
   width?: string
   height?: string
-  // open?: boolean
   children?: JSXElement
   /**
    * 垂直居中展示 Modal
@@ -31,6 +30,10 @@ export interface ModalProps {
   closeIcon?: boolean
   footer?: boolean | ((modal: ModalInstance) => JSXElement)
   /**
+   * 关闭时销毁 Modal 里的子元素	
+   */
+  destroyOnClose?: boolean
+  /**
    * 返回 true，会自动关闭 modal
    */
   onOk?: () => boolean | Promise<boolean>
@@ -46,18 +49,22 @@ export interface MethodProps
 
 function Modal(_props: ModalProps) {
   const props = mergeProps({ footer: true }, _props)
-  const [open, setOpen] = createSignal(props.initialOpen ?? false)
-  const close = () => {
-    setOpen(false)
-    props.afterClose?.()
-  }
+  const [open, setOpen] = createSignal(props.defaultOpen ?? false)
+  const [hide, setHide] = createSignal(false)
 
   const instance: ModalInstance = {
     open() {
       setOpen(true)
+      setHide(false)
     },
     close() {
-      setOpen(false)
+      untrack(() => {
+        if (props.destroyOnClose) {
+          setOpen(false)
+        } else {
+          setHide(true)
+        }
+      })
     },
   }
   untrack(() => {
@@ -65,6 +72,11 @@ function Modal(_props: ModalProps) {
       props.ref?.(instance)
     }
   })
+
+  const close = () => {
+    instance.close()
+    props.afterClose?.()
+  }
 
   const [confirmLoading, setConfirmLoading] = createSignal(false)
 
@@ -81,6 +93,7 @@ function Modal(_props: ModalProps) {
               close()
             }
           }}
+          style={{ display: hide() ? 'none' : undefined }}
         >
           <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
             <div
@@ -168,7 +181,7 @@ Modal.warning = (props: MethodProps) => {
           </>
         }
         children={<div class="ant-ml-34px">{props.children}</div>}
-        initialOpen
+        defaultOpen
         afterClose={() => {
           document.body.removeChild(div)
           dispose()
