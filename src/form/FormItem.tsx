@@ -50,11 +50,13 @@ const FormItem: Component<FormItemProps> = props => {
 
   return (
     <div class={cs('ant-[display:table-row]', props.class)} style={props.style}>
-      <span class="ant-[display:table-cell] ant-h-32px ant-leading-32px ant-pb-16px ant-pr-8px ant-text-right">
-        <Show when={props.required}>
+      <span class="ant-[display:table-cell] ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-pb-16px ant-text-right">
+        <Show when={!isNil(props.required)}>
           <span class="ant-mr-4px ant-text-[var(--error-color)]">*</span>
         </Show>
-        <label>{props.label}</label>
+        <Show when={!isNil(props.label)}>
+          <label>{props.label}</label>
+        </Show>
       </span>
 
       <div class="ant-[display:table-cell] ant-w-full ant-pb-16px">
