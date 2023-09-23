@@ -16,6 +16,7 @@ export interface FormProps<T extends {} = {}> {
    */
   layout?: 'horizontal' | 'vertical' | 'inline'
   children: JSXElement
+  initialValues?: T
 }
 
 function Form<T extends {} = {}>(_props: FormProps<T>) {
@@ -23,7 +24,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   const rulesDict: Record<string, Schema[]> = {}
   const setErrMsgDict: Record<string, Setter<string>> = {}
 
-  const values = {} as T
+  const values = props.initialValues ?? ({} as T)
   const formInstance: FormInstance<T> = {
     async validateFields() {
       const promises = Object.entries(rulesDict).flatMap(([name, rules]) => {
@@ -43,7 +44,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
           values,
         }
       }
-      return values
+      return values as T
     },
     setFieldValue(name, value) {
       set(values, name, value)
@@ -63,7 +64,9 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
         e.preventDefault()
       }}
     >
-      <Context.Provider value={{ formInstance, rulesDict, setErrMsgDict }}>
+      <Context.Provider
+        value={{ formInstance, rulesDict, setErrMsgDict, initialValues: props.initialValues as {} }}
+      >
         {props.children}
       </Context.Provider>
     </form>

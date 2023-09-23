@@ -7,7 +7,7 @@ import {
   untrack,
   createSignal,
 } from 'solid-js'
-import { isNil } from 'lodash-es'
+import { get, isNil } from 'lodash-es'
 import { Dynamic } from 'solid-js/web'
 import cs from 'classnames'
 import { type Schema } from 'yup'
@@ -31,7 +31,7 @@ export interface FormItemProps {
 }
 
 const FormItem: Component<FormItemProps> = props => {
-  const { formInstance, rulesDict, setErrMsgDict } = useContext(Context)
+  const { formInstance, rulesDict, setErrMsgDict, initialValues } = useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
 
   untrack(() => {
@@ -62,7 +62,7 @@ const FormItem: Component<FormItemProps> = props => {
       <div class="ant-[display:table-cell] ant-w-full ant-pb-16px">
         <Dynamic
           component={props.component}
-          defaultValue={props.initialValue}
+          defaultValue={props.initialValue ?? get(initialValues, props.name!)}
           status={errMsg() ? 'error' : undefined}
           onChange={(value: any) => {
             if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
