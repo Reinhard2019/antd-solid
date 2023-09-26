@@ -4,11 +4,13 @@ import {
   type JSX,
   Show,
   useContext,
-  untrack,
   createSignal,
+  onMount,
+  onCleanup,
 } from 'solid-js'
 import { get, isNil } from 'lodash-es'
 import { Dynamic } from 'solid-js/web'
+import { nanoid } from 'nanoid'
 import cs from 'classnames'
 import { type Schema } from 'yup'
 import Context from './context'
@@ -31,10 +33,12 @@ export interface FormItemProps {
 }
 
 const FormItem: Component<FormItemProps> = props => {
-  const { formInstance, rulesDict, setErrMsgDict, initialValues } = useContext(Context)
+  const { formInstance, rulesDict, setErrMsgDict, initialValues, setItemWidthDict, maxItemWidth } =
+    useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
+  const id = nanoid()
 
-  untrack(() => {
+  onMount(() => {
     if (isNil(props.name)) return
 
     if (!isNil(props.initialValue)) {
@@ -48,19 +52,62 @@ const FormItem: Component<FormItemProps> = props => {
     setErrMsgDict[props.name] = setErrMsg
   })
 
-  return (
-    <div class={cs('ant-[display:table-row]', props.class)} style={props.style}>
-      <span class="ant-[display:table-cell] ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-pb-16px ant-text-right ant-[white-space:nowrap]">
-        <Show when={!isNil(props.required)}>
-          <span class="ant-mr-4px ant-text-[var(--error-color)]">*</span>
-        </Show>
-        <Show when={!isNil(props.label)}>
-          <label>{props.label}</label>
-        </Show>
-      </span>
+  let label: HTMLLabelElement
+  onMount(() => {
+    const resizeObserver = new ResizeObserver(entries => {
+      const [entry] = entries
+      // Firefox implements `borderBoxSize` as a single content rect, rather than an array
+      const borderBoxSize: ResizeObserverSize = Array.isArray(entry.borderBoxSize)
+        ? entry.borderBoxSize[0]
+        : entry.borderBoxSize
+      setItemWidthDict(dict => ({
+        ...dict,
+        [id]: borderBoxSize.inlineSize,
+      }))
+    })
 
-      {/* TODO vertical-align:middle 并不是严格居中 */}
-      <div class="ant-[display:table-cell] ant-w-full ant-pb-16px ant-[vertical-align:middle]">
+    resizeObserver.observe(label)
+    
+    onCleanup(() => {
+      setItemWidthDict(dict => {
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete dict[id]
+        return { ...dict }
+      })
+      resizeObserver.disconnect()
+    })
+  })
+
+  const getLabel = (hidden?: boolean) => (
+    <label
+      class={cs(
+        'ant-shrink-0 ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-text-right ant-[white-space:nowrap]',
+        hidden && 'ant-absolute ant-opacity-0',
+      )}
+      {...hidden ? {
+        ref: (el) => {
+          label = el
+        }
+      }: {
+        style: { width: `${maxItemWidth() ?? 0}px` }
+      }}
+    >
+      <Show when={!isNil(props.required)}>
+        <span class="ant-mr-4px ant-text-[var(--error-color)]">*</span>
+      </Show>
+      <Show when={!isNil(props.label)}>
+        <label>{props.label}</label>
+      </Show>
+    </label>
+  )
+
+  return (
+    <div class={cs(props.class, 'ant-flex ant-items-center ant-mb-16px')} style={props.style}>
+      {/* 第一个 label 仅用于计算实际宽度 */}
+      {getLabel(true)}
+      {getLabel()}
+
+      <div class="ant-w-full">
         <Dynamic
           component={props.component}
           defaultValue={props.initialValue ?? get(initialValues, props.name!)}

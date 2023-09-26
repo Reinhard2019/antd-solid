@@ -1,4 +1,4 @@
-import { type Setter, createContext } from 'solid-js'
+import { type Setter, createContext, type Accessor } from 'solid-js'
 import { type FormInstance } from './Form'
 import { type Schema } from 'yup'
 
@@ -8,6 +8,8 @@ const Context = createContext(
     rulesDict: Record<string, Schema[]>
     setErrMsgDict: Record<string, Setter<string>>
     initialValues: {}
+    setItemWidthDict: Setter<Record<string, number>>
+    maxItemWidth: Accessor<number | undefined>
   },
 )
 

@@ -1,5 +1,13 @@
-import { type JSXElement, untrack, type Ref, mergeProps, type Setter } from 'solid-js'
-import { get, set } from 'lodash-es'
+import {
+  type JSXElement,
+  type Ref,
+  mergeProps,
+  type Setter,
+  onMount,
+  createSignal,
+  createMemo,
+} from 'solid-js'
+import { get, max, set } from 'lodash-es'
 import Context from './context'
 import { type Schema } from 'yup'
 
@@ -24,7 +32,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   const rulesDict: Record<string, Schema[]> = {}
   const setErrMsgDict: Record<string, Setter<string>> = {}
 
-  const values = props.initialValues ?? ({} as T)
+  const values = props.initialValues ? { ...props.initialValues } : ({} as T)
   const formInstance: FormInstance<T> = {
     async validateFields() {
       const promises = Object.entries(rulesDict).flatMap(([name, rules]) => {
@@ -51,21 +59,31 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
     },
   }
 
-  untrack(() => {
+  onMount(() => {
     if (typeof _props.ref === 'function') {
       _props.ref?.(formInstance)
     }
   })
 
+  // 存储 form item 的 dom 节点宽度
+  const [itemWidthDict, setItemWidthDict] = createSignal<Record<string, number>>({})
+  const maxItemWidth = createMemo(() => max(Object.values(itemWidthDict())))
+
   return (
     <form
-      class="ant-[display:table] ant-w-full"
       onSubmit={e => {
         e.preventDefault()
       }}
     >
       <Context.Provider
-        value={{ formInstance, rulesDict, setErrMsgDict, initialValues: props.initialValues as {} }}
+        value={{
+          formInstance,
+          rulesDict,
+          setErrMsgDict,
+          initialValues: props.initialValues as {},
+          setItemWidthDict,
+          maxItemWidth,
+        }}
       >
         {props.children}
       </Context.Provider>
