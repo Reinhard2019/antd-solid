@@ -13,3 +13,7 @@
   );
   --vp-home-hero-image-filter: blur(40px);
 }
+
+body {
+  font-size: 14px;
+}
