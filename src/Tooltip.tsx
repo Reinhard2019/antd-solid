@@ -189,7 +189,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           >
             <div
               class={cs(
-                'ant-p-12px ant-rounded-8px ant-box-content ant-overflow-hidden ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
+                'ant-px-8px ant-py-6px ant-rounded-8px ant-box-content ant-overflow-hidden ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
                 props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)] ant-text-white' : 'ant-bg-white',
               )}
               style={props.contentWrapStyle}
