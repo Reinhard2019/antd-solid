@@ -1,9 +1,10 @@
-import { type Component, createSignal, mergeProps, untrack } from 'solid-js'
+import { type Component, mergeProps, untrack } from 'solid-js'
 import { type ColorResult, SketchPicker, type Color, type RGBColor, type HSLColor } from 'react-color'
 import { reactToSolidComponent } from './utils/component'
 import Button from './Button'
 import Popover from './Popover'
 import { get, isNil } from 'lodash-es'
+import createControllableValue from './hooks/createControllableValue'
 
 const _SketchPicker = reactToSolidComponent(SketchPicker)
 
@@ -13,6 +14,7 @@ export interface ColorPickerProps {
    */
   type?: 'rgba' | 'hsla'
   defaultColor?: string
+  color?: string
   onChange?: (colorString: string, color: ColorResult) => void
 }
 
@@ -36,7 +38,10 @@ function colorStringify(color: Color | undefined) {
 
 const ColorPicker: Component<ColorPickerProps> = _props => {
   const props = mergeProps({ type: 'rgba' } as ColorPickerProps, _props)
-  const [color, setColor] = createSignal(props.defaultColor ?? 'black')
+  const [color, setColor] = createControllableValue(props, {
+    defaultValuePropName: 'defaultColor',
+    valuePropName: 'color',
+  })
 
   return (
     <Popover
