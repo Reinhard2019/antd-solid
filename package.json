@@ -8,7 +8,7 @@
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "node scripts/annotationNonProductionCode && vitepress build docs && node scripts/cancelAnnotationNonProductionCode",
-    "docs:preview": "vitepress preview docs",
+    "docs:preview": "vitepress preview docs --port 6000",
     "build": "rm -rf dist && NODE_ENV=production && npx rollup -c && npm run build:unocss",
     "build:unocss": "npx unocss './src/**' -o dist/index.css -m",
     "test": "vitest"
