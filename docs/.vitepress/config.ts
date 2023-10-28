@@ -23,19 +23,34 @@ export default defineConfig({
         ]
       },
       {
-        text: '数据展示',
-        items: [
-          { text: 'Table 表格', link: '/components/table' },
-        ]
-      },
-      {
         text: '数据录入',
         items: [
           { text: 'ColorPicker 颜色选择器', link: '/components/color-picker' },
+          { text: 'DatePicker 日期选择框', link: '/components/date-picker' },
           { text: 'Input 输入框', link: '/components/input' },
           { text: 'InputNumber 数字输入框', link: '/components/input-number' },
+          { text: 'Radio 单选框', link: '/components/radio' },
           { text: 'Form 表单', link: '/components/form' },
           { text: 'Select 选择器', link: '/components/select' },
+          { text: 'Switch 开关', link: '/components/switch' },
+        ]
+      },
+      {
+        text: '数据展示',
+        items: [
+          { text: 'Image 图片', link: '/components/image' },
+          { text: 'Popover 气泡卡片', link: '/components/popover' },
+          { text: 'Table 表格', link: '/components/table' },
+          { text: 'Tabs 标签页', link: '/components/tabs' },
+          { text: 'Tree 树形控件', link: '/components/tree' },
+        ]
+      },
+      {
+        text: '反馈',
+        items: [
+          { text: 'Modal 对话框', link: '/components/modal' },
+          { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
+          { text: 'Progress 进度条', link: '/components/progress' },
         ]
       },
     ],

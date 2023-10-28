@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Image 图片 {#title}
 
-提供颜色选取的组件。
+可预览的图片。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+单击图像可以放大显示。
 
-<Code path="color-picker/Base" />
+<Code path="image/Base" />
 
 ## API
 
-### InputNumber
+### Image
 
 <div class="vp-table">
 

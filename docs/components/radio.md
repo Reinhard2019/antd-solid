@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Radio 单选框 {#title}
 
-提供颜色选取的组件。
+单选框。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+最简单的用法。
 
-<Code path="color-picker/Base" />
+<Code path="radio/Base" />
 
 ## API
 
-### InputNumber
+### Radio
 
 <div class="vp-table">
 

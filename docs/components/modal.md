@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Modal 对话框 {#title}
 
-提供颜色选取的组件。
+模态对话框。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+基础弹框。
 
-<Code path="color-picker/Base" />
+<Code path="modal/Base" />
 
 ## API
 
-### InputNumber
+### Modal
 
 <div class="vp-table">
 

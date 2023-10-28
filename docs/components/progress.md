@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Progress 进度条 {#title}
 
-提供颜色选取的组件。
+展示操作的当前进度。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+标准的进度条。
 
-<Code path="color-picker/Base" />
+<Code path="progress/Base" />
 
 ## API
 
-### InputNumber
+### Progress
 
 <div class="vp-table">
 

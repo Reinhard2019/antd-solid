@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Switch 开关 {#title}
 
-提供颜色选取的组件。
+开关选择器。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+最简单的用法。
 
-<Code path="color-picker/Base" />
+<Code path="switch/Base" />
 
 ## API
 
-### InputNumber
+### Switch
 
 <div class="vp-table">
 

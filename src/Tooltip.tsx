@@ -131,7 +131,7 @@ const Tooltip: Component<TooltipProps> = _props => {
 
       switch (props.placement) {
         case 'top':
-          contentWrap.style.top = `${childrenRect.top}px`
+          contentWrap.style.top = `${childrenRect.top - arrowOffset}px`
           contentWrap.style.left = `${childrenRect.left + childrenRect.width / 2}px`
           contentWrap.style.transform = 'translate(-50%, -100%)'
           break
@@ -203,10 +203,10 @@ const Tooltip: Component<TooltipProps> = _props => {
                   'ant-w-8px ant-h-8px ant-rotate-45 ant-absolute',
                   props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)]' : 'ant-bg-white',
                   direction() === 'top' &&
-                    'ant-bottom-0 -ant-translate-x-1/2 -ant-translate-y-1/2 ant-[filter:drop-shadow(3px_2px_2px_rgba(0,0,0,0.08))]',
+                    'ant-bottom-0 -ant-translate-x-1/2 ant-translate-y-1/2 ant-[filter:drop-shadow(3px_2px_2px_rgba(0,0,0,0.08))]',
                   direction() === 'bottom' &&
                     'ant-top-0 -ant-translate-x-1/2 ant-translate-y-1/2 ant-[filter:drop-shadow(-3px_-2px_2px_rgba(0,0,0,0.08))]',
-                  (props.placement === 'top' || props.placement === 'bottom') && 'left-1/2',
+                  (props.placement === 'top' || props.placement === 'bottom') && 'ant-left-1/2',
                 )}
               />
             </Show>

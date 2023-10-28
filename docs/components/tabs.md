@@ -2,21 +2,21 @@
 outline: deep
 ---
 
-# ColorPicker 颜色选择器 {#title}
+# Tabs 标签页 {#title}
 
-提供颜色选取的组件。
+选项卡切换组件。
 
 ## 代码演示
 
-### 基本用法
+### 基本
 
-最简单的使用方法。
+默认选中第一项。
 
-<Code path="color-picker/Base" />
+<Code path="tabs/Base" />
 
 ## API
 
-### InputNumber
+### Tabs
 
 <div class="vp-table">
 
