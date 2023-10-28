@@ -8,6 +8,7 @@ export default defineConfig({
   description: "UI 库",
   cleanUrls: true,
   head: [['link', { rel: 'shortcut icon', href: 'https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png' }]],
+  appearance: false,
   themeConfig: {
     logo: 'https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png',
     nav: [
