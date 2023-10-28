@@ -106,7 +106,6 @@ onMounted(() => {
         window.SolidJsWeb = SolidJsWeb;
         window.React = React;
         window.ReactDOM = ReactDOM;
-        window.ReactColor = ReactColor;
         window.Nanoid = Nanoid;
         window.Antd = Antd;
         window.Classnames = Classnames;
