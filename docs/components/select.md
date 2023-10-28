@@ -8,24 +8,17 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './select/Base.tsx'
-import baseCode from './select/Base.tsx?raw'
-import allowClearComponent from './select/AllowClear.tsx'
-import allowClearCode from './select/AllowClear.tsx?raw '
-</script>
-
 ### 基本用法
 
 选择器的基础用法。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="select/Base" />
 
 ### 可清空
 
 注意只有选了值才能清空值。
 
-<Code :component="allowClearComponent" :code="allowClearCode" />
+<Code path="select/AllowClear" />
 
 ## API
 

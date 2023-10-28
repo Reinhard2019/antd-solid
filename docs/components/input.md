@@ -8,48 +8,35 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './input/Base.tsx'
-import baseCode from './input/Base.tsx?raw'
-import addonBeforeAndAfterComponent from './input/AddonBeforeAndAfter.tsx'
-import addonBeforeAndAfterCode from './input/AddonBeforeAndAfter.tsx?raw'
-import textAreaComponent from './input/TextArea.tsx'
-import textAreaCode from './input/TextArea.tsx?raw'
-import prefixAndSuffixComponent from './input/PrefixAndSuffix.tsx'
-import prefixAndSuffixCode from './input/PrefixAndSuffix.tsx?raw'
-import statusComponent from './input/Status.tsx'
-import statusCode from './input/Status.tsx?raw'
-</script>
-
 ### 基本用法
 
 基本用法。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="input/Base" />
 
 ### 前置/后置标签
 
 用于配置一些固定组合。
 
-<Code :component="addonBeforeAndAfterComponent" :code="addonBeforeAndAfterCode" />
+<Code path="input/AddonBeforeAndAfter" />
 
 ### 文本域
 
 用于多行输入。
 
-<Code :component="textAreaComponent" :code="textAreaCode" />
+<Code path="input/TextArea" />
 
 ### 前缀和后缀
 
 在输入框上添加前缀或后缀图标。
 
-<Code :component="prefixAndSuffixComponent" :code="prefixAndSuffixCode" />
+<Code path="input/PrefixAndSuffix" />
 
 ### 自定义状态
 
 使用 `status` 为 Input 添加状态，可选 `error` 或者 `warning`。
 
-<Code :component="statusComponent" :code="statusCode" />
+<Code path="input/Status" />
 
 ## API
 

@@ -10,16 +10,11 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './color-picker/Base.tsx'
-import baseCode from './color-picker/Base.tsx?raw'
-</script>
-
 ### 基本用法
 
 最简单的使用方法。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="color-picker/Base" />
 
 ## API
 

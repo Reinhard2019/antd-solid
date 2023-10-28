@@ -8,25 +8,17 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './button/Base.tsx'
-import baseCode from './button/Base.tsx?raw'
-
-import dangerComponent from './button/Danger.tsx'
-import dangerCode from './button/Danger.tsx?raw'
-</script>
-
 ### 按钮类型
 
 按钮有五种类型：主按钮、次按钮、虚线按钮、文本按钮和链接按钮。主按钮在同一个操作区域最多出现一次。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="button/Base" />
 
 ### 危险按钮
 
 在 4.0 之后，危险成为一种按钮属性而不是按钮类型。
 
-<Code :component="dangerComponent" :code="dangerCode" />
+<Code path="button/Danger" />
 
 ## API
 

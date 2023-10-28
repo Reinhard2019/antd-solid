@@ -4,8 +4,8 @@ import { ColorPicker } from 'antd-solid'
 const Base: Component = () => {
   return (
     <ColorPicker
-      onChange={value => {
-        console.log('onChange', value)
+      onChange={(value, hex) => {
+        console.log('onChange', value, hex)
       }}
     />
   )

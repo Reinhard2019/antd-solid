@@ -48,7 +48,9 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
+        '@': path.resolve(__dirname, '../../docs'),
         'antd-solid': path.resolve(__dirname, '../../src'),
+        'antd-solid-dist': path.resolve(__dirname, '../../dist'),
       },
     },
     plugins: [

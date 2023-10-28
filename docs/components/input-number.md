@@ -8,24 +8,17 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './input-number/Base.tsx'
-import baseCode from './input-number/Base.tsx?raw'
-import minMaxComponent from './input-number/MinMax.tsx'
-import minMaxCode from './input-number/MinMax.tsx?raw'
-</script>
-
 ### 基本用法
 
 数字输入框。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="input-number/Base" />
 
 ### 最小值 & 最大值
 
 你可以设定最小值和最大值。
 
-<Code :component="minMaxComponent" :code="minMaxCode" />
+<Code path="input-number/MinMax" />
 
 ## API
 

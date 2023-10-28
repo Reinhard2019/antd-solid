@@ -8,7 +8,6 @@ import {
   createMemo,
 } from 'solid-js'
 import cs from 'classnames'
-import './Button.css'
 
 interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElement> {
   type?: 'default' | 'primary' | 'dashed' | 'text' | 'link'

@@ -4,7 +4,7 @@ import { omit } from 'lodash-es'
 import { solidToReact } from './solid'
 import ReactToSolid from './ReactToSolid'
 import { ConfigProvider } from 'antd'
-import zhCN from 'antd/locale/zh_CN'
+import zhCN from './zh_CN'
 import { type ConfigProviderProps } from 'antd/es/config-provider'
 
 /**

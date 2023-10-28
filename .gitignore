@@ -4,7 +4,7 @@
 # dependencies
 node_modules
 
-es
+dist
 
 # System Files
 .DS_Store

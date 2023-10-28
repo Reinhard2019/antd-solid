@@ -8,16 +8,11 @@ outline: deep
 
 ## 代码演示
 
-<script lang="ts" setup>
-import baseComponent from './form/Base.tsx'
-import baseCode from './form/Base.tsx?raw'
-</script>
-
 ### 基本用法
 
 基本的表单数据域控制展示，包含布局、初始化、验证、提交。
 
-<Code :component="baseComponent" :code="baseCode" />
+<Code path="form/Base" />
 
 ## API
 
