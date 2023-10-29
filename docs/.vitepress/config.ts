@@ -17,9 +17,15 @@ export default defineConfig({
     ],
     sidebar: [
       {
-        text: '通用组件',
+        text: '通用',
         items: [
           { text: 'Button 按钮', link: '/components/button' },
+        ]
+      },
+      {
+        text: '布局',
+        items: [
+          { text: 'Compact 压缩', link: '/components/compact' },
         ]
       },
       {
