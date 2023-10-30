@@ -143,7 +143,6 @@ export default defineConfig({
     [
       /^ant-keyframes-(.*)(\[.*\])(\[.*\])$/,
       (match) => {
-        console.log('match', match)
         return `@keyframes ${match[1]} {
           from {
             ${match[2].slice(1, -1)};
