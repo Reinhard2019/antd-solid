@@ -179,7 +179,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             ref={contentWrap!}
             class={cs(
               'ant-z-1000 ant-fixed after:ant-content-empty',
-              props.arrow ? '[--padding:8px]' : '[--padding:4px]',
+              props.arrow ? 'ant-[--padding:8px]' : 'ant-[--padding:4px]',
               direction() === 'top' && 'ant-pb-[var(--padding)]',
               direction() === 'bottom' && 'ant-pt-[var(--padding)]',
             )}

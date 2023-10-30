@@ -126,7 +126,7 @@ export default defineConfig({
     },
   ],
   rules: [
-    ['rm-size-btn', { padding: 0, border: 'none', height: 'auto' }],
+    ['ant-rm-size-btn', { padding: 0, border: 'none', height: 'auto' }],
     [
       /^keyframes-spin$/,
       () => {
@@ -136,6 +136,20 @@ export default defineConfig({
           }
           to {
               transform: rotate(360deg);
+          }
+        }`
+      },
+    ],
+    [
+      /^ant-keyframes-(.*)(\[.*\])(\[.*\])$/,
+      (match) => {
+        console.log('match', match)
+        return `@keyframes ${match[1]} {
+          from {
+            ${match[2].slice(1, -1)};
+          }
+          to {
+            ${match[3].slice(1, -1)};
           }
         }`
       },

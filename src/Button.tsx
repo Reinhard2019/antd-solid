@@ -85,6 +85,7 @@ const Button: Component<ButtonProps> = props => {
         sizeClassMap[mergedProps.size!],
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'ant-opacity-65',
+        'ant-[--color:--light-primary-color]'
       )}
       style={mergedProps.style}
       onClick={e => {
@@ -101,10 +102,8 @@ const Button: Component<ButtonProps> = props => {
         ) {
           const div = document.createElement('div')
           div.className = cs(
-            'ant-absolute ant-inset-0 ant-rounded-inherit ant-[animation:button-border_linear_1s]',
-            props.danger
-              ? 'ant-[border:1px_solid_var(--light-error-color)]'
-              : 'ant-[border:1px_solid_var(--light-primary-color)]',
+            props.danger ? 'ant-[--color:var(--light-error-color)]' : 'ant-[--color:var(--light-primary-color)]',
+            'ant-absolute ant-inset-0 ant-rounded-inherit ant-[background:radial-gradient(var(--color),rgba(0,0,0,0))] ant-z--1 ant-keyframes-button-border[inset:0px][inset:-6px] ant-[animation:button-border_ease-out_0.3s]',
           )
           const onAnimationEnd = () => {
             div.remove()
