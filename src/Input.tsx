@@ -89,6 +89,10 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       onInput={e => {
         setValue(e.target.value)
         onChange?.(e as any)
+
+        if (Object.keys(props).includes('value')) {
+          e.target.value = value()
+        }
       }}
       onKeyDown={e => {
         if (e.key === 'Enter') {

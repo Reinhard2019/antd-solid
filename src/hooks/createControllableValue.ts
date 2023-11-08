@@ -45,18 +45,20 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
     _setValue(getValue() as any)
   })
 
-  const setValue: Setter<T> = (v => {
-    const newValue = _setValue(v)
+  const setValue = (v: T | undefined) => {
+    if (!isControlled()) {
+      _setValue(v as any)
+    }
 
     if (trigger) {
       const onChange = props[trigger]
       if (typeof onChange === 'function') {
-        onChange(newValue)
+        onChange(v)
       }
     }
 
-    return newValue
-  }) as Setter<T>
+    return v
+  }
 
   return [value, setValue] as Signal<T>
 }
