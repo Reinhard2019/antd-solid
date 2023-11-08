@@ -8,6 +8,7 @@ import {
   untrack,
   type JSX,
   Show,
+  onCleanup,
 } from 'solid-js'
 import cs from 'classnames'
 import { isNil } from 'lodash-es'
@@ -32,7 +33,10 @@ const Tabs: Component<TabsProps> = props => {
     left: '0px',
     width: '0px',
   })
-  const updateSelectedBarStyle = (el: HTMLElement) => {
+  const updateSelectedBarStyle = () => {
+    const el = navWrap.querySelector(':scope > .selected') as HTMLElement
+    if (!el) return
+  
     setSelectedBarStyle({
       left: `${el.offsetLeft}px`,
       width: `${el.clientWidth}px`,
@@ -41,7 +45,16 @@ const Tabs: Component<TabsProps> = props => {
 
   let navWrap: HTMLDivElement
   onMount(() => {
-    updateSelectedBarStyle(navWrap.children[0] as HTMLElement)
+    updateSelectedBarStyle()
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateSelectedBarStyle()
+    });
+
+    resizeObserver.observe(navWrap!)
+    onCleanup(() => {
+      resizeObserver.disconnect();
+    })
   })
 
   return (
@@ -59,11 +72,11 @@ const Tabs: Component<TabsProps> = props => {
               class={cs(
                 'ant-py-12px ant-cursor-pointer',
                 props.navItemClass,
-                isSelectedItem(item.key) && 'ant-text-[var(--primary-color)]',
+                isSelectedItem(item.key) && 'ant-text-[var(--primary-color)] selected',
               )}
-              onClick={e => {
+              onClick={() => {
                 setSelectedItem(item)
-                updateSelectedBarStyle(e.currentTarget)
+                updateSelectedBarStyle()
               }}
             >
               {item.label}
