@@ -25,7 +25,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     min: -Infinity,
     max: Infinity,
   }, _props)
-  const [{ onChange, onBlur }, inputProps] = splitProps(props, [
+  const [_, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
     'onChange',
@@ -39,7 +39,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     if (prev === v) return
 
     prev = v
-    onChange?.(prev)
+    props.onChange?.(prev)
   }
 
   const [value, setValue] = createSignal<number | string | null | undefined>(untrack(() => props.value ?? props.defaultValue))
@@ -114,9 +114,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
         updatePrev(newValueNum)
       }}
       onBlur={e => {
-        setValue(prev)
+        setValue(props.value ?? prev)
 
-        dispatchEventHandlerUnion(onBlur, e)
+        dispatchEventHandlerUnion(props.onBlur, e)
       }}
     />
   )
