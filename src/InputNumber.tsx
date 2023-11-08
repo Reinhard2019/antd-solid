@@ -50,18 +50,18 @@ const InputNumber: Component<InputNumberProps> = _props => {
   }))
 
   const add = (addon: number) => {
-    const newValue = setValue(v => {
-      if (isEmptyValue(v)) {
-        return clampValue(addon)
-      }
+    let newValue: number | null
+    if (isEmptyValue(value())) {
+      newValue = clampValue(addon)
+    } else {
+      const num = Number(value())
+      newValue = Number.isNaN(num) ? null : clampValue(num + addon)
+    }
 
-      const num = Number(v)
-      if (Number.isNaN(num)) {
-        return v
-      }
-      return clampValue(num + addon)
-    })
-    updatePrev(newValue as number | null)
+    if (!Object.keys(props).includes('value')) {
+      setValue(newValue)
+    }
+    updatePrev(newValue)
   }
   const up = () => {
     add(1)
