@@ -9,7 +9,7 @@ export interface SwitchProps {
 }
 
 const Switch: Component<SwitchProps> = props => {
-  const [checked, setChecked] = createControllableValue(props, {
+  const [checked, setChecked] = createControllableValue<boolean>(props, {
     defaultValuePropName: 'defaultChecked',
     valuePropName: 'checked',
   })
