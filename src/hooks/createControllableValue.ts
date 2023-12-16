@@ -1,4 +1,4 @@
-import { type Setter, type Signal, createSignal } from 'solid-js'
+import { type Signal, createSignal } from 'solid-js'
 import createUpdateEffect from './createUpdateEffect'
 
 export interface Options<T> {
@@ -45,19 +45,21 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
     _setValue(getValue() as any)
   })
 
-  const setValue = (v: T | undefined) => {
+  const setValue = (v: ((prev: T) => T) | T | undefined) => {
+    const newValue = typeof v === 'function'? (v as (prev: T) => T)(value()!) : v
+    
     if (!isControlled()) {
-      _setValue(v as any)
+      _setValue(newValue as any)
     }
 
     if (trigger) {
       const onChange = props[trigger]
       if (typeof onChange === 'function') {
-        onChange(v)
+        onChange(newValue)
       }
     }
 
-    return v
+    return newValue
   }
 
   return [value, setValue] as Signal<T>
