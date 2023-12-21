@@ -9,6 +9,7 @@ import {
   mergeProps,
   onCleanup,
   createMemo,
+  createSignal,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
@@ -40,7 +41,7 @@ export interface TooltipProps {
    * 默认: top
    */
   placement?: TooltipPlacement
-  contentWrapStyle?: JSX.CSSProperties
+  contentStyle?: JSX.CSSProperties
   content?: JSXElement | ((close: () => void) => JSXElement)
   children?: JSXElement
   open?: boolean
@@ -69,17 +70,16 @@ export const Content: Component<{
 const Tooltip: Component<TooltipProps> = _props => {
   const props = mergeProps(
     {
-      trigger: 'hover',
+      trigger: 'click',
       placement: 'top',
       mode: 'dark',
       arrow: true,
-    } as TooltipProps,
+    },
     _props,
   )
 
   const resolvedChildren = children(() => _props.children)
-  let contentWrap: HTMLDivElement
-  let arrow: HTMLDivElement
+  let content: HTMLDivElement
   const [open, setOpen] = createControllableValue(_props, {
     defaultValue: false,
     valuePropName: 'open',
@@ -104,10 +104,10 @@ const Tooltip: Component<TooltipProps> = _props => {
           onCleanup(() => {
             _children.removeEventListener('click', reverseOpen)
           })
-  
+
           useClickAway(
             () => setOpen(false),
-            () => compact([contentWrap, _children]),
+            () => compact([content, _children]),
           )
           break
         case 'focus':
@@ -122,92 +122,227 @@ const Tooltip: Component<TooltipProps> = _props => {
     })
   })
 
+  const [childrenRect, setChildrenRect] = createSignal(new DOMRect())
   createEffect(() => {
     if (open()) {
       const _children = resolvedChildren() as Element
-      const childrenRect = _children.getBoundingClientRect()
-      const pointAtCenter = typeof props.arrow === 'object' ? props.arrow.pointAtCenter : false
-      const arrowOffset = 8
-
-      switch (props.placement) {
-        case 'top':
-          contentWrap.style.top = `${childrenRect.top - arrowOffset}px`
-          contentWrap.style.left = `${childrenRect.left + childrenRect.width / 2}px`
-          contentWrap.style.transform = 'translate(-50%, -100%)'
-          break
-        case 'topRight':
-          contentWrap.style.top = `${childrenRect.top}px`
-          contentWrap.style.left = `${childrenRect.right}px`
-          contentWrap.style.transform = 'translate(-100%, -100%)'
-          if (arrow) arrow.style.right = `${arrowOffset}px`
-          break
-        case 'bottom':
-          contentWrap.style.top = `${childrenRect.top + childrenRect.height}px`
-          contentWrap.style.left = `${childrenRect.left + childrenRect.width / 2}px`
-          contentWrap.style.transform = 'translate(-50%, 0)'
-          break
-        case 'bottomLeft':
-          contentWrap.style.top = `${childrenRect.top + childrenRect.height}px`
-          contentWrap.style.left = `${childrenRect.left}px`
-          if (arrow) arrow.style.left = `${arrowOffset}px`
-          break
-        case 'bottomRight':
-          contentWrap.style.top = `${childrenRect.top + childrenRect.height}px`
-          contentWrap.style.left = `${childrenRect.right + (pointAtCenter ? arrowOffset : 0)}px`
-          contentWrap.style.transform = 'translate(-100%, 0)'
-          if (arrow) arrow.style.right = `${arrowOffset}px`
-          break
-      }
+      setChildrenRect(_children.getBoundingClientRect())
     }
   })
 
-  const direction = createMemo(() => {
-    if (props.placement?.startsWith('top')) return 'top'
-    if (props.placement?.startsWith('bottom')) return 'bottom'
-    if (props.placement?.startsWith('left')) return 'left'
-    if (props.placement?.startsWith('right')) return 'right'
+  const firstDirection = createMemo(() => {
+    if (props.placement.startsWith('bottom')) return 'bottom'
+    if (props.placement.startsWith('left')) return 'left'
+    if (props.placement.startsWith('right')) return 'right'
+    return 'top'
+  })
+
+  const secondDirection = createMemo(() => {
+    if (props.placement.endsWith('Left')) return 'left'
+    if (props.placement.endsWith('Right')) return 'right'
+    if (props.placement.endsWith('Top')) return 'top'
+    if (props.placement.endsWith('Bottom')) return 'bottom'
+    return 'center'
+  })
+
+  const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
+  const contentPositionStyle = createMemo(() => {
+    switch (props.placement) {
+      case 'top':
+        return {
+          top: `${childrenRect().top - arrowOffset()}px`,
+          left: `${childrenRect().left + childrenRect().width / 2}px`,
+          transform: 'translate(-50%, -100%)',
+        } as JSX.CSSProperties
+      case 'topLeft':
+        return {
+          top: `${childrenRect().top - arrowOffset()}px`,
+          left: `${childrenRect().left}px`,
+          transform: 'translate(0, -100%)',
+        } as JSX.CSSProperties
+      case 'topRight':
+        return {
+          top: `${childrenRect().top - arrowOffset()}px`,
+          left: `${childrenRect().right}px`,
+          transform: 'translate(-100%, -100%)',
+        } as JSX.CSSProperties
+      case 'bottom':
+        return {
+          top: `${childrenRect().bottom + arrowOffset()}px`,
+          left: `${childrenRect().left + childrenRect().width / 2}px`,
+          transform: 'translate(-50%, 0)',
+        } as JSX.CSSProperties
+      case 'bottomLeft':
+        return {
+          top: `${childrenRect().bottom + arrowOffset()}px`,
+          left: `${childrenRect().left}px`,
+        } as JSX.CSSProperties
+      case 'bottomRight':
+        return {
+          top: `${childrenRect().bottom + arrowOffset()}px`,
+          left: `${childrenRect().right}px`,
+          transform: 'translate(-100%, 0)',
+        } as JSX.CSSProperties
+      case 'left':
+        return {
+          top: `${childrenRect().top + childrenRect().height / 2}px`,
+          left: `${childrenRect().left - arrowOffset()}px`,
+          transform: 'translate(-100%, -50%)',
+        } as JSX.CSSProperties
+      case 'leftTop':
+        return {
+          top: `${childrenRect().top}px`,
+          left: `${childrenRect().left - arrowOffset()}px`,
+          transform: 'translate(-100%)',
+        } as JSX.CSSProperties
+      case 'leftBottom':
+        return {
+          top: `${childrenRect().bottom}px`,
+          left: `${childrenRect().left - arrowOffset()}px`,
+          transform: 'translate(-100%, -100%)',
+        } as JSX.CSSProperties
+      case 'right':
+        return {
+          top: `${childrenRect().top + childrenRect().height / 2}px`,
+          left: `${childrenRect().right + arrowOffset()}px`,
+          transform: 'translate(0, -50%)',
+        } as JSX.CSSProperties
+      case 'rightTop':
+        return {
+          top: `${childrenRect().top}px`,
+          left: `${childrenRect().right + arrowOffset()}px`,
+        } as JSX.CSSProperties
+      case 'rightBottom':
+        return {
+          top: `${childrenRect().bottom}px`,
+          left: `${childrenRect().right + arrowOffset()}px`,
+          transform: 'translate(0, -100%)',
+        } as JSX.CSSProperties
+    }
+  })
+  const arrowStyle = createMemo(() => {
+    switch (props.placement) {
+      case 'top':
+        return {
+          'border-top-color': 'var(--color)',
+          top: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        } as JSX.CSSProperties
+      case 'topLeft':
+        return {
+          'border-top-color': 'var(--color)',
+          top: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          left: '8px',
+        } as JSX.CSSProperties
+      case 'topRight':
+        return {
+          'border-top-color': 'var(--color)',
+          top: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          right: '8px',
+        } as JSX.CSSProperties
+      case 'bottom':
+        return {
+          'border-bottom-color': 'var(--color)',
+          bottom: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          left: '50%',
+          transform: 'translateX(-50%)',
+        } as JSX.CSSProperties
+      case 'bottomLeft':
+        return {
+          'border-bottom-color': 'var(--color)',
+          bottom: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          left: '8px',
+        } as JSX.CSSProperties
+      case 'bottomRight':
+        return {
+          'border-bottom-color': 'var(--color)',
+          bottom: '100%',
+          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+          right: '8px',
+        } as JSX.CSSProperties
+      case 'left':
+        return {
+          'border-left-color': 'var(--color)',
+          top: '50%',
+          right: 0,
+          transform: 'translate(100%, -50%)',
+        } as JSX.CSSProperties
+      case 'leftTop':
+        return {
+          'border-left-color': 'var(--color)',
+          top: '8px',
+          right: 0,
+          transform: 'translate(100%, 0)',
+        } as JSX.CSSProperties
+      case 'leftBottom':
+        return {
+          'border-left-color': 'var(--color)',
+          bottom: '8px',
+          right: 0,
+          transform: 'translate(100%, 0)',
+        } as JSX.CSSProperties
+      case 'right':
+        return {
+          'border-right-color': 'var(--color)',
+          top: '50%',
+          left: 0,
+          transform: 'translate(-100%, -50%)',
+        } as JSX.CSSProperties
+      case 'rightTop':
+        return {
+          'border-right-color': 'var(--color)',
+          top: '8px',
+          left: 0,
+          transform: 'translate(-100%, 0)',
+        } as JSX.CSSProperties
+      case 'rightBottom':
+        return {
+          'border-right-color': 'var(--color)',
+          bottom: '8px',
+          left: 0,
+          transform: 'translate(-100%, 0)',
+        } as JSX.CSSProperties
+    }
   })
 
   return (
     <>
-      {resolvedChildren}
+      {resolvedChildren()}
 
       <Show when={open()}>
         <Portal>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
-            ref={contentWrap!}
+            ref={content!}
             class={cs(
-              'ant-z-1000 ant-fixed after:ant-content-empty',
-              props.arrow ? 'ant-[--padding:8px]' : 'ant-[--padding:4px]',
-              direction() === 'top' && 'ant-pb-[var(--padding)]',
-              direction() === 'bottom' && 'ant-pt-[var(--padding)]',
+              'ant-z-1000 ant-fixed ant-absolute ant-px-8px ant-py-6px ant-rounded-8px ant-box-content ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
+              props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)] ant-text-white' : 'ant-bg-white',
             )}
+            style={{
+              ...contentPositionStyle(),
+              ...props.contentStyle,
+            }}
             onClick={e => {
               e.stopPropagation()
             }}
           >
-            <div
-              class={cs(
-                'ant-px-8px ant-py-6px ant-rounded-8px ant-box-content ant-overflow-hidden ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
-                props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)] ant-text-white' : 'ant-bg-white',
-              )}
-              style={props.contentWrapStyle}
-            >
-              <Content content={props.content} close={() => setOpen(false)} />
-            </div>
+            <Content content={props.content} close={() => setOpen(false)} />
+
             <Show when={props.arrow}>
               <div
-                ref={arrow!}
                 class={cs(
-                  'ant-w-8px ant-h-8px ant-rotate-45 ant-absolute',
-                  props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)]' : 'ant-bg-white',
-                  direction() === 'top' &&
-                    'ant-bottom-0 -ant-translate-x-1/2 ant-translate-y-1/2 ant-[filter:drop-shadow(3px_2px_2px_rgba(0,0,0,0.08))]',
-                  direction() === 'bottom' &&
-                    'ant-top-0 -ant-translate-x-1/2 ant-translate-y-1/2 ant-[filter:drop-shadow(-3px_-2px_2px_rgba(0,0,0,0.08))]',
-                  (props.placement === 'top' || props.placement === 'bottom') && 'ant-left-1/2',
+                  'ant-w-8px ant-h-8px ant-absolute ant-border-solid ant-border-4px ant-border-transparent',
                 )}
+                style={{
+                  '--color': props.mode === 'dark' ? 'rgba(0,0,0,0.85)' : 'white',
+                  ...arrowStyle(),
+                }}
               />
             </Show>
           </div>

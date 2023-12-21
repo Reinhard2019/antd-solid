@@ -53,7 +53,7 @@ const Select: Component<SelectProps> = props => {
       trigger={[]}
       placement="bottomLeft"
       arrow={false}
-      contentWrapStyle={{
+      contentStyle={{
         padding: 0,
       }}
       content={close => (
