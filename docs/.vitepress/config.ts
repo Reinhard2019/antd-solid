@@ -48,6 +48,7 @@ export default defineConfig({
           { text: 'Popover 气泡卡片', link: '/components/popover' },
           { text: 'Table 表格', link: '/components/table' },
           { text: 'Tabs 标签页', link: '/components/tabs' },
+          { text: 'Tooltip 文字提示', link: '/components/tooltip' },
           { text: 'Tree 树形控件', link: '/components/tree' },
         ]
       },
