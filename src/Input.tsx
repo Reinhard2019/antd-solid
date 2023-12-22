@@ -31,7 +31,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
 
 const statusClassDict = {
   default:
-    'ant-[border:1px_solid_var(--border-color)] focus-within:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
+    'ant-[border:1px_solid_var(--ant-color-border)] focus-within:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
   error:
     'ant-[border:1px_solid_var(--error-color)] hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
   warning:
@@ -109,7 +109,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={props.addonBefore}>
         <div
           class={cs(
-            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--border-color)] ant-border-r-0 ant-rounded-l-6px ant-text-14px',
+            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-r-0 ant-rounded-l-6px ant-text-14px',
             Compact.compactItemRounded0Class,
             Compact.compactItemRoundedLeftClass,
           )}
@@ -146,7 +146,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={props.addonAfter}>
         <div
           class={cs(
-            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--border-color)] ant-border-l-0 ant-rounded-r-6px ant-text-14px',
+            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-l-0 ant-rounded-r-6px ant-text-14px',
             Compact.compactItemRounded0Class,
             Compact.compactItemRoundedRightClass,
           )}

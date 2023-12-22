@@ -61,7 +61,8 @@
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "solid-js": "^1.7.8",
+    "solid-js": "^1.8.7",
+    "solid-transition-group": "^0.2.3",
     "yup": "^1.2.0"
   },
   "pnpm": {

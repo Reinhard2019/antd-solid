@@ -8,7 +8,7 @@ import {
   createMemo,
 } from 'solid-js'
 import Tooltip from './Tooltip'
-import { type ID } from './types'
+import { type Key } from './types'
 import createControllableValue from './hooks/createControllableValue'
 import cs from 'classnames'
 import { useClickAway } from './hooks'
@@ -16,12 +16,12 @@ import { isNil } from 'lodash-es'
 
 interface SelectOption {
   label: JSXElement
-  value: ID
+  value: Key
 }
 
 interface SelectProps {
-  value?: ID
-  onChange?: (value: ID) => void
+  value?: Key
+  onChange?: (value: Key) => void
   options: SelectOption[]
   placeholder?: string
   allowClear?: boolean
@@ -31,7 +31,7 @@ interface SelectProps {
 const Select: Component<SelectProps> = props => {
   let select: HTMLDivElement
 
-  const [value, setValue] = createControllableValue<ID | undefined>(props)
+  const [value, setValue] = createControllableValue<Key | undefined>(props)
   const selectedValue = createSelector(value)
   const selectedOption = createMemo(() => !isNil(value()) ? props.options.find(option => option.value === value()) : undefined)
 
@@ -79,7 +79,7 @@ const Select: Component<SelectProps> = props => {
     >
       <div
         ref={select!}
-        class={cs('ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--border-color)] ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
+        class={cs('ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--ant-color-border)] ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
         tabIndex="0"
         onClick={e => {
           setOpen(true)

@@ -1,12 +1,12 @@
 import { type JSXElement, For } from 'solid-js'
 
-export interface Column<R extends {}> {
+export interface TableColumn<R extends {}> {
   title: JSXElement
   render: (row: R) => JSXElement
 }
 
 export interface TableProps<R extends {}> {
-  columns: Array<Column<R>>
+  columns: Array<TableColumn<R>>
   dataSource: R[]
 }
 

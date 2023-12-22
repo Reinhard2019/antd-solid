@@ -25,7 +25,6 @@ export default defineConfig({
           --warning-color: #faad14;
           --color-warning-border-hover: #ffd666;
         
-          --border-color: #d9d9d9;
           --secondary-border-color: #f0f0f0;
         
           --light-color: rgba(0, 0, 0, 0.45);
@@ -37,7 +36,19 @@ export default defineConfig({
           --color-text-tertiary: rgba(0, 0, 0, 0.45);
           --color-text-quaternary: rgba(0, 0, 0, 0.25);
         
-          --light-bg-color: #fafafa;  
+          --light-bg-color: #fafafa;
+
+          --ant-color-border: #d9d9d9;
+
+          --ant-margin-sm: 12px;
+          --ant-padding-sm: 12px;
+
+          --ant-border-radius-lg: 8px;
+
+          --ant-color-text-heading: rgba(0, 0, 0, 0.88);
+          
+          --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);
+          --ant-collapse-header-padding: 12px 16px;
         
           font-size: 14px;
         }

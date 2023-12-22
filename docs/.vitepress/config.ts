@@ -44,6 +44,7 @@ export default defineConfig({
       {
         text: '数据展示',
         items: [
+          { text: 'Collapse 折叠面板', link: '/components/collapse' },
           { text: 'Image 图片', link: '/components/image' },
           { text: 'Popover 气泡卡片', link: '/components/popover' },
           { text: 'Table 表格', link: '/components/table' },

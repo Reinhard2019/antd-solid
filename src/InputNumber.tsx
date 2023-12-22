@@ -74,12 +74,12 @@ const InputNumber: Component<InputNumberProps> = _props => {
     <CommonInput
       {...inputProps}
       actions={
-        <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_var(--border-color)]">
+        <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_var(--ant-color-border)]">
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />
           </div>
           <div
-            class={`ant-[border-top:1px_solid_var(--border-color)] ${actionBtnClass}`}
+            class={`ant-[border-top:1px_solid_var(--ant-color-border)] ${actionBtnClass}`}
             onClick={down}
           >
             <div class="i-ant-design:down-outlined" />
