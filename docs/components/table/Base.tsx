@@ -1,12 +1,12 @@
 import { type Component } from 'solid-js'
-import { type Column, Table } from 'antd-solid'
+import { type TableColumn, Table } from 'antd-solid'
 
 interface Row {
   name: string
 }
 
 const Index: Component = () => {
-  const columns: Array<Column<Row>> = [
+  const columns: Array<TableColumn<Row>> = [
     {
       title: '动画',
       render(row) {
