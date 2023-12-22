@@ -215,14 +215,14 @@ function Tree<T extends {} = {}>(props: TreeProps<T>) {
     <TreeContext.Provider
       value={{
         selectedNodes,
-        setSelectedNodes,
+        setSelectedNodes: setSelectedNodes as unknown as Setter<Array<{}>>,
         draggableNode,
-        setDraggableNode,
+        setDraggableNode: setDraggableNode as unknown as Setter<{} | null>,
         draggableIndexes,
         setDraggableIndexes,
         isDraggable,
         targetNode,
-        setTargetNode,
+        setTargetNode: setTargetNode as unknown as Setter<{} | null>,
         targetIndexes,
         setTargetIndexes,
         isTarget,
