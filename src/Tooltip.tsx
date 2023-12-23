@@ -70,7 +70,7 @@ export const Content: Component<{
 const Tooltip: Component<TooltipProps> = _props => {
   const props = mergeProps(
     {
-      trigger: 'click',
+      trigger: 'hover',
       placement: 'top',
       mode: 'dark',
       arrow: true,
