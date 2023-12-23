@@ -1,4 +1,4 @@
-import { type JSXElement, type Component, For, Show } from 'solid-js'
+import { type JSX, type JSXElement, type Component, For, Show } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
 import { type Key } from '../types'
@@ -11,9 +11,11 @@ export interface CollapseItem {
 }
 
 export interface CollapseProps {
+  class?: string
   defaultActiveKey?: Key[]
   activeKey?: Key[]
   items: CollapseItem[]
+  style?: JSX.CSSProperties
 }
 
 const Collapse: Component<CollapseProps> = props => {
@@ -24,7 +26,13 @@ const Collapse: Component<CollapseProps> = props => {
   })
 
   return (
-    <div class="ant-rounded-[var(--ant-border-radius-lg)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-b-0">
+    <div
+      class={cs(
+        'ant-rounded-[var(--ant-border-radius-lg)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-b-0',
+        props.class,
+      )}
+      style={props.style}
+    >
       <For each={props.items}>
         {item => (
           <div class="ant-[border-bottom:1px_solid_var(--ant-color-border)] first:ant-rounded-t-[var(--ant-border-radius-lg)] last:ant-rounded-b-[var(--ant-border-radius-lg)] ant-cursor-pointer">
