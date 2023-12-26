@@ -6,7 +6,21 @@ import createControllableValue from '../hooks/createControllableValue'
 export interface SegmentedProps {
   block?: boolean
   disabled?: boolean
-  options: Array<string | number | { label: JSXElement; value: string; disabled?: boolean }>
+  options: Array<
+  | string
+  | number
+  | {
+    label: JSXElement
+    value: string
+    disabled?: boolean
+    onClick?: (
+      e: MouseEvent & {
+        currentTarget: HTMLDivElement
+        target: Element
+      },
+    ) => void
+  }
+  >
   value?: Key
   onChange?: (value: Key) => void
 }
@@ -51,9 +65,13 @@ const Segmented: Component<SegmentedProps> = props => {
                 isSelected(unWarpValue(item)) &&
                   'ant-bg-white ant-shadow-[var(--ant-box-shadow-tertiary)]',
                 props.block && 'ant-flex ant-justify-center',
-                isDisabledValue(item) && 'ant-[pointer-events:none] ant-text-[var(--ant-color-text-disabled)]',
+                isDisabledValue(item) &&
+                  'ant-[pointer-events:none] ant-text-[var(--ant-color-text-disabled)]',
               )}
-              onClick={() => setValue(unWarpValue(item))}
+              onClick={e => {
+                setValue(unWarpValue(item))
+                typeof item === 'object' && item.onClick?.(e)
+              }}
             >
               <Show
                 when={typeof item !== 'object'}
