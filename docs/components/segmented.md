@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="segmented/Block" />
 
+### 不可用
+
+Segmented 不可用。
+
+<Code path="segmented/Disabled" />
+
 ## API
 
 ### Segmented

@@ -1,20 +1,29 @@
-import { type Component, For, createSelector } from 'solid-js'
+import { type Component, For, createSelector, type JSXElement, Show } from 'solid-js'
 import cs from 'classnames'
 import { type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 
 export interface SegmentedProps {
   block?: boolean
-  options: string[] | number[]
+  disabled?: boolean
+  options: Array<string | number | { label: JSXElement; value: string; disabled?: boolean }>
   value?: Key
   onChange?: (value: Key) => void
 }
 
+const unWarpValue = (value: SegmentedProps['options'][0]) =>
+  typeof value === 'object' ? value.value : value
+
 const Segmented: Component<SegmentedProps> = props => {
   const [value, setValue] = createControllableValue<Key>(props, {
-    defaultValue: props.options[0],
+    defaultValue: unWarpValue(props.options[0]),
   })
   const isSelected = createSelector(value)
+
+  const isDisabledValue = (v: SegmentedProps['options'][0]) => {
+    if (props.disabled) return true
+    return typeof v === 'object' ? v.disabled : false
+  }
 
   return (
     <div
@@ -32,13 +41,27 @@ const Segmented: Component<SegmentedProps> = props => {
         {item => (
           <div
             class={cs(
-              'ant-rounded-[var(--ant-border-radius-sm)] ant-px-[var(--ant-padding-sm)] ant-cursor-pointer ant-leading-28px where:hover:ant-bg-[var(--ant-segmented-item-hover-bg)] where:active:ant-bg-[var(--ant-segmented-item-active-bg)]',
-              isSelected(item) && 'ant-bg-white ant-shadow-[var(--ant-box-shadow-tertiary)]',
-              props.block && 'ant-basis-0 ant-grow-1 ant-flex ant-justify-center',
+              props.block && 'ant-basis-0 ant-grow-1',
+              isDisabledValue(item) && 'ant-cursor-not-allowed',
             )}
-            onClick={() => setValue(item)}
           >
-            {item as string | number}
+            <div
+              class={cs(
+                'ant-rounded-[var(--ant-border-radius-sm)] ant-px-[var(--ant-padding-sm)] where:ant-cursor-pointer ant-leading-28px where:hover:ant-bg-[var(--ant-segmented-item-hover-bg)] where:active:ant-bg-[var(--ant-segmented-item-active-bg)]',
+                isSelected(unWarpValue(item)) &&
+                  'ant-bg-white ant-shadow-[var(--ant-box-shadow-tertiary)]',
+                props.block && 'ant-flex ant-justify-center',
+                isDisabledValue(item) && 'ant-[pointer-events:none] ant-text-[var(--ant-color-text-disabled)]',
+              )}
+              onClick={() => setValue(unWarpValue(item))}
+            >
+              <Show
+                when={typeof item !== 'object'}
+                fallback={typeof item === 'object' && item.label}
+              >
+                {item as string | number}
+              </Show>
+            </div>
           </div>
         )}
       </For>
