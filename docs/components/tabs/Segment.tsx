@@ -19,7 +19,7 @@ const App: Component = () => {
       children: 'Content of Tab Pane 3',
     },
   ]
-  return <Tabs items={items} />
+  return <Tabs type="segment" items={items} />
 }
 
 export default App

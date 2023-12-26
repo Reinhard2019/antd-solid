@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="tabs/Base" />
 
+### 分段
+
+分段类型的标签页。
+
+<Code path="tabs/Segment" />
+
 ## API
 
 ### Tabs
@@ -22,5 +28,6 @@ outline: deep
 
 | 参数      | 说明 | 类型 | 默认值
 | ----------- | ----------- | ----------- | ----------- |
+| type | 页签的基本样式，可选 `line`、`segment` 类型 | string | `line` |
 
 </div>
