@@ -48,7 +48,11 @@ const Tabs: Component<TabsProps> = _props => {
     left: '0px',
     width: '0px',
   })
+
+  let nav: HTMLDivElement | undefined
   const updateSelectedBarStyle = () => {
+    if (!nav) return
+
     const el = nav.querySelector(':scope > .selected') as HTMLElement
     if (!el) return
 
@@ -57,16 +61,16 @@ const Tabs: Component<TabsProps> = _props => {
       width: `${el.clientWidth}px`,
     })
   }
-
-  let nav: HTMLDivElement
   onMount(() => {
+    if (!nav) return
+    
     updateSelectedBarStyle()
 
     const resizeObserver = new ResizeObserver(() => {
       updateSelectedBarStyle()
     })
 
-    resizeObserver.observe(nav!)
+    resizeObserver.observe(nav)
     onCleanup(() => {
       resizeObserver.disconnect()
     })
