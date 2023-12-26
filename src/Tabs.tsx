@@ -21,8 +21,9 @@ export interface Tab {
 
 export interface TabsProps {
   class?: string
-  navWrapClass?: string
+  navClass?: string
   navItemClass?: string
+  contentClass?: string
   items: Tab[]
 }
 
@@ -34,7 +35,7 @@ const Tabs: Component<TabsProps> = props => {
     width: '0px',
   })
   const updateSelectedBarStyle = () => {
-    const el = navWrap.querySelector(':scope > .selected') as HTMLElement
+    const el = nav.querySelector(':scope > .selected') as HTMLElement
     if (!el) return
   
     setSelectedBarStyle({
@@ -43,7 +44,7 @@ const Tabs: Component<TabsProps> = props => {
     })
   }
 
-  let navWrap: HTMLDivElement
+  let nav: HTMLDivElement
   onMount(() => {
     updateSelectedBarStyle()
 
@@ -51,19 +52,19 @@ const Tabs: Component<TabsProps> = props => {
       updateSelectedBarStyle()
     });
 
-    resizeObserver.observe(navWrap!)
+    resizeObserver.observe(nav!)
     onCleanup(() => {
       resizeObserver.disconnect();
     })
   })
 
   return (
-    <div class={cs(props.class, 'ant-grid ant-[grid-template-rows:auto_1fr]')}>
+    <div class={props.class}>
       <div
-        ref={navWrap!}
+        ref={nav!}
         class={cs(
-          'ant-flex ant-gap-32px ant-[border-bottom:solid_1px_rgba(5,5,5,0.1)] ant-relative',
-          props.navWrapClass,
+          'ant-mb-16px ant-flex ant-gap-32px ant-[border-bottom:solid_1px_rgba(5,5,5,0.1)] ant-relative',
+          props.navClass,
         )}
       >
         <For each={props.items}>
@@ -92,7 +93,7 @@ const Tabs: Component<TabsProps> = props => {
       </div>
 
       <Show when={!isNil(selectedItem()?.children)}>
-        <div class="ant-px-12px ant-py-16px ant-overflow-auto">{selectedItem()?.children}</div>
+        <div class={props.contentClass}>{selectedItem()?.children}</div>
       </Show>
     </div>
   )
