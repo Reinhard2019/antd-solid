@@ -48,6 +48,7 @@ export default defineConfig({
           { text: 'Empty 空状态', link: '/components/empty' },
           { text: 'Image 图片', link: '/components/image' },
           { text: 'Popover 气泡卡片', link: '/components/popover' },
+          { text: 'Segmented 分段控制器', link: '/components/segmented' },
           { text: 'Table 表格', link: '/components/table' },
           { text: 'Tabs 标签页', link: '/components/tabs' },
           { text: 'Tooltip 文字提示', link: '/components/tooltip' },

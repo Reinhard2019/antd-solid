@@ -42,12 +42,18 @@ export default defineConfig({
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
 
+          --ant-color-bg-layout: #f5f5f5;
+
           --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
           --ant-margin-xl: 32px;
 
           --ant-padding-sm: 12px;
 
+          --ant-box-shadow-tertiary: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
+
+          --ant-border-radius-sm: 4px;
+          --ant-border-radius: 6px;
           --ant-border-radius-lg: 8px;
 
           --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);

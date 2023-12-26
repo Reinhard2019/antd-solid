@@ -36,5 +36,7 @@ export { default as Compact } from './Compact'
 export type { CollapseProps, CollapseItem } from './Collapse'
 export { default as Collapse } from './Collapse'
 export { default as Empty } from './Empty'
+export type { SegmentedProps } from './Segmented'
+export { default as Segmented } from './Segmented'
 
 export { message } from 'antd'
