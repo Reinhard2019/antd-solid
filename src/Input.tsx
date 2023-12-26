@@ -33,7 +33,7 @@ const statusClassDict = {
   default:
     'ant-[border:1px_solid_var(--ant-color-border)] focus-within:ant-border-[var(--primary-color)] hover:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
   error:
-    'ant-[border:1px_solid_var(--error-color)] hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+    'ant-[border:1px_solid_var(--ant-color-error)] hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
   warning:
     'ant-[border:1px_solid_var(--warning-color)] hover:ant-border-[var(--color-warning-border-hover)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
 }

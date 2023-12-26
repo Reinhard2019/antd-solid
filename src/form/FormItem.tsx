@@ -93,7 +93,7 @@ const FormItem: Component<FormItemProps> = props => {
       }}
     >
       <Show when={!isNil(props.required)}>
-        <span class="ant-mr-4px ant-text-[var(--error-color)]">*</span>
+        <span class="ant-mr-4px ant-text-[var(--ant-color-error)]">*</span>
       </Show>
       <Show when={!isNil(props.label)}>
         <label>{props.label}</label>
@@ -129,7 +129,7 @@ const FormItem: Component<FormItemProps> = props => {
         />
 
         <Show when={errMsg()}>
-          <div class="ant-text-[var(--error-color)]">{errMsg()}</div>
+          <div class="ant-text-[var(--ant-color-error)]">{errMsg()}</div>
         </Show>
       </div>
     </div>

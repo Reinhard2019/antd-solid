@@ -15,7 +15,6 @@ export default defineConfig({
           --active-bg-color: #d9f7be;
           --hover-bg-color: rgba(0,0,0,.04);
         
-          --error-color: #ff4d4f;
           --light-error-color: #ff7875;
           --dark-error-color: #d9363e;
         
@@ -30,13 +29,13 @@ export default defineConfig({
           --light-color: rgba(0, 0, 0, 0.45);
           --dark-color: rgba(0, 0, 0, 0.88);
         
-        
           --color-text-secondary: rgba(0, 0, 0, 0.65);
           --color-text-tertiary: rgba(0, 0, 0, 0.45);
           --color-text-quaternary: rgba(0, 0, 0, 0.25);
         
           --light-bg-color: #fafafa;
 
+          --ant-color-error: #ff4d4f;
           --ant-color-text: rgba(0, 0, 0, 0.88);
           --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);

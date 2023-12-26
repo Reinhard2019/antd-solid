@@ -38,35 +38,35 @@ const typeClassMap = {
     cs(
       'ant-bg-white',
       danger
-        ? 'ant-[border:1px_solid_var(--error-color)] ant-text-[var(--error-color)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
+        ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
         : 'ant-[border:1px_solid_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
     ),
   primary: (danger: boolean) =>
     cs(
       'ant-border-none ant-text-white',
       danger
-        ? 'ant-bg-[var(--error-color)] hover:ant-bg-[var(--light-error-color)] active:ant-bg-[var(--dark-error-color)]'
+        ? 'ant-bg-[var(--ant-color-error)] hover:ant-bg-[var(--light-error-color)] active:ant-bg-[var(--dark-error-color)]'
         : 'ant-bg-[var(--primary-color)] hover:ant-bg-[var(--light-primary-color)] active:ant-bg-[var(--dark-primary-color)]',
     ),
   dashed: (danger: boolean) =>
     cs(
       ' ant-bg-white',
       danger
-        ? 'ant-[border:1px_dashed_var(--error-color)] ant-text-[var(--error-color)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
+        ? 'ant-[border:1px_dashed_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
         : 'ant-[border:1px_dashed_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
     ),
   text: (danger: boolean) =>
     cs(
       'ant-border-none ant-bg-transparent',
       danger
-        ? 'ant-text-[var(--error-color)] hover:ant-bg-[var(--error-bg-color)] active:ant-bg-[var(--error-bg-color)]'
+        ? 'ant-text-[var(--ant-color-error)] hover:ant-bg-[var(--error-bg-color)] active:ant-bg-[var(--error-bg-color)]'
         : 'ant-text-[var(--dark-color)] hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
     ),
   link: (danger: boolean) =>
     cs(
       'ant-border-none ant-bg-transparent',
       danger
-        ? 'ant-text-[var(--error-color)] hover:ant-text-[var(--light-error-color)] active:ant-text-[var(--dark-error-color)]'
+        ? 'ant-text-[var(--ant-color-error)] hover:ant-text-[var(--light-error-color)] active:ant-text-[var(--dark-error-color)]'
         : 'ant-text-[var(--primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-text-[var(--dark-primary-color)]',
     ),
 } as const
