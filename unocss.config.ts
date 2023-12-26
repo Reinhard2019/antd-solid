@@ -38,11 +38,13 @@ export default defineConfig({
           --light-bg-color: #fafafa;
 
           --ant-color-text: rgba(0, 0, 0, 0.88);
+          --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
 
           --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
+          --ant-margin-xl: 32px;
 
           --ant-padding-sm: 12px;
 

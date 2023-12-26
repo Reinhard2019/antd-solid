@@ -1,7 +1,10 @@
 import { type Component } from 'solid-js'
+import PRESENTED_IMAGE_SIMPLE from './PRESENTED_IMAGE_SIMPLE'
 import emptySvg from './assets/empty.svg?raw'
 
-const Empty: Component = () => {
+const Empty: Component & {
+  PRESENTED_IMAGE_SIMPLE: Component
+} = () => {
   return (
     <div>
       {/* eslint-disable-next-line solid/no-innerhtml */}
@@ -10,5 +13,7 @@ const Empty: Component = () => {
     </div>
   )
 }
+
+Empty.PRESENTED_IMAGE_SIMPLE = PRESENTED_IMAGE_SIMPLE
 
 export default Empty

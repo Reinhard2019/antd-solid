@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="empty/Base" />
 
+### 选择图片
+
+可以通过设置 `image` 为 `Empty.PRESENTED_IMAGE_SIMPLE` 选择另一种风格的图片。
+
+<Code path="empty/PRESENTED_IMAGE_SIMPLE" />
+
 ## API
 
 ### Empty
