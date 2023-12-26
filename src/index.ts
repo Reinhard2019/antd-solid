@@ -35,5 +35,6 @@ export type { TableProps, TableColumn } from './Table'
 export { default as Compact } from './Compact'
 export type { CollapseProps, CollapseItem } from './Collapse'
 export { default as Collapse } from './Collapse'
+export { default as Empty } from './Empty'
 
 export { message } from 'antd'

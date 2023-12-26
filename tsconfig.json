@@ -18,5 +18,6 @@
   "include": [
     "./src",
     "./docs",
+    "./global.d.ts"
   ],
 }

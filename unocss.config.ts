@@ -31,22 +31,23 @@ export default defineConfig({
           --dark-color: rgba(0, 0, 0, 0.88);
         
         
-          --color-text: rgba(0, 0, 0, 0.88);
           --color-text-secondary: rgba(0, 0, 0, 0.65);
           --color-text-tertiary: rgba(0, 0, 0, 0.45);
           --color-text-quaternary: rgba(0, 0, 0, 0.25);
         
           --light-bg-color: #fafafa;
 
+          --ant-color-text: rgba(0, 0, 0, 0.88);
+          --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
 
+          --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
+
           --ant-padding-sm: 12px;
 
           --ant-border-radius-lg: 8px;
 
-          --ant-color-text-heading: rgba(0, 0, 0, 0.88);
-          
           --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);
           --ant-collapse-header-padding: 12px 16px;
         
