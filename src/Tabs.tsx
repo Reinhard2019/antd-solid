@@ -52,7 +52,7 @@ const Tabs: Component<TabsProps> = _props => {
   const updateSelectedBarStyle = () => {
     if (!nav) return
 
-    const el = nav.querySelector(':scope > .selected')!
+    const el = nav.querySelector<HTMLElement>(':scope > .selected')
     if (!el) return
 
     setSelectedBarStyle({
