@@ -130,21 +130,6 @@ const Tooltip: Component<TooltipProps> = _props => {
     }
   })
 
-  const firstDirection = createMemo(() => {
-    if (props.placement.startsWith('bottom')) return 'bottom'
-    if (props.placement.startsWith('left')) return 'left'
-    if (props.placement.startsWith('right')) return 'right'
-    return 'top'
-  })
-
-  const secondDirection = createMemo(() => {
-    if (props.placement.endsWith('Left')) return 'left'
-    if (props.placement.endsWith('Right')) return 'right'
-    if (props.placement.endsWith('Top')) return 'top'
-    if (props.placement.endsWith('Bottom')) return 'bottom'
-    return 'center'
-  })
-
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
   const contentPositionStyle = createMemo(() => {
     switch (props.placement) {
