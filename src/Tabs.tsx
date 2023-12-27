@@ -7,20 +7,18 @@ import {
   onMount,
   untrack,
   type JSX,
-  Show,
   onCleanup,
   mergeProps,
   Switch,
   Match,
 } from 'solid-js'
 import cs from 'classnames'
-import { isNil } from 'lodash-es'
 import Segmented from './Segmented'
 
 export interface Tab {
   key: string
-  label: JSXElement
-  children?: JSXElement
+  label: () => JSXElement
+  children?: () => JSXElement
 }
 
 export interface TabsProps {
@@ -53,7 +51,7 @@ const Tabs: Component<TabsProps> = _props => {
   const updateSelectedBarStyle = () => {
     if (!nav) return
 
-    const el = nav.querySelector(':scope > .selected') as HTMLElement
+    const el = nav.querySelector(':scope > .selected')!
     if (!el) return
 
     setSelectedBarStyle({
@@ -63,7 +61,7 @@ const Tabs: Component<TabsProps> = _props => {
   }
   onMount(() => {
     if (!nav) return
-    
+
     updateSelectedBarStyle()
 
     const resizeObserver = new ResizeObserver(() => {
@@ -100,7 +98,7 @@ const Tabs: Component<TabsProps> = _props => {
                     updateSelectedBarStyle()
                   }}
                 >
-                  {item.label}
+                  {item.label()}
                 </div>
               )}
             </For>
@@ -115,14 +113,16 @@ const Tabs: Component<TabsProps> = _props => {
         <Match when={props.type === 'segment'}>
           <Segmented
             block
-            options={props.items.map(item => ({ label: item.label, value: item.key, onClick: () => setSelectedItem(item) }))}
+            options={props.items.map(item => ({
+              label: item.label,
+              value: item.key,
+              onClick: () => setSelectedItem(item),
+            }))}
           />
         </Match>
       </Switch>
 
-      <Show when={!isNil(selectedItem()?.children)}>
-        <div class={props.contentClass}>{selectedItem()?.children}</div>
-      </Show>
+      <div class={props.contentClass}>{selectedItem()?.children?.()}</div>
     </div>
   )
 }

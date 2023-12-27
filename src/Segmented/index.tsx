@@ -10,7 +10,7 @@ export interface SegmentedProps {
   | string
   | number
   | {
-    label: JSXElement
+    label: () => JSXElement
     value: string
     disabled?: boolean
     onClick?: (
@@ -79,7 +79,7 @@ const Segmented: Component<SegmentedProps> = props => {
             >
               <Show
                 when={typeof item !== 'object'}
-                fallback={typeof item === 'object' && item.label}
+                fallback={typeof item === 'object' && item.label()}
               >
                 {item as string | number}
               </Show>

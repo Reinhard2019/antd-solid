@@ -4,9 +4,9 @@ import { Segmented } from 'antd-solid'
 const App: Component = () => {
   const options = [
     'Daily',
-    { label: 'Weekly', value: 'Weekly', disabled: true },
+    { label: () => 'Weekly', value: 'Weekly', disabled: true },
     'Monthly',
-    { label: 'Quarterly', value: 'Quarterly', disabled: true },
+    { label: () => 'Quarterly', value: 'Quarterly', disabled: true },
     'Yearly',
   ]
 
