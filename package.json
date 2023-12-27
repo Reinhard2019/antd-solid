@@ -11,7 +11,8 @@
     "docs:preview": "vitepress preview docs",
     "build": "rm -rf dist && NODE_ENV=production && npx rollup -c && npm run build:unocss",
     "build:unocss": "npx unocss './src/**' -o dist/index.css -m",
-    "test": "vitest"
+    "test": "vitest",
+    "preinstall": "husky install"
   },
   "devDependencies": {
     "@iconify-json/ant-design": "^1.1.5",
@@ -40,7 +41,9 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-solid": "^0.12.1",
+    "husky": "^8.0.3",
     "jsdom": "^21.1.1",
+    "lint-staged": "^15.2.0",
     "rollup": "^3.21.0",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-import-css": "^3.2.1",
@@ -69,5 +72,11 @@
     "patchedDependencies": {
       "vitepress@1.0.0-rc.4": "patches/vitepress@1.0.0-rc.4.patch"
     }
+  },
+  "lint-staged": {
+    "**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   }
 }
