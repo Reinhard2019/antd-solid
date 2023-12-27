@@ -1,7 +1,6 @@
 import {
   type Component,
   For,
-  type JSXElement,
   createSelector,
   createSignal,
   onMount,
@@ -14,11 +13,13 @@ import {
 } from 'solid-js'
 import cs from 'classnames'
 import Segmented from './Segmented'
+import { type StringOrJSXElement } from './types'
+import { unwrapStringOrJSXElement } from './utils/solid'
 
 export interface Tab {
   key: string
-  label: () => JSXElement
-  children?: () => JSXElement
+  label: StringOrJSXElement
+  children?: StringOrJSXElement
 }
 
 export interface TabsProps {
@@ -98,7 +99,7 @@ const Tabs: Component<TabsProps> = _props => {
                     updateSelectedBarStyle()
                   }}
                 >
-                  {item.label()}
+                  {unwrapStringOrJSXElement(item.label)}
                 </div>
               )}
             </For>
@@ -122,7 +123,7 @@ const Tabs: Component<TabsProps> = _props => {
         </Match>
       </Switch>
 
-      <div class={props.contentClass}>{selectedItem()?.children?.()}</div>
+      <div class={props.contentClass}>{unwrapStringOrJSXElement(selectedItem()?.children)}</div>
     </div>
   )
 }

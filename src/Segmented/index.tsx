@@ -1,7 +1,8 @@
-import { type Component, For, createSelector, type JSX, type JSXElement, Show } from 'solid-js'
+import { type Component, For, createSelector, type JSX, Show } from 'solid-js'
 import cs from 'classnames'
-import { type Key } from '../types'
+import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface SegmentedProps {
   block?: boolean
@@ -10,7 +11,7 @@ export interface SegmentedProps {
   | string
   | number
   | {
-    label: () => JSXElement
+    label: StringOrJSXElement
     value: string
     disabled?: boolean
     onClick?: (
@@ -79,7 +80,7 @@ const Segmented: Component<SegmentedProps> = props => {
             >
               <Show
                 when={typeof item !== 'object'}
-                fallback={typeof item === 'object' && item.label()}
+                fallback={typeof item === 'object' && unwrapStringOrJSXElement(item.label)}
               >
                 {item as string | number}
               </Show>

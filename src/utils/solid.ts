@@ -1,7 +1,8 @@
 import React from 'react'
-import { type JSXElement , type JSX } from 'solid-js'
+import { type JSXElement, type JSX } from 'solid-js'
 import { isNil } from 'lodash-es'
 import SolidToReact from './SolidToReact'
+import { type StringOrJSXElement } from '../types'
 
 /**
  * 判断 JSXElement 是否是基础类型
@@ -44,5 +45,9 @@ export function dispatchEventHandlerUnion<T, E extends Event>(
     return
   }
 
-  handler[0](handler[1], e);
+  handler[0](handler[1], e)
+}
+
+export function unwrapStringOrJSXElement(value: StringOrJSXElement): JSXElement {
+  return typeof value === 'function' ? value() : value
 }
