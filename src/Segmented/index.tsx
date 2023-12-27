@@ -1,4 +1,4 @@
-import { type Component, For, createSelector, type JSXElement, Show } from 'solid-js'
+import { type Component, For, createSelector, type JSX, type JSXElement, Show } from 'solid-js'
 import cs from 'classnames'
 import { type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
@@ -23,6 +23,8 @@ export interface SegmentedProps {
   >
   value?: Key
   onChange?: (value: Key) => void
+  class?: string
+  style?: JSX.CSSProperties
 }
 
 const unWarpValue = (value: SegmentedProps['options'][0]) =>
@@ -44,11 +46,13 @@ const Segmented: Component<SegmentedProps> = props => {
       class={cs(
         'ant-bg-[var(--ant-color-bg-layout)] ant-rounded-[var(--ant-border-radius)] ant-p-2px',
         props.block ? 'ant-flex' : 'ant-inline-flex',
+        props.class,
       )}
       style={{
         '--ant-segmented-item-color': 'rgba(0, 0, 0, 0.65)',
         '--ant-segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
         '--ant-segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
+        ...props.style,
       }}
     >
       <For each={props.options}>
