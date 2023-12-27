@@ -11,15 +11,9 @@
     "jsx": "preserve",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "paths": {
-      "antd-solid": ["./src/index"],
-    },
     "skipLibCheck": true,
   },
   "include": [
     "src",
-    "docs",
-    "global.d.ts",
-    "unocss.config.ts"
   ],
 }

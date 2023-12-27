@@ -1,16 +1,16 @@
 {
   "name": "antd-solid",
-  "version": "0.0.7",
+  "version": "0.0.10",
   "description": "",
   "main": "src/index.ts",
-  "types": "src/index.ts",
+  "types": "es/index.d.ts",
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",
     "docs:build": "node scripts/annotationNonProductionCode && vitepress build docs && node scripts/cancelAnnotationNonProductionCode",
     "docs:preview": "vitepress preview docs",
-    "build": "rm -rf dist && NODE_ENV=production && npx rollup -c && npm run build:unocss",
-    "build:unocss": "npx unocss './src/**' -o dist/index.css -m",
+    "build": "rm -rf dist && rm -rf es && rm -rf css && NODE_ENV=production && npx rollup -c && npm run build:unocss",
+    "build:unocss": "npx unocss './src/**' -o css/index.css -m",
     "test": "vitest",
     "prepare": "husky install"
   },
@@ -81,6 +81,8 @@
   },
   "files": [
     "dist",
+    "es",
+    "css",
     "src"
   ]
 }

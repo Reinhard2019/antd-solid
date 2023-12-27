@@ -1,2 +1,4 @@
 **/*.cjs
 **/*.d.ts
+
+rollup.config.js
