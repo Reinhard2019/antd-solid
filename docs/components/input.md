@@ -32,6 +32,12 @@ outline: deep
 
 <Code path="input/PrefixAndSuffix" />
 
+### 不可用状态
+
+Input 不可用状态
+
+<Code path="input/Disabled" />
+
 ### 自定义状态
 
 使用 `status` 为 Input 添加状态，可选 `error` 或者 `warning`。

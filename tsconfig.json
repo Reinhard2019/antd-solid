@@ -19,6 +19,7 @@
   "include": [
     "./src",
     "./docs",
-    "./global.d.ts"
+    "./global.d.ts",
+    "./unocss.config.ts"
   ],
 }

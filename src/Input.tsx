@@ -30,12 +30,24 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
   }
 
 const statusClassDict = {
-  default:
-    'ant-[border:1px_solid_var(--ant-color-border)] focus-within:ant-border-[var(--primary-color)] hover:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
-  error:
-    'ant-[border:1px_solid_var(--ant-color-error)] hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
-  warning:
-    'ant-[border:1px_solid_var(--warning-color)] hover:ant-border-[var(--color-warning-border-hover)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+  default: (disabled: boolean) =>
+    cs(
+      'ant-[border:1px_solid_var(--ant-color-border)]',
+      !disabled &&
+        'hover:ant-border-[var(--primary-color)] focus-within:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
+    ),
+  error: (disabled: boolean) =>
+    cs(
+      'ant-[border:1px_solid_var(--ant-color-error)]',
+      !disabled &&
+        'hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+    ),
+  warning: (disabled: boolean) =>
+    cs(
+      'ant-[border:1px_solid_var(--warning-color)]',
+      !disabled &&
+        'hover:ant-border-[var(--color-warning-border-hover)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+    ),
 }
 
 export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
@@ -65,7 +77,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       !props.textarea && 'ant-h-32px',
       props.addonBefore ? 'ant-rounded-l-0' : Compact.compactItemRoundedLeftClass,
       props.addonAfter ? 'ant-rounded-r-0' : Compact.compactItemRoundedRightClass,
-      statusClassDict[props.status ?? 'default'],
+      statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
     ),
@@ -84,10 +96,13 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       class={cs(
         'ant-w-full ant-[outline:none] ant-text-14px',
         !hasPrefixOrSuffix() && inputWrapClass(),
+        inputProps.disabled &&
+          'ant-bg-[var(--ant-color-bg-container-disabled)] ant-cursor-not-allowed',
       )}
       value={value() ?? ''}
       onInput={e => {
         setValue(e.target.value)
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         onChange?.(e as any)
 
         if (Object.keys(props).includes('value')) {
@@ -96,9 +111,11 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
           onPressEnter?.(e as any)
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         onKeyDown?.(e as any)
       }}
     />

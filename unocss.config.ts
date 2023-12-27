@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/promise-function-async */
 import { defineConfig } from '@unocss/vite'
 import { presetMini } from '@unocss/preset-mini'
 import transformerVariantGroup from '@unocss/transformer-variant-group'
@@ -40,6 +39,7 @@ export default defineConfig({
           --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
+          --ant-color-bg-container-disabled: rgba(0, 0, 0, 0.04);
 
           --ant-color-bg-layout: #f5f5f5;
 
@@ -60,16 +60,16 @@ export default defineConfig({
         
           font-size: 14px;
         }
-      `
-    }
+      `,
+    },
   ],
   presets: [
     presetMini({
-      prefix: 'ant-'
+      prefix: 'ant-',
     }),
     presetIcons({
       collections: {
-        'ant-design': () => import('@iconify-json/ant-design').then(i => i.icons),
+        'ant-design': async () => await import('@iconify-json/ant-design').then(i => i.icons),
       },
       extraProperties: {
         display: 'inline-block',
@@ -161,7 +161,7 @@ export default defineConfig({
     ],
     [
       /^ant-keyframes-(.*)(\[.*\])(\[.*\])$/,
-      (match) => {
+      match => {
         return `@keyframes ${match[1]} {
           from {
             ${match[2].slice(1, -1)};
