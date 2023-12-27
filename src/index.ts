@@ -39,4 +39,6 @@ export { default as Empty } from './Empty'
 export type { SegmentedProps } from './Segmented'
 export { default as Segmented } from './Segmented'
 
+export { default as createControllableValue } from './hooks/createControllableValue'
+
 export { message } from 'antd'
