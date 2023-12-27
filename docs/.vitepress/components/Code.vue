@@ -29,7 +29,7 @@
 import { onMounted, ref } from 'vue'
 import Prism from 'prismjs'
 // @ts-ignore
-import antdCss from 'antd-solid-dist/index.css?raw'
+import antdCss from 'antd-solid-css/index.css?raw'
 // @ts-ignore
 import antdRaw from 'antd-solid-dist/index.umd.js?raw'
 import 'prismjs/themes/prism.css'
@@ -58,18 +58,18 @@ onMounted(() => {
 
     // 以下的代码在生产环境下会被注释掉
     // Non-production code start
-    // @ts-ignore
-    if (import.meta.env.MODE !== 'production') {
-      // @ts-ignore
-      const modules = import.meta.glob('../../components/*/**.tsx')
-      modules[`../../components/${props.path}.tsx`]().then(module => {
-        const App = module.default
-        import('solid-js/web').then(({ render, createComponent }) => {
-          render(() => createComponent(App, {}), app.value!)
-        })
-      })
-      return
-    }
+//     // @ts-ignore
+//     if (import.meta.env.MODE !== 'production') {
+//       // @ts-ignore
+//       const modules = import.meta.glob('../../components/*/**.tsx')
+//       modules[`../../components/${props.path}.tsx`]().then(module => {
+//         const App = module.default
+//         import('solid-js/web').then(({ render, createComponent }) => {
+//           render(() => createComponent(App, {}), app.value!)
+//         })
+//       })
+//       return
+//     }
     // Non-production code end
 
     // @ts-ignore
