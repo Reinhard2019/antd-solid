@@ -30,7 +30,7 @@ export interface ModalProps {
   closeIcon?: boolean
   footer?: boolean | ((modal: ModalInstance) => JSXElement)
   /**
-   * 关闭时销毁 Modal 里的子元素	
+   * 关闭时销毁 Modal 里的子元素
    */
   destroyOnClose?: boolean
   /**
@@ -51,11 +51,18 @@ function Modal(_props: ModalProps) {
   const props = mergeProps({ footer: true }, _props)
   const [open, setOpen] = createSignal(props.defaultOpen ?? false)
   const [hide, setHide] = createSignal(false)
+  let recoverBodyStyle: () => void
 
   const instance: ModalInstance = {
     open() {
       setOpen(true)
       setHide(false)
+
+      const originOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      recoverBodyStyle = () => {
+        document.body.style.overflow = originOverflow
+      }
     },
     close() {
       untrack(() => {
@@ -64,6 +71,8 @@ function Modal(_props: ModalProps) {
         } else {
           setHide(true)
         }
+
+        recoverBodyStyle()
       })
     },
   }
@@ -130,8 +139,11 @@ function Modal(_props: ModalProps) {
 
               <Show when={props.footer !== false}>
                 <div class="ant-mt-12px">
-                  <Show when={typeof props.footer !== 'function'} fallback={typeof props.footer === 'function' && props.footer(instance)}>
-                    <div class='ant-flex ant-gap-8px ant-justify-end'>
+                  <Show
+                    when={typeof props.footer !== 'function'}
+                    fallback={typeof props.footer === 'function' && props.footer(instance)}
+                  >
+                    <div class="ant-flex ant-gap-8px ant-justify-end">
                       <Button onClick={close}>取消</Button>
                       <Button
                         type="primary"
@@ -150,7 +162,7 @@ function Modal(_props: ModalProps) {
                           }
                         }}
                       >
-                      确定
+                        确定
                       </Button>
                     </div>
                   </Show>
