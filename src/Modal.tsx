@@ -51,7 +51,7 @@ function Modal(_props: ModalProps) {
   const props = mergeProps({ footer: true }, _props)
   const [open, setOpen] = createSignal(props.defaultOpen ?? false)
   const [hide, setHide] = createSignal(false)
-  let recoverBodyStyle: () => void
+  let cleanup: () => void
 
   const instance: ModalInstance = {
     open() {
@@ -60,8 +60,17 @@ function Modal(_props: ModalProps) {
 
       const originOverflow = document.body.style.overflow
       document.body.style.overflow = 'hidden'
-      recoverBodyStyle = () => {
+
+      const onKeyup = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          instance.close()
+        }
+      }
+      document.addEventListener('keyup', onKeyup)
+
+      cleanup = () => {
         document.body.style.overflow = originOverflow
+        document.removeEventListener('keyup', onKeyup)
       }
     },
     close() {
@@ -72,7 +81,8 @@ function Modal(_props: ModalProps) {
           setHide(true)
         }
 
-        recoverBodyStyle()
+        cleanup()
+        props.afterClose?.()
       })
     },
   }
@@ -81,11 +91,6 @@ function Modal(_props: ModalProps) {
       props.ref?.(instance)
     }
   })
-
-  const close = () => {
-    instance.close()
-    props.afterClose?.()
-  }
 
   const [confirmLoading, setConfirmLoading] = createSignal(false)
 
@@ -99,7 +104,7 @@ function Modal(_props: ModalProps) {
           )}
           onClick={() => {
             if (props.maskClosable ?? true) {
-              close()
+              instance.close()
             }
           }}
           style={{ display: hide() ? 'none' : undefined }}
@@ -126,7 +131,9 @@ function Modal(_props: ModalProps) {
                   class={cs(
                     'ant-rm-size-btn !ant-w-22px !ant-h-22px !ant-flex !ant-justify-center !ant-items-center ant-text-center ant-text-18px !ant-absolute !ant-top-16px !ant-right-16px ant-z-1000 ant-text-[rgba(0,0,0,.45)] hover:!ant-text-[rgba(0,0,0,.88)]',
                   )}
-                  onClick={close}
+                  onClick={() => {
+                    instance.close()
+                  }}
                 >
                   <span class="i-ant-design:close-outlined" />
                 </Button>
@@ -144,7 +151,13 @@ function Modal(_props: ModalProps) {
                     fallback={typeof props.footer === 'function' && props.footer(instance)}
                   >
                     <div class="ant-flex ant-gap-8px ant-justify-end">
-                      <Button onClick={close}>取消</Button>
+                      <Button
+                        onClick={() => {
+                          instance.close()
+                        }}
+                      >
+                        取消
+                      </Button>
                       <Button
                         type="primary"
                         loading={confirmLoading()}
