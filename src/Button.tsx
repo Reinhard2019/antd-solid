@@ -43,10 +43,10 @@ const typeClassMap = {
     ),
   primary: (danger: boolean) =>
     cs(
-      'ant-border-none ant-text-white',
+      'ant-text-white',
       danger
-        ? 'ant-bg-[var(--ant-color-error)] hover:ant-bg-[var(--light-error-color)] active:ant-bg-[var(--dark-error-color)]'
-        : 'ant-bg-[var(--primary-color)] hover:ant-bg-[var(--light-primary-color)] active:ant-bg-[var(--dark-primary-color)]',
+        ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-bg-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-bg-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-bg-[var(--dark-error-color)]'
+        : 'ant-[border:1px_solid_var(--primary-color)] ant-bg-[var(--primary-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-bg-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-bg-[var(--dark-primary-color)]',
     ),
   dashed: (danger: boolean) =>
     cs(
