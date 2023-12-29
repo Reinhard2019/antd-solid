@@ -67,7 +67,7 @@ const FormItem: Component<FormItemProps> = props => {
     })
 
     resizeObserver.observe(label)
-    
+
     onCleanup(() => {
       setItemWidthDict(dict => {
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
@@ -84,13 +84,15 @@ const FormItem: Component<FormItemProps> = props => {
         'ant-shrink-0 ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-text-right ant-[white-space:nowrap]',
         hidden && 'ant-absolute ant-opacity-0',
       )}
-      {...hidden ? {
-        ref: (el) => {
-          label = el
+      {...(hidden
+        ? {
+          ref: el => {
+            label = el
+          },
         }
-      }: {
-        style: { width: `${maxItemWidth() ?? 0}px` }
-      }}
+        : {
+          style: { width: `${maxItemWidth() ?? 0}px` },
+        })}
     >
       <Show when={!isNil(props.required)}>
         <span class="ant-mr-4px ant-text-[var(--ant-color-error)]">*</span>
