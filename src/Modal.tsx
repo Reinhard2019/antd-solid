@@ -6,6 +6,11 @@ import cs from 'classnames'
 export interface ModalInstance {
   open: () => void
   close: () => void
+  /**
+   * 与 close 相似，但关闭时会销毁 Modal 里的子元素
+   * @returns
+   */
+  destroy: () => void
 }
 
 export interface ModalProps {
@@ -29,10 +34,6 @@ export interface ModalProps {
    */
   closeIcon?: boolean
   footer?: boolean | ((modal: ModalInstance) => JSXElement)
-  /**
-   * 关闭时销毁 Modal 里的子元素
-   */
-  destroyOnClose?: boolean
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -74,16 +75,14 @@ function Modal(_props: ModalProps) {
       }
     },
     close() {
-      untrack(() => {
-        if (props.destroyOnClose) {
-          setOpen(false)
-        } else {
-          setHide(true)
-        }
-
-        cleanup()
-        props.afterClose?.()
-      })
+      setHide(true)
+      cleanup()
+      props.afterClose?.()
+    },
+    destroy() {
+      setOpen(false)
+      cleanup()
+      props.afterClose?.()
     },
   }
   untrack(() => {
