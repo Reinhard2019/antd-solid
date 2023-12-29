@@ -81,11 +81,12 @@ const Button: Component<ButtonProps> = props => {
       ref={mergedProps.ref}
       class={cs(
         'ant-relative ant-cursor-pointer',
+        'focus-visible:ant-[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:ant-[outline-offset:1px]',
         mergedProps.class,
         sizeClassMap[mergedProps.size!],
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'ant-opacity-65',
-        'ant-[--color:--light-primary-color]'
+        'ant-[--color:--light-primary-color]',
       )}
       style={mergedProps.style}
       onClick={e => {
@@ -102,7 +103,9 @@ const Button: Component<ButtonProps> = props => {
         ) {
           const div = document.createElement('div')
           div.className = cs(
-            props.danger ? 'ant-[--color:var(--light-error-color)]' : 'ant-[--color:var(--light-primary-color)]',
+            props.danger
+              ? 'ant-[--color:var(--light-error-color)]'
+              : 'ant-[--color:var(--light-primary-color)]',
             'ant-absolute ant-inset-0 ant-rounded-inherit ant-[background:radial-gradient(var(--color),rgba(0,0,0,0))] ant-z--1 ant-keyframes-button-border[inset:0px][inset:-6px] ant-[animation:button-border_ease-out_0.3s]',
           )
           const onAnimationEnd = () => {

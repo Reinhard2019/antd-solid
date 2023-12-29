@@ -34,6 +34,7 @@ export default defineConfig({
         
           --light-bg-color: #fafafa;
 
+          --ant-color-primary-border: #95de64;
           --ant-color-error: #ff4d4f;
           --ant-color-text: rgba(0, 0, 0, 0.88);
           --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
