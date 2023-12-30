@@ -1,4 +1,4 @@
-import { mergeProps, type Component, Switch, Match, Show } from 'solid-js'
+import { mergeProps, type Component, Switch, Match, Show, createMemo } from 'solid-js'
 import cs from 'classnames'
 
 export interface ProgressProps {
@@ -9,9 +9,8 @@ export interface ProgressProps {
   percent?: number
   /**
    * 状态
-   * 默认 'default'
    */
-  status?: 'default' | 'success' | 'error'
+  status?: 'normal' | 'success' | 'error'
   /**
    * 'line' 类型进度条的高度
    * 默认 8
@@ -28,12 +27,16 @@ const Progress: Component<ProgressProps> = _props => {
   const props = mergeProps(
     {
       percent: 0,
-      status: 'default',
       height: 8,
       showInfo: true,
-    } as Required<ProgressProps>,
+    },
     _props,
   )
+
+  const status = createMemo(() => {
+    if (props.status) return props.status
+    return props.percent >= 100 ? 'success' : 'normal'
+  })
 
   return (
     <div
@@ -45,22 +48,27 @@ const Progress: Component<ProgressProps> = _props => {
       <div
         class={cs(
           'ant-w-full ant-bg-[var(--ant-progress-remaining-color)]',
-          'before:ant-content-empty before:ant-block before:ant-bg-[var(--ant-color-primary)] before:ant-w-[var(--percent)] before:ant-h-full before:ant-rounded-inherit',
+          'before:ant-content-empty before:ant-block before:ant-bg-[var(--color)] before:ant-w-[var(--percent)] before:ant-h-full before:ant-rounded-inherit',
         )}
         style={{
           height: `${props.height}px`,
           'border-radius': `${props.height / 2}px`,
           '--percent': `${props.percent}%`,
+          '--color': {
+            normal: 'var(--ant-color-primary)',
+            success: 'var(--ant-color-success)',
+            error: 'var(--ant-color-error)',
+          }[status()],
         }}
       />
 
       <Show when={props.showInfo}>
         <span class="ant-shrink-0 ant-min-w-40px ant-ml-8px ant-text-center">
           <Switch fallback={`${props.percent}%`}>
-            <Match when={props.status === 'success' || props.percent >= 100}>
+            <Match when={status() === 'success'}>
               <span class="i-ant-design:check-circle-filled ant-text-[var(--ant-color-success)]" />
             </Match>
-            <Match when={props.status === 'error'}>
+            <Match when={status() === 'error'}>
               <span class="i-ant-design:close-circle-filled ant-text-[var(--ant-color-error)]" />
             </Match>
           </Switch>
