@@ -5,7 +5,7 @@ export interface Options<T> {
   defaultValue?: T
   defaultValuePropName?: string
   valuePropName?: string
-  trigger?: string | undefined
+  trigger?: string | null
 }
 
 export type Props = Record<string, any>
@@ -46,8 +46,8 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
   })
 
   const setValue = (v: ((prev: T) => T) | T | undefined) => {
-    const newValue = typeof v === 'function'? (v as (prev: T) => T)(value()!) : v
-    
+    const newValue = typeof v === 'function' ? (v as (prev: T) => T)(value()!) : v
+
     if (!isControlled()) {
       _setValue(newValue as any)
     }

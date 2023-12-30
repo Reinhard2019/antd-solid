@@ -39,20 +39,28 @@ const Radio: Component<RadioProps> & {
     defaultValue: false,
     defaultValuePropName: 'defaultChecked',
     valuePropName: 'checked',
-    trigger: undefined,
+    trigger: null,
   })
 
   return (
-    <label class="ant-inline-flex ant-gap-4px">
-      <input
-        checked={checked()}
-        value={props.value ?? ''}
-        type="radio"
-        onInput={e => {
-          setChecked(e.target.checked)
-          untrack(() => props.onChange?.(e))
-        }}
-      />
+    <label class="ant-inline-flex ant-gap-4px ant-cursor-pointer ant-inline-flex ant-items-center">
+      <span
+        class={cs(
+          'ant-w-16px ant-h-16px ant-rounded-50% ant-[border:1px_solid_var(--ant-color-border)]',
+          checked() && 'ant-[border:5px_solid_var(--primary-color)]',
+        )}
+      >
+        <input
+          class="ant-m-0 ant-hidden"
+          checked={checked()}
+          value={props.value ?? ''}
+          type="radio"
+          onInput={e => {
+            setChecked(e.target.checked)
+            untrack(() => props.onChange?.(e))
+          }}
+        />
+      </span>
       {props.children}
     </label>
   )
@@ -63,7 +71,7 @@ Radio.Button = props => {
     defaultValue: false,
     defaultValuePropName: 'defaultChecked',
     valuePropName: 'checked',
-    trigger: undefined,
+    trigger: null,
   })
 
   return (
@@ -97,7 +105,7 @@ Radio.Group = _props => {
     _props,
   )
   const [value, setValue] = createControllableValue<string>(props, {
-    trigger: undefined,
+    trigger: null,
   })
   const isChecked = createSelector(value)
 
@@ -117,7 +125,9 @@ Radio.Group = _props => {
             onChange={
               (e => {
                 setValue(option.value)
-                untrack(() => props.onChange?.(e))
+                untrack(() => {
+                  props.onChange?.(e)
+                })
               }) as JSX.ChangeEventHandler<HTMLInputElement, Event>
             }
           >
