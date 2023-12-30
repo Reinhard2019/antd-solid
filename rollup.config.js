@@ -4,6 +4,7 @@ import { babel } from '@rollup/plugin-babel'
 import { nodeResolve } from '@rollup/plugin-node-resolve'
 import terser from '@rollup/plugin-terser'
 import cleanup from 'rollup-plugin-cleanup'
+import postcss from 'rollup-plugin-postcss'
 import fs from 'fs'
 import path from 'path'
 
@@ -22,6 +23,18 @@ function readFileList(dir, filesList = []) {
 }
 
 const filesList = readFileList('./src')
+
+const commonPlugins = [
+  commonjs(),
+  babel({
+    extensions: ['.js', '.ts', '.jsx', '.tsx'],
+    presets: ['babel-preset-solid'],
+  }),
+  postcss({
+    extract: false,
+    use: ['sass'],
+  }),
+]
 
 export default [
   {
@@ -43,11 +56,7 @@ export default [
           },
         },
       }),
-      commonjs(),
-      babel({
-        extensions: ['.js', '.ts', '.jsx', '.tsx'],
-        presets: ['babel-preset-solid'],
-      }),
+      ...commonPlugins,
     ],
   },
   {
@@ -61,11 +70,7 @@ export default [
         // include: "src/**/*.ts+(|x)",
         exclude: ['**/*.test.[ts|tsx]'],
       }),
-      babel({
-        extensions: ['.js', '.ts', '.jsx', '.tsx'],
-        presets: ['babel-preset-solid'],
-      }),
-      commonjs(),
+      ...commonPlugins,
     ],
     external: ['uno.css'],
   },
@@ -93,14 +98,10 @@ export default [
         // include: "src/**/*.ts+(|x)",
         exclude: ['**/*.test.[ts|tsx]'],
       }),
-      babel({
-        extensions: ['.js', '.ts', '.jsx', '.tsx'],
-        presets: ['babel-preset-solid'],
-      }),
       nodeResolve({
         browser: true,
       }),
-      commonjs(),
+      ...commonPlugins,
       terser(),
       cleanup(),
     ],
