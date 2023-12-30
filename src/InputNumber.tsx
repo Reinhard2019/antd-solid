@@ -1,4 +1,12 @@
-import { type Component, createEffect, on, splitProps, untrack, createSignal, mergeProps } from 'solid-js'
+import {
+  type Component,
+  createEffect,
+  on,
+  splitProps,
+  untrack,
+  createSignal,
+  mergeProps,
+} from 'solid-js'
 import { CommonInput, type InputProps } from './Input'
 import { clamp, isNil } from 'lodash-es'
 import { dispatchEventHandlerUnion } from './utils/solid'
@@ -18,22 +26,20 @@ export interface InputNumberProps
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
 
 const actionBtnClass =
-  'ant-text-12px ant-flex ant-justify-center ant-items-center ant-h-1/2 ant-cursor-pointer ant-opacity-70 hover:ant-h-100% hover:ant-text-[var(--primary-color)] ant-transition-color ant-transition-height ant-transition-duration-500'
+  'ant-text-12px ant-flex ant-justify-center ant-items-center ant-h-1/2 ant-cursor-pointer ant-opacity-70 hover:ant-h-100% hover:ant-text-[var(--ant-color-primary)] ant-transition-color ant-transition-height ant-transition-duration-500'
 
 const InputNumber: Component<InputNumberProps> = _props => {
-  const props = mergeProps({
-    min: -Infinity,
-    max: Infinity,
-  }, _props)
-  const [_, inputProps] = splitProps(props, [
-    'defaultValue',
-    'value',
-    'onChange',
-    'onBlur',
-  ])
+  const props = mergeProps(
+    {
+      min: -Infinity,
+      max: Infinity,
+    },
+    _props,
+  )
+  const [_, inputProps] = splitProps(props, ['defaultValue', 'value', 'onChange', 'onBlur'])
 
   const clampValue = (v: number) => untrack(() => clamp(v, props.min, props.max))
-    
+
   let prev: number | null = null
   const updatePrev = (v: number | null) => {
     if (prev === v) return
@@ -42,12 +48,20 @@ const InputNumber: Component<InputNumberProps> = _props => {
     props.onChange?.(prev)
   }
 
-  const [value, setValue] = createSignal<number | string | null | undefined>(untrack(() => props.value ?? props.defaultValue))
-  createEffect(on(() => props.value, () => {
-    setValue(props.value)
-  }, {
-    defer: true
-  }))
+  const [value, setValue] = createSignal<number | string | null | undefined>(
+    untrack(() => props.value ?? props.defaultValue),
+  )
+  createEffect(
+    on(
+      () => props.value,
+      () => {
+        setValue(props.value)
+      },
+      {
+        defer: true,
+      },
+    ),
+  )
 
   const add = (addon: number) => {
     let newValue: number | null
@@ -104,7 +118,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
 
         let newValueNum: number | null = Number(newValue)
         if (Number.isNaN(newValueNum)) return
-        
+
         if (isEmptyValue(newValue)) {
           newValueNum = null
         } else {

@@ -34,7 +34,7 @@ const statusClassDict = {
     cs(
       'ant-[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
-        'hover:ant-border-[var(--primary-color)] focus-within:ant-border-[var(--primary-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
+        'hover:ant-border-[var(--ant-color-primary)] focus-within:ant-border-[var(--ant-color-primary)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
     ),
   error: (disabled: boolean) =>
     cs(
@@ -138,7 +138,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={hasPrefixOrSuffix()} fallback={inputJSX}>
         <div
           class={cs(
-            'ant-flex ant-items-center ant-w-full ant-relative ant-[--input-after-display:none] hover:ant-[--input-after-display:block] p:hover-child[input]:ant-border-[var(--primary-color)]',
+            'ant-flex ant-items-center ant-w-full ant-relative ant-[--input-after-display:none] hover:ant-[--input-after-display:block] p:hover-child[input]:ant-border-[var(--ant-color-primary)]',
             inputWrapClass(),
           )}
         >

@@ -45,7 +45,7 @@ const Progress: Component<ProgressProps> = _props => {
       <div
         class={cs(
           'ant-w-full ant-bg-[var(--ant-progress-remaining-color)]',
-          'before:ant-content-empty before:ant-block before:ant-bg-[var(--primary-color)] before:ant-w-[var(--percent)] before:ant-h-full before:ant-rounded-inherit',
+          'before:ant-content-empty before:ant-block before:ant-bg-[var(--ant-color-primary)] before:ant-w-[var(--percent)] before:ant-h-full before:ant-rounded-inherit',
         )}
         style={{
           height: `${props.height}px`,
@@ -58,7 +58,7 @@ const Progress: Component<ProgressProps> = _props => {
         <span class="ant-shrink-0 ant-min-w-40px ant-ml-8px ant-text-center">
           <Switch fallback={`${props.percent}%`}>
             <Match when={props.status === 'success' || props.percent >= 100}>
-              <span class="i-ant-design:check-circle-filled ant-text-[var(--primary-color)]" />
+              <span class="i-ant-design:check-circle-filled ant-text-[var(--ant-color-success)]" />
             </Match>
             <Match when={props.status === 'error'}>
               <span class="i-ant-design:close-circle-filled ant-text-[var(--ant-color-error)]" />

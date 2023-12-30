@@ -8,10 +8,6 @@ export default defineConfig({
     {
       getCSS: () => `
         :root {
-          --primary-color: #52c41a;
-          --light-primary-color: #95de64;
-          --dark-primary-color: #237804;
-          --active-bg-color: #d9f7be;
           --hover-bg-color: rgba(0,0,0,.04);
         
           --light-error-color: #ff7875;
@@ -34,8 +30,12 @@ export default defineConfig({
         
           --light-bg-color: #fafafa;
 
+          --ant-color-primary-active: #0958d9;
+          --ant-color-primary: #1677ff;
+          --ant-color-primary-hover: #4096ff;
           --ant-color-primary-border: #95de64;
           --ant-color-error: #ff4d4f;
+          --ant-color-success: #52c41a;
           --ant-color-text: rgba(0, 0, 0, 0.88);
           --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
@@ -70,6 +70,10 @@ export default defineConfig({
 
           --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);
           --ant-collapse-header-padding: 12px 16px;
+
+          --ant-select-option-selected-bg: #e6f4ff;
+          
+          --ant-tree-node-selected-bg: #e6f4ff;
         
           font-size: 14px;
         }

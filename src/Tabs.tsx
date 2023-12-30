@@ -92,7 +92,7 @@ const Tabs: Component<TabsProps> = _props => {
                   class={cs(
                     'ant-py-12px ant-cursor-pointer',
                     props.navItemClass,
-                    isSelectedItem(item.key) && 'ant-text-[var(--primary-color)] selected',
+                    isSelectedItem(item.key) && 'ant-text-[var(--ant-color-primary)] selected',
                   )}
                   onClick={() => {
                     setSelectedItem(item)
@@ -106,7 +106,7 @@ const Tabs: Component<TabsProps> = _props => {
 
             <div
               role={'selected-bar' as any}
-              class="ant-absolute ant-bottom-0 ant-bg-[var(--primary-color)] ant-h-2px ant-transition-left"
+              class="ant-absolute ant-bottom-0 ant-bg-[var(--ant-color-primary)] ant-h-2px ant-transition-left"
               style={selectedBarStyle()}
             />
           </div>

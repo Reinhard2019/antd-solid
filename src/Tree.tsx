@@ -98,7 +98,8 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
             <div
               class={cs(
                 'ant-flex ant-items-center ant-h-28px ant-pb-4px',
-                isDraggable(item()) && 'ant-[border:1px_solid_var(--primary-color)] ant-bg-white',
+                isDraggable(item()) &&
+                  'ant-[border:1px_solid_var(--ant-color-primary)] ant-bg-white',
                 draggableNode() && 'child[]:ant-pointer-events-none',
               )}
               draggable={draggable}
@@ -168,9 +169,9 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
                 class={cs(
                   'ant-h-full ant-leading-24px hover:ant-bg-[var(--hover-bg-color)] ant-rounded-1 ant-px-1 ant-cursor-pointer ant-relative',
                   props.blockNode && 'w-full',
-                  selectedNodes()?.includes(item()) && '!ant-bg-[var(--active-bg-color)]',
+                  selectedNodes()?.includes(item()) && '!ant-bg-[var(--ant-tree-node-selected-bg)]',
                   isTarget(item()) &&
-                    "before:ant-content-[''] before:ant-inline-block before:ant-w-8px before:ant-h-8px before:ant-absolute before:ant-bottom-0 before:ant-left-0 before:-ant-translate-x-full before:ant-translate-y-1/2 before:ant-rounded-1/2 before:ant-[border:2px_solid_var(--primary-color)] after:ant-content-[''] after:ant-inline-block after:ant-h-2px after:ant-absolute after:ant-left-0 after:ant-right-0 after:ant-bottom--1px after:ant-bg-[var(--primary-color)]",
+                    "before:ant-content-[''] before:ant-inline-block before:ant-w-8px before:ant-h-8px before:ant-absolute before:ant-bottom-0 before:ant-left-0 before:-ant-translate-x-full before:ant-translate-y-1/2 before:ant-rounded-1/2 before:ant-[border:2px_solid_var(--ant-color-primary)] after:ant-content-[''] after:ant-inline-block after:ant-h-2px after:ant-absolute after:ant-left-0 after:ant-right-0 after:ant-bottom--1px after:ant-bg-[var(--ant-color-primary)]",
                 )}
                 onClick={() => {
                   setSelectedNodes([item()])

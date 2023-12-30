@@ -37,21 +37,21 @@ const typeClassMap = {
       'ant-bg-white',
       danger
         ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-[border:1px_solid_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+        : 'ant-[border:1px_solid_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-text-[var(--ant-color-primary-active)]',
     ),
   primary: (danger: boolean) =>
     cs(
       'ant-text-white',
       danger
         ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-bg-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-bg-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-bg-[var(--dark-error-color)]'
-        : 'ant-[border:1px_solid_var(--primary-color)] ant-bg-[var(--primary-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-bg-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-bg-[var(--dark-primary-color)]',
+        : 'ant-[border:1px_solid_var(--ant-color-primary)] ant-bg-[var(--ant-color-primary)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-bg-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-bg-[var(--ant-color-primary-active)]',
     ),
   dashed: (danger: boolean) =>
     cs(
       ' ant-bg-white',
       danger
         ? 'ant-[border:1px_dashed_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-[border:1px_dashed_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--light-primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-[border-color:var(--dark-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+        : 'ant-[border:1px_dashed_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-text-[var(--ant-color-primary-active)]',
     ),
   text: (danger: boolean) =>
     cs(
@@ -65,7 +65,7 @@ const typeClassMap = {
       'ant-border-none ant-bg-transparent',
       danger
         ? 'ant-text-[var(--ant-color-error)] hover:ant-text-[var(--light-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-text-[var(--primary-color)] hover:ant-text-[var(--light-primary-color)] active:ant-text-[var(--dark-primary-color)]',
+        : 'ant-text-[var(--ant-color-primary)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-text-[var(--ant-color-primary-active)]',
     ),
 } as const
 
@@ -84,7 +84,7 @@ const Button: Component<ButtonProps> = props => {
         sizeClassMap[mergedProps.size!],
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'ant-opacity-65',
-        'ant-[--color:--light-primary-color]',
+        'ant-[--color:--ant-color-primary-hover]',
       )}
       style={mergedProps.style}
       onClick={e => {
@@ -103,7 +103,7 @@ const Button: Component<ButtonProps> = props => {
           div.className = cs(
             props.danger
               ? 'ant-[--color:var(--light-error-color)]'
-              : 'ant-[--color:var(--light-primary-color)]',
+              : 'ant-[--color:var(--ant-color-primary-hover)]',
             'ant-absolute ant-inset-0 ant-rounded-inherit ant-[background:radial-gradient(var(--color),rgba(0,0,0,0))] ant-z--1 ant-keyframes-button-border[inset:0px][inset:-6px] ant-[animation:button-border_ease-out_0.3s]',
           )
           const onAnimationEnd = () => {

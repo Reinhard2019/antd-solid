@@ -33,7 +33,9 @@ const Select: Component<SelectProps> = props => {
 
   const [value, setValue] = createControllableValue<Key | undefined>(props)
   const selectedValue = createSelector(value)
-  const selectedOption = createMemo(() => !isNil(value()) ? props.options.find(option => option.value === value()) : undefined)
+  const selectedOption = createMemo(() =>
+    !isNil(value()) ? props.options.find(option => option.value === value()) : undefined,
+  )
 
   const [open, setOpen] = createSignal(false)
   useClickAway(
@@ -63,7 +65,7 @@ const Select: Component<SelectProps> = props => {
               <div
                 class={cs(
                   'ant-box-content ant-px-12px ant-py-5px ant-h-22px ant-leading-22px hover:ant-bg-[var(--hover-bg-color)]',
-                  selectedValue(item.value) ? '!ant-bg-[var(--active-bg-color)]' : '',
+                  selectedValue(item.value) ? '!ant-bg-[var(--ant-select-option-selected-bg)]' : '',
                 )}
                 onClick={() => {
                   setValue(item.value)
@@ -79,7 +81,10 @@ const Select: Component<SelectProps> = props => {
     >
       <div
         ref={select!}
-        class={cs('ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--ant-color-border)] ant-px-11px focus:ant-[border-color:var(--primary-color)]', props.class)}
+        class={cs(
+          'ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--ant-color-border)] ant-px-11px focus:ant-[border-color:var(--ant-color-primary)]',
+          props.class,
+        )}
         tabIndex="0"
         onClick={e => {
           setOpen(true)
@@ -109,7 +114,12 @@ const Select: Component<SelectProps> = props => {
           </Show>
 
           <div class="ant-absolute ant-top-0 ant-bottom-0 ant-right-0">
-            <Show when={showClearBtn()} fallback={<span class="i-ant-design:down-outlined ant-text-[var(--ant-allow-color)]" />}>
+            <Show
+              when={showClearBtn()}
+              fallback={
+                <span class="i-ant-design:down-outlined ant-text-[var(--ant-allow-color)]" />
+              }
+            >
               <span
                 class="i-ant-design:close-circle-filled ant-cursor-pointer ant-text-[var(--ant-clear-color)] hover:ant-text-[var(--ant-clear-color-hover)]"
                 onClick={e => {

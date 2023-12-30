@@ -17,7 +17,7 @@ const Switch: Component<SwitchProps> = props => {
     <button
       class={cs(
         'ant-w-44px ant-h-22px ant-rounded-100px ant-relative',
-        checked() ? 'ant-bg-[var(--primary-color)]' : 'ant-bg-[rgba(0,0,0,0.45)]',
+        checked() ? 'ant-bg-[var(--ant-color-primary)]' : 'ant-bg-[rgba(0,0,0,0.45)]',
       )}
       onClick={() => setChecked(c => !c)}
     >

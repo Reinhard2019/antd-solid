@@ -12,7 +12,7 @@ export interface ResultProps extends ParentProps {
 
 const statusIconMap = {
   success: 'ant-text-#52c41a i-ant-design:check-circle-filled',
-  info: 'ant-text-[var(--primary-color)] i-ant-design:exclamation-circle-filled',
+  info: 'ant-text-[var(--ant-color-primary)] i-ant-design:exclamation-circle-filled',
   warning: 'ant-text-#faad14 i-ant-design:warning-filled',
   error: 'ant-text-#ff4d4f i-ant-design:close-circle-filled',
 }

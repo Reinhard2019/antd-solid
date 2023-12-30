@@ -47,7 +47,7 @@ const Radio: Component<RadioProps> & {
       <span
         class={cs(
           'ant-w-16px ant-h-16px ant-rounded-50% ant-[border:1px_solid_var(--ant-color-border)]',
-          checked() && 'ant-[border:5px_solid_var(--primary-color)]',
+          checked() && 'ant-[border:5px_solid_var(--ant-color-primary)]',
         )}
       >
         <input
@@ -77,9 +77,9 @@ Radio.Button = props => {
   return (
     <label
       class={cs(
-        'ant-px-15px ant-[border:1px_solid_rgb(217,217,217)] first:ant-rounded-l-6px last:ant-rounded-r-6px ant-h-32px ant-inline-flex ant-items-center hover:ant-text-[var(--primary-color)] not[:last-child]:ant-border-r-transparent ant-cursor-pointer ant-flex-grow ant-justify-center',
+        'ant-px-15px ant-[border:1px_solid_rgb(217,217,217)] first:ant-rounded-l-6px last:ant-rounded-r-6px ant-h-32px ant-inline-flex ant-items-center hover:ant-text-[var(--ant-color-primary)] not[:last-child]:ant-border-r-transparent ant-cursor-pointer ant-flex-grow ant-justify-center',
         checked() &&
-          'ant-text-[var(--primary-color)] ant-[border:1px_solid_var(--primary-color)] !ant-border-r-[var(--primary-color)]',
+          'ant-text-[var(--ant-color-primary)] ant-[border:1px_solid_var(--ant-color-primary)] !ant-border-r-[var(--ant-color-primary)]',
       )}
     >
       <input
