@@ -41,14 +41,26 @@ export default defineConfig({
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
           --ant-color-bg-container-disabled: rgba(0, 0, 0, 0.04);
-
           --ant-color-bg-layout: #f5f5f5;
+          --ant-color-split: rgba(5, 5, 5, 0.06);
+          --ant-color-icon: rgba(0, 0, 0, 0.45);
+          --ant-color-icon-hover: rgba(0, 0, 0, 0.88);
+
+          --ant-font-weight-strong: 600;
+
+          --ant-font-size-lg: 16px;
+
+          --ant-line-height-lg: 1.5;
+
+          --ant-line-width: 1px;
 
           --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
           --ant-margin-xl: 32px;
 
           --ant-padding-sm: 12px;
+          --ant-padding: 16px;
+          --ant-padding-lg: 24px;
 
           --ant-box-shadow-tertiary: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
 

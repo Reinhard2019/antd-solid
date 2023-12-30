@@ -1,0 +1,53 @@
+.ant-drawer-content-right {
+  top: 0;
+  bottom: 0;
+  right: 0;
+}
+
+.ant-drawer-content-left {
+  top: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.ant-drawer-content-top {
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.ant-drawer-content-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.ant-drawer-fade-enter-active,
+.ant-drawer-fade-exit-active {
+  transition: opacity .3s;
+
+  .ant-drawer-content {
+    transition: transform .3s;
+  }
+}
+
+.ant-drawer-fade-enter,
+.ant-drawer-fade-exit-to {
+  opacity: 0;
+
+  .ant-drawer-content-right {
+    transform: translateX(100%);
+  }
+
+  .ant-drawer-content-left {
+    transform: translateX(-100%);
+  }
+
+  .ant-drawer-content-top {
+    transform: translateY(-100%);
+  }
+
+  .ant-drawer-content-bottom {
+    transform: translateY(100%);
+  }
+}

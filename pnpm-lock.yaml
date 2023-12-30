@@ -143,6 +143,9 @@ importers:
       rollup-plugin-typescript2:
         specifier: ^0.34.1
         version: 0.34.1(rollup@3.21.0)(typescript@5.1.6)
+      sass:
+        specifier: ^1.69.6
+        version: 1.69.6
       typescript:
         specifier: ^5.1.6
         version: 5.1.6
@@ -151,10 +154,10 @@ importers:
         version: 2.7.0(solid-js@1.8.7)(vite@4.5.0)
       vitepress:
         specifier: 1.0.0-rc.4
-        version: 1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.20.0)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.9.0)
+        version: 1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.20.0)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.6)(search-insights@2.9.0)
       vitest:
         specifier: ^0.30.1
-        version: 0.30.1(jsdom@21.1.1)
+        version: 0.30.1(jsdom@21.1.1)(sass@1.69.6)
 
   packages/antd-solid:
     dependencies:
@@ -2393,7 +2396,7 @@ packages:
       chokidar: 3.5.3
       fast-glob: 3.2.12
       magic-string: 0.30.0
-      vite: 4.5.0
+      vite: 4.5.0(sass@1.69.6)
     transitivePeerDependencies:
       - rollup
     dev: true
@@ -2405,7 +2408,7 @@ packages:
       vite: ^4.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 4.4.9
+      vite: 4.4.9(sass@1.69.6)
       vue: 3.3.4
     dev: true
 
@@ -4302,6 +4305,10 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
+  /immutable@4.3.4:
+    resolution: {integrity: sha512-fsXeu4J4i6WNWSikpI88v/PcVflZz+6kMhUfIwc5SY+poQRPnaf5V7qds6SUyUN3cVxEzuCab7QIoLOQ+DQ1wA==}
+    dev: true
+
   /import-fresh@3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -6074,6 +6081,16 @@ packages:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
     dev: true
 
+  /sass@1.69.6:
+    resolution: {integrity: sha512-qbRr3k9JGHWXCvZU77SD2OTwUlC+gNT+61JOLcmLm+XqH4h/5D+p4IIsxvpkB89S9AwJOyb5+rWNpIucaFxSFQ==}
+    engines: {node: '>=14.0.0'}
+    hasBin: true
+    dependencies:
+      chokidar: 3.5.3
+      immutable: 4.3.4
+      source-map-js: 1.0.2
+    dev: true
+
   /saxes@6.0.0:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
@@ -6651,7 +6668,7 @@ packages:
     resolution: {integrity: sha512-hGdgQozCsQJMyfK5urgFcWEqsSSrK63Awe0t/IMR0bZ0QMtnuaiHzThW81guu3qx9abLi99NEuiaN6P9gVYsNg==}
     dev: true
 
-  /vite-node@0.30.1(@types/node@18.16.0):
+  /vite-node@0.30.1(@types/node@18.16.0)(sass@1.69.6):
     resolution: {integrity: sha512-vTikpU/J7e6LU/8iM3dzBo8ZhEiKZEKRznEMm+mJh95XhWaPrJQraT/QsT2NWmuEf+zgAoMe64PKT7hfZ1Njmg==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -6661,7 +6678,7 @@ packages:
       mlly: 1.2.0
       pathe: 1.1.0
       picocolors: 1.0.0
-      vite: 4.3.1(@types/node@18.16.0)
+      vite: 4.3.1(@types/node@18.16.0)(sass@1.69.6)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -6685,13 +6702,13 @@ packages:
       merge-anything: 5.1.4
       solid-js: 1.8.7
       solid-refresh: 0.5.2(solid-js@1.8.7)
-      vite: 4.5.0
+      vite: 4.5.0(sass@1.69.6)
       vitefu: 0.2.4(vite@4.5.0)
     transitivePeerDependencies:
       - supports-color
     dev: true
 
-  /vite@4.3.1(@types/node@18.16.0):
+  /vite@4.3.1(@types/node@18.16.0)(sass@1.69.6):
     resolution: {integrity: sha512-EPmfPLAI79Z/RofuMvkIS0Yr091T2ReUoXQqc5ppBX/sjFRhHKiPPF/R46cTdoci/XgeQpB23diiJxq5w30vdg==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6720,11 +6737,12 @@ packages:
       esbuild: 0.17.18
       postcss: 8.4.23
       rollup: 3.21.0
+      sass: 1.69.6
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
 
-  /vite@4.4.9:
+  /vite@4.4.9(sass@1.69.6):
     resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6755,11 +6773,12 @@ packages:
       esbuild: 0.18.20
       postcss: 8.4.28
       rollup: 3.28.1
+      sass: 1.69.6
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
 
-  /vite@4.5.0:
+  /vite@4.5.0(sass@1.69.6):
     resolution: {integrity: sha512-ulr8rNLA6rkyFAlVWw2q5YJ91v098AFQ2R0PRFwPzREXOUJQPtFUG0t+/ZikhaOCDqFoDhN6/v8Sq0o4araFAw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -6790,6 +6809,7 @@ packages:
       esbuild: 0.18.20
       postcss: 8.4.31
       rollup: 3.28.1
+      sass: 1.69.6
     optionalDependencies:
       fsevents: 2.3.3
     dev: true
@@ -6802,10 +6822,10 @@ packages:
       vite:
         optional: true
     dependencies:
-      vite: 4.5.0
+      vite: 4.5.0(sass@1.69.6)
     dev: true
 
-  /vitepress@1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.20.0)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(search-insights@2.9.0):
+  /vitepress@1.0.0-rc.4(patch_hash=jhyffk4hh4v5rceklryrcj4zee)(@algolia/client-search@4.20.0)(@types/react@18.0.38)(react-dom@18.2.0)(react@18.2.0)(sass@1.69.6)(search-insights@2.9.0):
     resolution: {integrity: sha512-JCQ89Bm6ECUTnyzyas3JENo00UDJeK8q1SUQyJYou+4Yz5BKEc/F3O21cu++DnUT2zXc0kvQ2Aj4BZCc/nioXQ==}
     hasBin: true
     dependencies:
@@ -6820,7 +6840,7 @@ packages:
       mark.js: 8.11.1
       minisearch: 6.1.0
       shiki: 0.14.3
-      vite: 4.4.9
+      vite: 4.4.9(sass@1.69.6)
       vue: 3.3.4
     transitivePeerDependencies:
       - '@algolia/client-search'
@@ -6850,7 +6870,7 @@ packages:
     dev: true
     patched: true
 
-  /vitest@0.30.1(jsdom@21.1.1):
+  /vitest@0.30.1(jsdom@21.1.1)(sass@1.69.6):
     resolution: {integrity: sha512-y35WTrSTlTxfMLttgQk4rHcaDkbHQwDP++SNwPb+7H8yb13Q3cu2EixrtHzF27iZ8v0XCciSsLg00RkPAzB/aA==}
     engines: {node: '>=v14.18.0'}
     hasBin: true
@@ -6905,8 +6925,8 @@ packages:
       strip-literal: 1.0.1
       tinybench: 2.4.0
       tinypool: 0.4.0
-      vite: 4.3.1(@types/node@18.16.0)
-      vite-node: 0.30.1(@types/node@18.16.0)
+      vite: 4.3.1(@types/node@18.16.0)(sass@1.69.6)
+      vite-node: 0.30.1(@types/node@18.16.0)(sass@1.69.6)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

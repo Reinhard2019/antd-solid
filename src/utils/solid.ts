@@ -1,5 +1,5 @@
 import React from 'react'
-import { type JSXElement, type JSX } from 'solid-js'
+import { type JSXElement, type JSX, untrack, type Ref } from 'solid-js'
 import { isNil } from 'lodash-es'
 import SolidToReact from './SolidToReact'
 import { type StringOrJSXElement } from '../types'
@@ -50,4 +50,12 @@ export function dispatchEventHandlerUnion<T, E extends Event>(
 
 export function unwrapStringOrJSXElement(value: StringOrJSXElement): JSXElement {
   return typeof value === 'function' ? value() : value
+}
+
+export function setRef<T>(props: { ref?: Ref<T> }, value: T | null) {
+  untrack(() => {
+    if (typeof props.ref === 'function') {
+      ;(props.ref as (v: T | null) => void)?.(value)
+    }
+  })
 }

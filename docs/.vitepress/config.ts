@@ -62,6 +62,7 @@ export default defineConfig({
       {
         text: '反馈',
         items: [
+          { text: 'Drawer 抽屉', link: '/components/drawer' },
           { text: 'Modal 对话框', link: '/components/modal' },
           { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
           { text: 'Progress 进度条', link: '/components/progress' },
