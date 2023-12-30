@@ -14,9 +14,8 @@ interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElemen
   onClick?: ((e: MouseEvent) => void) | ((e: MouseEvent) => Promise<unknown>)
   /**
    * 默认: middle
-   * plain: 没有多余的 padding 和高度等
    */
-  size?: 'large' | 'middle' | 'small' | 'plain'
+  size?: 'large' | 'middle' | 'small'
   class?: string
   style?: JSX.CSSProperties
   loading?: boolean
@@ -30,7 +29,6 @@ const sizeClassMap = {
   large: 'ant-px-15px ant-py-6px ant-h-40px ant-rounded-8px',
   middle: 'ant-px-15px ant-py-4px ant-h-32px ant-rounded-6px',
   small: 'ant-px-7px ant-h-24px ant-rounded-4px',
-  plain: 'ant-p-0',
 } as const
 
 const typeClassMap = {

@@ -179,8 +179,7 @@ const Drawer: Component<DrawerProps> = _props => {
                 <Show when={props.closeIcon !== false}>
                   <Button
                     type="text"
-                    size="plain"
-                    class="ant-mr-[var(--ant-margin-sm)] ant-text-size-[var(--ant-font-size-lg)] ant-h-[var(--ant-font-size-lg)] ant-leading-[var(--ant-font-size-lg)] hover:!ant-bg-transparent !ant-text-[var(--ant-color-icon)] hover:!ant-text-[var(--ant-color-icon-hover)]"
+                    class="ant-mr-[var(--ant-margin-sm)] ant-text-size-[var(--ant-font-size-lg)] ant-h-[var(--ant-font-size-lg)] ant-leading-[var(--ant-font-size-lg)] hover:!ant-bg-transparent !ant-text-[var(--ant-color-icon)] hover:!ant-text-[var(--ant-color-icon-hover)] !ant-p-0"
                     onClick={() => {
                       instance?.close()
                     }}
