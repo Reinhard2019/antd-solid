@@ -1,10 +1,134 @@
-import { reactToSolidComponent, replaceChildren, replaceClassName } from './utils/component'
-import { Upload as UploadAntd } from 'antd'
+import { nanoid } from 'nanoid'
+import { type Component, mergeProps, type ParentProps, createSignal, type Signal } from 'solid-js'
 
-export type { UploadFile } from 'antd/es/upload'
+interface UploadProgressEvent extends Partial<ProgressEvent> {
+  percent?: number
+}
 
-const Upload = replaceChildren(replaceClassName(reactToSolidComponent(UploadAntd)))
+export interface UploadRequestOption<T = any> {
+  file: File
+  onProgress?: (event: UploadProgressEvent) => void
+  onError?: (event: Error) => void
+  onSuccess?: (body: T) => void
+}
 
-export type UploadProps = Parameters<typeof Upload>[0]
+export interface UploadFile<T = any> {
+  /**
+   * 文件唯一标识
+   */
+  id: string
+  /**
+   * 文件名
+   */
+  name: string
+  /**
+   * MIME 类型
+   */
+  type?: string
+  /**
+   * 文件大小
+   */
+  size?: number
+  file?: File
+  response?: T
+  status?: 'pending' | 'uploading' | 'error' | 'finished'
+  percent?: number
+  /**
+   * 下载地址
+   */
+  url?: string
+}
+
+export interface UploadProps<T = any> extends ParentProps {
+  accept?: string
+  /**
+   * 上传的地址
+   */
+  action?: string
+  /**
+   * 上传请求的 http method
+   * 默认 'post'
+   */
+  method?: string
+  customRequest?: (option: UploadRequestOption<T>) => void
+  onAdd?: (fileList: Array<Signal<T>>) => void
+  multiple?: boolean
+}
+
+const Upload: Component<UploadProps> = _props => {
+  let input: HTMLInputElement | undefined
+  const props = mergeProps(
+    {
+      customRequest: ({ file, onSuccess, onError }) => {
+        if (!_props.action) return
+
+        const formData = new FormData()
+        formData.append('file', file)
+        fetch(_props.action, {
+          method: _props.method ?? 'post',
+          body: formData,
+        })
+          .then(onSuccess)
+          .catch(onError)
+      },
+    } as UploadProps,
+    _props,
+  )
+
+  return (
+    <span onClick={() => input?.click()}>
+      {props.children}
+
+      <input
+        ref={input}
+        class="hidden"
+        type="file"
+        accept={props.accept}
+        multiple={props.multiple}
+        onInput={e => {
+          const fileList: Array<Signal<UploadFile>> = []
+          for (const file of e.target.files ?? []) {
+            const id = `upload-${nanoid()}`
+            // eslint-disable-next-line solid/reactivity
+            const uploadFileSignal = createSignal<UploadFile>({
+              id,
+              file,
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              status: 'pending',
+              percent: 0,
+            })
+
+            fileList.push(uploadFileSignal)
+
+            props.onAdd?.(fileList)
+
+            const [, setUploadFile] = uploadFileSignal
+
+            props.customRequest?.({
+              file,
+              onProgress(event) {
+                setUploadFile(value => ({
+                  ...value,
+                  status: 'uploading',
+                  percent: event.percent ?? 0,
+                }))
+              },
+              onSuccess(response) {
+                setUploadFile(value => ({ ...value, status: 'finished', response }))
+              },
+              onError() {
+                setUploadFile(value => ({ ...value, status: 'error' }))
+              },
+            })
+          }
+
+          e.target.value = ''
+        }}
+      />
+    </span>
+  )
+}
 
 export default Upload
