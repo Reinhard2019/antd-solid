@@ -56,7 +56,44 @@ export interface UploadProps<T = any> extends ParentProps {
   multiple?: boolean
 }
 
-const Upload: Component<UploadProps> = _props => {
+function request(file: File, customRequest: UploadProps['customRequest']) {
+  const id = `upload-${nanoid()}`
+  // eslint-disable-next-line solid/reactivity
+  const uploadFileSignal = createSignal<UploadFile>({
+    id,
+    file,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    status: 'pending',
+    percent: 0,
+  })
+
+  const [, setUploadFile] = uploadFileSignal
+
+  customRequest?.({
+    file,
+    onProgress(event) {
+      setUploadFile(value => ({
+        ...value,
+        status: 'uploading',
+        percent: event.percent ?? 0,
+      }))
+    },
+    onSuccess(response) {
+      setUploadFile(value => ({ ...value, status: 'finished', response }))
+    },
+    onError() {
+      setUploadFile(value => ({ ...value, status: 'error' }))
+    },
+  })
+
+  return uploadFileSignal
+}
+
+const Upload: Component<UploadProps> & {
+  request: typeof request
+} = _props => {
   let input: HTMLInputElement | undefined
   const props = mergeProps(
     {
@@ -89,47 +126,18 @@ const Upload: Component<UploadProps> = _props => {
         onInput={e => {
           const fileList: Array<Signal<UploadFile>> = []
           for (const file of e.target.files ?? []) {
-            const id = `upload-${nanoid()}`
-            // eslint-disable-next-line solid/reactivity
-            const uploadFileSignal = createSignal<UploadFile>({
-              id,
-              file,
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              status: 'pending',
-              percent: 0,
-            })
-
+            const uploadFileSignal = request(file, props.customRequest)
             fileList.push(uploadFileSignal)
-
-            props.onAdd?.(fileList)
-
-            const [, setUploadFile] = uploadFileSignal
-
-            props.customRequest?.({
-              file,
-              onProgress(event) {
-                setUploadFile(value => ({
-                  ...value,
-                  status: 'uploading',
-                  percent: event.percent ?? 0,
-                }))
-              },
-              onSuccess(response) {
-                setUploadFile(value => ({ ...value, status: 'finished', response }))
-              },
-              onError() {
-                setUploadFile(value => ({ ...value, status: 'error' }))
-              },
-            })
           }
 
+          props.onAdd?.(fileList)
           e.target.value = ''
         }}
       />
     </span>
   )
 }
+
+Upload.request = request
 
 export default Upload
