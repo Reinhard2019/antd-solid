@@ -6,12 +6,14 @@ import {
   Show,
   createSignal,
   createMemo,
+  untrack,
 } from 'solid-js'
 import cs from 'classnames'
 
 interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElement> {
   type?: 'default' | 'primary' | 'dashed' | 'text' | 'link'
   onClick?: ((e: MouseEvent) => void) | ((e: MouseEvent) => Promise<unknown>)
+  'on:click'?: (e: MouseEvent) => void
   /**
    * 默认: middle
    */
@@ -87,6 +89,9 @@ const Button: Component<ButtonProps> = props => {
         'ant-[--color:--ant-color-primary-hover]',
       )}
       style={mergedProps.style}
+      // @ts-expect-error on:
+      on:click={untrack(() => props['on:click'])}
+      // eslint-disable-next-line solid/jsx-no-duplicate-props
       onClick={e => {
         const res = mergedProps.onClick?.(e)
         if (res instanceof Promise) {
