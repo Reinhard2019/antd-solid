@@ -40,6 +40,7 @@ export interface UploadFile<T = any> {
 }
 
 export interface UploadProps<T = any> extends ParentProps {
+  class?: string
   accept?: string
   /**
    * 上传的地址
@@ -76,7 +77,7 @@ const Upload: Component<UploadProps> = _props => {
   )
 
   return (
-    <span onClick={() => input?.click()}>
+    <span class={props.class} onClick={() => input?.click()}>
       {props.children}
 
       <input
