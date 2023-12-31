@@ -1,16 +1,21 @@
-import { type Component } from 'solid-js'
+import { type Component, type JSX } from 'solid-js'
 import PRESENTED_IMAGE_SIMPLE from './PRESENTED_IMAGE_SIMPLE'
 import EmptySvg from './assets/EmptySvg'
 
-const Empty: Component & {
+export interface EmptyProps {
+  class?: string
+  style?: JSX.CSSProperties
+}
+
+const Empty: Component<EmptyProps> & {
   PRESENTED_IMAGE_SIMPLE: Component
-} = () => {
+} = props => {
   return (
-    <div>
-      <div class='ant-mb-[var(--ant-margin-xs)] ant-flex ant-justify-center'>
+    <div {...props} style={props.style}>
+      <div class="ant-mb-[var(--ant-margin-xs)] ant-flex ant-justify-center">
         <EmptySvg />
       </div>
-      <div class='ant-text-[var(--ant-color-text)] ant-text-center'>暂无数据</div>
+      <div class="ant-text-[var(--ant-color-text)] ant-text-center">暂无数据</div>
     </div>
   )
 }
