@@ -123,15 +123,15 @@ export default defineConfig({
     },
     /**
      * 定义子级的样式
-     * child[.*]:
+     * child[.*]>?:
      */
     matcher => {
-      const prevReg = /^child\[(.*)\]:/
+      const prevReg = /^child\[(.*)\](>?):/
       const match = matcher.match(prevReg)
       if (!match) return matcher
       return {
         matcher: matcher.slice(match[0].length),
-        selector: s => `${s} ${match[1] || '*'}`,
+        selector: s => `${s}${match[2] ? '>' : ' '}${match[1] || '*'}`,
       }
     },
     /**

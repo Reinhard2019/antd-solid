@@ -1,12 +1,30 @@
 import { type Component } from 'solid-js'
-import { Compact, Input, InputNumber } from 'antd-solid'
+import { Button, Compact, Input, InputNumber } from 'antd-solid'
 
 const Index: Component = () => {
   return (
-    <div style={{
-      display: 'grid',
-      gap: '8px',
-    }}>
+    <div
+      style={{
+        display: 'grid',
+        gap: '8px',
+      }}
+    >
+      <Compact>
+        <Button type="primary" style={{ width: '33.3%' }}>
+          左
+        </Button>
+        <Button type="primary" style={{ width: '33.3%' }}>
+          中
+        </Button>
+        <Button type="primary" style={{ width: '33.3%' }}>
+          有
+        </Button>
+      </Compact>
+      <Compact>
+        <Button style={{ width: '33.3%' }}>左</Button>
+        <Button style={{ width: '33.3%' }}>中</Button>
+        <Button style={{ width: '33.3%' }}>有</Button>
+      </Compact>
       <Compact>
         <Input style={{ width: '20%' }} />
         <InputNumber style={{ width: '30%' }} />

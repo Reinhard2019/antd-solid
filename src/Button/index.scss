@@ -1,0 +1,9 @@
+.ant-compact {
+  .ant-btn-primary:not(:first-child) {
+    border-left: 1px solid white;
+  }
+  .ant-btn-primary:not(:last-child) {
+    border-right: 1px solid white;
+
+  }
+}

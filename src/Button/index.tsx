@@ -9,6 +9,8 @@ import {
   untrack,
 } from 'solid-js'
 import cs from 'classnames'
+import Compact from '../Compact'
+import './index.scss'
 
 interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElement> {
   type?: 'default' | 'primary' | 'dashed' | 'text' | 'link'
@@ -80,6 +82,7 @@ const Button: Component<ButtonProps> = props => {
     <button
       ref={mergedProps.ref}
       class={cs(
+        `ant-btn ant-btn-${mergedProps.type}`,
         'ant-relative ant-cursor-pointer',
         'focus-visible:ant-[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:ant-[outline-offset:1px]',
         mergedProps.class,
@@ -87,6 +90,9 @@ const Button: Component<ButtonProps> = props => {
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'ant-opacity-65',
         'ant-[--color:--ant-color-primary-hover]',
+        Compact.compactItemRounded0Class,
+        Compact.compactItemZIndexClass,
+        Compact.compactItemClass,
       )}
       style={mergedProps.style}
       // @ts-expect-error on:
