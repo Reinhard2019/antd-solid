@@ -1,6 +1,6 @@
 import { DatePicker as DatePickerAntd } from 'antd'
 import { type DatePickerProps, type RangePickerProps } from 'antd/es/date-picker'
-import { reactToSolidComponent, replaceClassName } from './utils/component'
+import { reactToSolidComponent, replaceClassName } from '../utils/component'
 
 const RangePicker = replaceClassName(
   reactToSolidComponent<

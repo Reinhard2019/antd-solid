@@ -6,8 +6,8 @@ import {
   untrack,
   splitProps,
 } from 'solid-js'
-import Button from './Button'
-import Tooltip, { type TooltipProps } from './Tooltip'
+import Button from '../Button'
+import Tooltip, { type TooltipProps } from '../Tooltip'
 
 interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow'> {
   title?: JSXElement

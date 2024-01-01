@@ -7,9 +7,9 @@ import {
   createSignal,
   mergeProps,
 } from 'solid-js'
-import { CommonInput, type InputProps } from './Input'
+import { CommonInput, type InputProps } from '../Input'
 import { clamp, isNil } from 'lodash-es'
-import { dispatchEventHandlerUnion } from './utils/solid'
+import { dispatchEventHandlerUnion } from '../utils/solid'
 
 export interface InputNumberProps
   extends Omit<

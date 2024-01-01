@@ -7,11 +7,11 @@ import {
   Show,
   createMemo,
 } from 'solid-js'
-import Tooltip from './Tooltip'
-import { type Key } from './types'
-import createControllableValue from './hooks/createControllableValue'
+import Tooltip from '../Tooltip'
+import { type Key } from '../types'
+import createControllableValue from '../hooks/createControllableValue'
 import cs from 'classnames'
-import { useClickAway } from './hooks'
+import { useClickAway } from '../hooks'
 import { isNil } from 'lodash-es'
 
 interface SelectOption {

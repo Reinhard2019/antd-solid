@@ -1,5 +1,5 @@
 import { Skeleton as SkeletonAntd } from 'antd'
-import { reactToSolidComponent, replaceClassName } from './utils/component'
+import { reactToSolidComponent, replaceClassName } from '../utils/component'
 
 const _Skeleton = replaceClassName(reactToSolidComponent(SkeletonAntd))
 

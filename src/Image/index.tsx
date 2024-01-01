@@ -1,6 +1,6 @@
 import { Image as ImageAntd } from 'antd'
-import { configProvider, reactToSolidComponent, replaceClassName } from './utils/component'
-import { solidToReact } from './utils/solid'
+import { configProvider, reactToSolidComponent, replaceClassName } from '../utils/component'
+import { solidToReact } from '../utils/solid'
 import { type JSXElement, createMemo } from 'solid-js'
 import { mapValues } from 'lodash-es'
 

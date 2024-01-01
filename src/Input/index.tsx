@@ -2,9 +2,9 @@ import { isNil, omit } from 'lodash-es'
 import { Show, createMemo, splitProps } from 'solid-js'
 import type { JSX, JSXElement, Component } from 'solid-js'
 import cs from 'classnames'
-import createControllableValue from './hooks/createControllableValue'
 import { Dynamic } from 'solid-js/web'
-import Compact from './Compact'
+import createControllableValue from '../hooks/createControllableValue'
+import Compact from '../Compact'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {

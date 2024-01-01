@@ -1,11 +1,12 @@
 import { describe, expect, it, vi } from 'vitest'
 import { fireEvent, render } from '@solidjs/testing-library'
-import InputNumber from './InputNumber'
+import InputNumber from '../InputNumber'
 import '@testing-library/jest-dom'
 
 describe('InputNumber component', () => {
   it('onChange', () => {
     const onChange = vi.fn()
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     const { getByPlaceholderText } = render(() => (
       <InputNumber placeholder="input-number" onChange={onChange} />
     ))

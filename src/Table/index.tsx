@@ -1,5 +1,5 @@
-import Empty from './Empty'
 import { type JSXElement, For, Show } from 'solid-js'
+import Empty from '../Empty'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement

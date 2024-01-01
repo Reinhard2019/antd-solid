@@ -12,9 +12,9 @@ import {
   Match,
 } from 'solid-js'
 import cs from 'classnames'
-import Segmented from './Segmented'
-import { type StringOrJSXElement } from './types'
-import { unwrapStringOrJSXElement } from './utils/solid'
+import Segmented from '../Segmented'
+import { type StringOrJSXElement } from '../types'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface Tab {
   key: string

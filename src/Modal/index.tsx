@@ -1,6 +1,6 @@
 import { type JSXElement, Show, createSignal, untrack, type Ref, mergeProps } from 'solid-js'
 import { Portal, render } from 'solid-js/web'
-import Button from './Button'
+import Button from '../Button'
 import cs from 'classnames'
 
 export interface ModalInstance {

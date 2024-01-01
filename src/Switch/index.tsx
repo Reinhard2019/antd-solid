@@ -1,6 +1,6 @@
 import { type Component } from 'solid-js'
-import createControllableValue from './hooks/createControllableValue'
 import cs from 'classnames'
+import createControllableValue from '../hooks/createControllableValue'
 
 export interface SwitchProps {
   defaultChecked?: boolean

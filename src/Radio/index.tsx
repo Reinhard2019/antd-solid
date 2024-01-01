@@ -10,7 +10,7 @@ import {
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import cs from 'classnames'
-import createControllableValue from './hooks/createControllableValue'
+import createControllableValue from '../hooks/createControllableValue'
 
 export interface RadioProps extends ParentProps {
   defaultChecked?: boolean

@@ -13,9 +13,9 @@ import {
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
-import createControllableValue from './hooks/createControllableValue'
-import { useClickAway } from './hooks'
-import { toArray } from './utils/array'
+import createControllableValue from '../hooks/createControllableValue'
+import { useClickAway } from '../hooks'
+import { toArray } from '../utils/array'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =

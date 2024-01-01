@@ -1,6 +1,6 @@
 import { ColorPicker } from 'antd'
 import { type Color } from 'antd/es/color-picker'
-import { reactToSolidComponent } from './utils/component'
+import { reactToSolidComponent } from '../utils/component'
 
 export interface ColorPickerProps {
   defaultValue?: string | Color
