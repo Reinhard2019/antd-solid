@@ -145,10 +145,7 @@ const Drawer: Component<DrawerProps> = _props => {
       <Show when={open()}>
         <div
           ref={drawer}
-          class={cs(
-            'ant-inset-0 ant-bg-[rgba(0,0,0,.45)] ant-z-1000',
-            isBody() ? 'ant-fixed' : 'ant-absolute',
-          )}
+          class={cs('inset-0 bg-[rgba(0,0,0,.45)] z-1000', isBody() ? 'fixed' : 'absolute')}
           onClick={() => {
             if (props.maskClosable) {
               instance.close()
@@ -164,7 +161,7 @@ const Drawer: Component<DrawerProps> = _props => {
                 top: 'ant-drawer-content-top',
                 bottom: 'ant-drawer-content-bottom',
               }[props.placement],
-              'ant-absolute ant-bg-white ant-grid ant-[grid-template-rows:auto_1fr]',
+              'absolute bg-white grid [grid-template-rows:auto_1fr]',
             )}
             style={{
               width: direction() === 'horizontal' ? props.width : undefined,
@@ -174,12 +171,12 @@ const Drawer: Component<DrawerProps> = _props => {
               e.stopPropagation()
             }}
           >
-            <div class="ant-px-[var(--ant-padding-lg)] ant-py-[var(--ant-padding)] ant-flex ant-justify-between ant-items-center ant-[border-bottom:var(--ant-line-width)_solid_var(--ant-color-split)]">
-              <div class="ant-flex ant-items-center">
+            <div class="px-[var(--ant-padding-lg)] py-[var(--ant-padding)] flex justify-between items-center [border-bottom:var(--ant-line-width)_solid_var(--ant-color-split)]">
+              <div class="flex items-center">
                 <Show when={props.closeIcon !== false}>
                   <Button
                     type="text"
-                    class="ant-mr-[var(--ant-margin-sm)] ant-text-size-[var(--ant-font-size-lg)] ant-h-[var(--ant-font-size-lg)] ant-leading-[var(--ant-font-size-lg)] hover:!ant-bg-transparent !ant-text-[var(--ant-color-icon)] hover:!ant-text-[var(--ant-color-icon-hover)] !ant-p-0"
+                    class="mr-[var(--ant-margin-sm)] text-size-[var(--ant-font-size-lg)] h-[var(--ant-font-size-lg)] leading-[var(--ant-font-size-lg)] hover:!bg-transparent !text-[var(--ant-color-icon)] hover:!text-[var(--ant-color-icon-hover)] !p-0"
                     onClick={() => {
                       instance?.close()
                     }}
@@ -187,14 +184,14 @@ const Drawer: Component<DrawerProps> = _props => {
                     <span class="i-ant-design:close-outlined" />
                   </Button>
                 </Show>
-                <span class="ant-text-[var(--ant-color-text)] ant-text-size-[var(--ant-font-size-lg)] ant-[font-weight:var(--ant-font-weight-strong)] ant-leading-[var(--ant-line-height-lg)]">
+                <span class="text-[var(--ant-color-text)] text-size-[var(--ant-font-size-lg)] [font-weight:var(--ant-font-weight-strong)] leading-[var(--ant-line-height-lg)]">
                   {props.title}
                 </span>
               </div>
 
               <div>{props.extra}</div>
             </div>
-            <div class="ant-p-[var(--ant-padding-lg)] ant-overflow-auto">{props.children}</div>
+            <div class="p-[var(--ant-padding-lg)] overflow-auto">{props.children}</div>
           </div>
         </div>
       </Show>

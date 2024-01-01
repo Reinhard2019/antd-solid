@@ -30,46 +30,46 @@ interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElemen
 }
 
 const sizeClassMap = {
-  large: 'ant-px-15px ant-py-6px ant-h-40px ant-rounded-8px',
-  middle: 'ant-px-15px ant-py-4px ant-h-32px ant-rounded-6px',
-  small: 'ant-px-7px ant-h-24px ant-rounded-4px',
+  large: 'px-15px py-6px h-40px rounded-8px',
+  middle: 'px-15px py-4px h-32px rounded-6px',
+  small: 'px-7px h-24px rounded-4px',
 } as const
 
 const typeClassMap = {
   default: (danger: boolean) =>
     cs(
-      'ant-bg-white',
+      'bg-white',
       danger
-        ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-[border:1px_solid_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-text-[var(--ant-color-primary-active)]',
+        ? '[border:1px_solid_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:text-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:text-[var(--ant-dark-error-color)]'
+        : '[border:1px_solid_var(--ant-color-border)] text-[var(--ant-dark-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
     ),
   primary: (danger: boolean) =>
     cs(
-      'ant-text-white',
+      'text-white',
       danger
-        ? 'ant-[border:1px_solid_var(--ant-color-error)] ant-bg-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-bg-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-bg-[var(--dark-error-color)]'
-        : 'ant-[border:1px_solid_var(--ant-color-primary)] ant-bg-[var(--ant-color-primary)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-bg-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-bg-[var(--ant-color-primary-active)]',
+        ? '[border:1px_solid_var(--ant-color-error)] bg-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:bg-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:bg-[var(--ant-dark-error-color)]'
+        : '[border:1px_solid_var(--ant-color-primary)] bg-[var(--ant-color-primary)] hover:[border-color:var(--ant-color-primary-hover)] hover:bg-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:bg-[var(--ant-color-primary-active)]',
     ),
   dashed: (danger: boolean) =>
     cs(
-      ' ant-bg-white',
+      ' bg-white',
       danger
-        ? 'ant-[border:1px_dashed_var(--ant-color-error)] ant-text-[var(--ant-color-error)] hover:ant-[border-color:var(--light-error-color)] hover:ant-text-[var(--light-error-color)] active:ant-[border-color:var(--dark-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-[border:1px_dashed_var(--ant-color-border)] ant-text-[var(--dark-color)] hover:ant-[border-color:var(--ant-color-primary-hover)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-[border-color:var(--ant-color-primary-active)] active:ant-text-[var(--ant-color-primary-active)]',
+        ? '[border:1px_dashed_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:text-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:text-[var(--ant-dark-error-color)]'
+        : '[border:1px_dashed_var(--ant-color-border)] text-[var(--ant-dark-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
     ),
   text: (danger: boolean) =>
     cs(
-      'ant-border-none ant-bg-transparent',
+      'border-none bg-transparent',
       danger
-        ? 'ant-text-[var(--ant-color-error)] hover:ant-bg-[var(--error-bg-color)] active:ant-bg-[var(--error-bg-color)]'
-        : 'ant-text-[var(--dark-color)] hover:ant-bg-[rgba(0,0,0,0.06)] active:ant-bg-[rgba(0,0,0,.15)]',
+        ? 'text-[var(--ant-color-error)] hover:bg-[var(--ant-error-bg-color)] active:bg-[var(--ant-error-bg-color)]'
+        : 'text-[var(--ant-dark-color)] hover:bg-[rgba(0,0,0,0.06)] active:bg-[rgba(0,0,0,.15)]',
     ),
   link: (danger: boolean) =>
     cs(
-      'ant-border-none ant-bg-transparent',
+      'border-none bg-transparent',
       danger
-        ? 'ant-text-[var(--ant-color-error)] hover:ant-text-[var(--light-error-color)] active:ant-text-[var(--dark-error-color)]'
-        : 'ant-text-[var(--ant-color-primary)] hover:ant-text-[var(--ant-color-primary-hover)] active:ant-text-[var(--ant-color-primary-active)]',
+        ? 'text-[var(--ant-color-error)] hover:text-[var(--ant-light-error-color)] active:text-[var(--ant-dark-error-color)]'
+        : 'text-[var(--ant-color-primary)] hover:text-[var(--ant-color-primary-hover)] active:text-[var(--ant-color-primary-active)]',
     ),
 } as const
 
@@ -83,13 +83,12 @@ const Button: Component<ButtonProps> = props => {
       ref={mergedProps.ref}
       class={cs(
         `ant-btn ant-btn-${mergedProps.type}`,
-        'ant-relative ant-cursor-pointer',
-        'focus-visible:ant-[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:ant-[outline-offset:1px]',
+        'relative cursor-pointer',
+        'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
         mergedProps.class,
         sizeClassMap[mergedProps.size!],
         typeClassMap[mergedProps.type!](props.danger ?? false),
-        loading() && 'ant-opacity-65',
-        'ant-[--color:--ant-color-primary-hover]',
+        loading() && 'opacity-65',
         Compact.compactItemRounded0Class,
         Compact.compactItemZIndexClass,
         Compact.compactItemClass,
@@ -113,9 +112,9 @@ const Button: Component<ButtonProps> = props => {
           const div = document.createElement('div')
           div.className = cs(
             props.danger
-              ? 'ant-[--color:var(--light-error-color)]'
-              : 'ant-[--color:var(--ant-color-primary-hover)]',
-            'ant-absolute ant-inset-0 ant-rounded-inherit ant-[background:radial-gradient(var(--color),rgba(0,0,0,0))] ant-z--1 ant-keyframes-button-border[inset:0px][inset:-6px] ant-[animation:button-border_ease-out_0.3s]',
+              ? '[--color:var(--ant-light-error-color)]'
+              : '[--color:var(--ant-color-primary-hover)]',
+            'absolute inset-0 rounded-inherit [background:radial-gradient(var(--color),rgba(0,0,0,0))] z--1 keyframes-button-border[inset:0px][inset:-6px] [animation:button-border_ease-out_.3s]',
           )
           const onAnimationEnd = () => {
             div.remove()
@@ -127,7 +126,7 @@ const Button: Component<ButtonProps> = props => {
       }}
     >
       <Show when={loading()}>
-        <span class="i-ant-design:loading ant-[vertical-align:-0.125em] keyframes-spin ant-[animation:spin_1s_linear_infinite] ant-mr-8px" />
+        <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite] mr-8px" />
       </Show>
       <span>{mergedProps.children}</span>
     </button>

@@ -32,21 +32,21 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
 const statusClassDict = {
   default: (disabled: boolean) =>
     cs(
-      'ant-[border:1px_solid_var(--ant-color-border)]',
+      '[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
-        'hover:ant-border-[var(--ant-color-primary)] focus-within:ant-border-[var(--ant-color-primary)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
+        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
     ),
   error: (disabled: boolean) =>
     cs(
-      'ant-[border:1px_solid_var(--ant-color-error)]',
+      '[border:1px_solid_var(--ant-color-error)]',
       !disabled &&
-        'hover:ant-border-[var(--light-error-color)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+        'hover:border-[var(--ant-light-error-color)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
     ),
   warning: (disabled: boolean) =>
     cs(
-      'ant-[border:1px_solid_var(--warning-color)]',
+      '[border:1px_solid_var(--ant-warning-color)]',
       !disabled &&
-        'hover:ant-border-[var(--color-warning-border-hover)] focus-within:ant-[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+        'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
     ),
 }
 
@@ -73,10 +73,10 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
 
   const inputWrapClass = createMemo(() =>
     cs(
-      'ant-px-11px ant-py-4px ant-rounded-6px',
-      !props.textarea && 'ant-h-32px',
-      props.addonBefore ? 'ant-rounded-l-0' : Compact.compactItemRoundedLeftClass,
-      props.addonAfter ? 'ant-rounded-r-0' : Compact.compactItemRoundedRightClass,
+      'px-11px py-4px rounded-6px',
+      !props.textarea && 'h-32px',
+      props.addonBefore ? 'rounded-l-0' : Compact.compactItemRoundedLeftClass,
+      props.addonAfter ? 'rounded-r-0' : Compact.compactItemRoundedRightClass,
       statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
@@ -94,10 +94,9 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       }
       {...(inputProps as JSX.InputHTMLAttributes<HTMLInputElement>)}
       class={cs(
-        'ant-w-full ant-[outline:none] ant-text-14px',
+        'w-full [outline:none] text-14px',
         !hasPrefixOrSuffix() && inputWrapClass(),
-        inputProps.disabled &&
-          'ant-bg-[var(--ant-color-bg-container-disabled)] ant-cursor-not-allowed',
+        inputProps.disabled && 'bg-[var(--ant-color-bg-container-disabled)] cursor-not-allowed',
       )}
       value={value() ?? ''}
       onInput={e => {
@@ -122,11 +121,11 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   )
 
   return (
-    <div class={cs('ant-flex ant-w-full', Compact.compactItemClass)} style={style}>
+    <div class={cs('flex w-full', Compact.compactItemClass)} style={style}>
       <Show when={props.addonBefore}>
         <div
           class={cs(
-            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-r-0 ant-rounded-l-6px ant-text-14px',
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px text-14px',
             Compact.compactItemRounded0Class,
             Compact.compactItemRoundedLeftClass,
           )}
@@ -138,22 +137,22 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={hasPrefixOrSuffix()} fallback={inputJSX}>
         <div
           class={cs(
-            'ant-flex ant-items-center ant-w-full ant-relative ant-[--input-after-display:none] hover:ant-[--input-after-display:block] p:hover-child[input]:ant-border-[var(--ant-color-primary)]',
+            'flex items-center w-full relative [--input-after-display:none] hover:[--input-after-display:block] p:hover-child[input]:border-[var(--ant-color-primary)]',
             inputWrapClass(),
           )}
         >
           <Show when={props.prefix}>
-            <div class="ant-mr-4px">{props.prefix}</div>
+            <div class="mr-4px">{props.prefix}</div>
           </Show>
 
           {inputJSX}
 
           <Show when={props.suffix}>
-            <div class="ant-ml-4px">{props.suffix}</div>
+            <div class="ml-4px">{props.suffix}</div>
           </Show>
 
           <Show when={props.actions}>
-            <div class="ant-[display:var(--input-after-display)] ant-absolute ant-top-0 ant-bottom-0 ant-right-0 ant-h-[calc(100%-2px)] ant-translate-y-1px -ant-translate-x-1px">
+            <div class="[display:var(--ant-input-after-display)] absolute top-0 bottom-0 right-0 h-[calc(100%-2px)] translate-y-1px -translate-x-1px">
               {props.actions}
             </div>
           </Show>
@@ -163,7 +162,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={props.addonAfter}>
         <div
           class={cs(
-            'ant-shrink-0 ant-flex ant-justify-center ant-items-center ant-px-11px ant-bg-[rgba(0,0,0,.02)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-l-0 ant-rounded-r-6px ant-text-14px',
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px text-14px',
             Compact.compactItemRounded0Class,
             Compact.compactItemRoundedRightClass,
           )}

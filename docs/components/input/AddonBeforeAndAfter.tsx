@@ -3,7 +3,13 @@ import { Input } from 'antd-solid'
 
 const AddonBeforeAndAfter: Component = () => {
   return (
-    <div class='ant-flex ant-flex-col ant-gap-8px'>
+    <div
+      style={{
+        display: 'flex',
+        'flex-direction': 'column',
+        gap: '8px',
+      }}
+    >
       <Input addonBefore="http://" addonAfter=".com" defaultValue="mysite" />
       <Input addonBefore="http://" defaultValue="mysite" />
       <Input addonAfter=".com" defaultValue="mysite" />

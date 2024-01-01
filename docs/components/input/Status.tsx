@@ -3,7 +3,13 @@ import { Input } from 'antd-solid'
 
 const Status: Component = () => {
   return (
-    <div class="ant-flex ant-flex-col ant-gap-8px">
+    <div
+      style={{
+        display: 'flex',
+        'flex-direction': 'column',
+        gap: '8px',
+      }}
+    >
       <Input
         placeholder="Error"
         status="error"

@@ -99,8 +99,8 @@ function Modal(_props: ModalProps) {
       <Portal>
         <div
           class={cs(
-            'ant-fixed ant-justify-center ant-inset-0 ant-bg-[rgba(0,0,0,.45)] ant-flex ant-z-1000',
-            props.centered && 'ant-items-center',
+            'fixed justify-center inset-0 bg-[rgba(0,0,0,.45)] flex z-1000',
+            props.centered && 'items-center',
           )}
           onClick={() => {
             if (props.maskClosable ?? true) {
@@ -112,9 +112,9 @@ function Modal(_props: ModalProps) {
           <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
             <div
               class={cs(
-                'ant-absolute ant-px-24px ant-py-20px ant-rounded-8px ant-overflow-hidden ant-bg-white ant-flex ant-flex-col',
-                // '!ant-[animation-duration:.5s]',
-                !props.centered && 'ant-top-100px',
+                'absolute px-24px py-20px rounded-8px overflow-hidden bg-white flex flex-col',
+                // '![animation-duration:.5s]',
+                !props.centered && 'top-100px',
               )}
               onClick={e => {
                 e.stopPropagation()
@@ -129,7 +129,7 @@ function Modal(_props: ModalProps) {
                 <Button
                   type="text"
                   class={cs(
-                    'ant-rm-size-btn !ant-w-22px !ant-h-22px !ant-flex !ant-justify-center !ant-items-center ant-text-center ant-text-18px !ant-absolute !ant-top-16px !ant-right-16px ant-z-1000 ant-text-[rgba(0,0,0,.45)] hover:!ant-text-[rgba(0,0,0,.88)]',
+                    'rm-size-btn !w-22px !h-22px !flex !justify-center !items-center text-center text-18px !absolute !top-16px !right-16px z-1000 text-[rgba(0,0,0,.45)] hover:!text-[rgba(0,0,0,.88)]',
                   )}
                   onClick={() => {
                     instance.close()
@@ -139,18 +139,16 @@ function Modal(_props: ModalProps) {
                 </Button>
               </Show>
 
-              <div class="ant-text-[rgba(0,0,0,.88)] ant-text-16px ant-font-600 ant-mb-8px">
-                {props.title}
-              </div>
-              <div class="ant-grow">{props.children}</div>
+              <div class="text-[rgba(0,0,0,.88)] text-16px font-600 mb-8px">{props.title}</div>
+              <div class="grow">{props.children}</div>
 
               <Show when={props.footer !== false}>
-                <div class="ant-mt-12px">
+                <div class="mt-12px">
                   <Show
                     when={typeof props.footer !== 'function'}
                     fallback={typeof props.footer === 'function' && props.footer(instance)}
                   >
-                    <div class="ant-flex ant-gap-8px ant-justify-end">
+                    <div class="flex gap-8px justify-end">
                       <Button
                         onClick={() => {
                           instance.close()
@@ -201,11 +199,11 @@ Modal.warning = (props: MethodProps) => {
         {...props}
         title={
           <>
-            <span class="i-ant-design:exclamation-circle ant-text-22px ant-mr-12px ant-text-[var(--warning-color)]" />
+            <span class="i-ant-design:exclamation-circle text-22px mr-12px text-[var(--ant-warning-color)]" />
             {props.title}
           </>
         }
-        children={<div class="ant-ml-34px">{props.children}</div>}
+        children={<div class="ml-34px">{props.children}</div>}
         defaultOpen
         afterClose={() => {
           document.body.removeChild(div)

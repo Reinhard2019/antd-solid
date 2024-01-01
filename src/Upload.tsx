@@ -119,7 +119,7 @@ const Upload: Component<UploadProps> & {
 
       <input
         ref={input}
-        class="ant-hidden"
+        class="hidden"
         type="file"
         accept={props.accept}
         multiple={props.multiple}

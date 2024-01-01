@@ -3,11 +3,11 @@ import SimpleEmptySvg from './assets/SimpleEmptySvg'
 
 const PRESENTED_IMAGE_SIMPLE: Component = () => {
   return (
-    <div class='ant-my-[var(--ant-margin-xl)] ant-mx-[var(--ant-margin-xs)]'>
-      <div class="ant-mb-[var(--ant-margin-xs)] ant-flex ant-justify-center">
+    <div class="my-[var(--ant-margin-xl)] mx-[var(--ant-margin-xs)]">
+      <div class="mb-[var(--ant-margin-xs)] flex justify-center">
         <SimpleEmptySvg />
       </div>
-      <div class="ant-text-[var(--ant-color-text-disabled)] ant-text-center">暂无数据</div>
+      <div class="text-[var(--ant-color-text-disabled)] text-center">暂无数据</div>
     </div>
   )
 }

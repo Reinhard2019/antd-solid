@@ -40,15 +40,15 @@ const Progress: Component<ProgressProps> = _props => {
 
   return (
     <div
-      class="ant-flex ant-items-center"
+      class="flex items-center"
       style={{
-        '--ant-progress-remaining-color': 'rgba(0, 0, 0, 0.06)',
+        '--progress-remaining-color': 'rgba(0, 0, 0, 0.06)',
       }}
     >
       <div
         class={cs(
-          'ant-w-full ant-bg-[var(--ant-progress-remaining-color)]',
-          'before:ant-content-empty before:ant-block before:ant-bg-[var(--color)] before:ant-w-[var(--percent)] before:ant-h-full before:ant-rounded-inherit',
+          'w-full bg-[var(--progress-remaining-color)]',
+          'before:content-empty before:block before:bg-[var(--color)] before:w-[var(--percent)] before:h-full before:rounded-inherit',
         )}
         style={{
           height: `${props.height}px`,
@@ -63,13 +63,13 @@ const Progress: Component<ProgressProps> = _props => {
       />
 
       <Show when={props.showInfo}>
-        <span class="ant-shrink-0 ant-min-w-40px ant-ml-8px ant-text-center">
+        <span class="shrink-0 min-w-40px ml-8px text-center">
           <Switch fallback={`${props.percent}%`}>
             <Match when={status() === 'success'}>
-              <span class="i-ant-design:check-circle-filled ant-text-[var(--ant-color-success)]" />
+              <span class="i-ant-design:check-circle-filled text-[var(--ant-color-success)]" />
             </Match>
             <Match when={status() === 'error'}>
-              <span class="i-ant-design:close-circle-filled ant-text-[var(--ant-color-error)]" />
+              <span class="i-ant-design:close-circle-filled text-[var(--ant-color-error)]" />
             </Match>
           </Switch>
         </span>

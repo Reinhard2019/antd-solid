@@ -12,10 +12,10 @@ const Empty: Component<EmptyProps> & {
 } = props => {
   return (
     <div {...props} style={props.style}>
-      <div class="ant-mb-[var(--ant-margin-xs)] ant-flex ant-justify-center">
+      <div class="mb-[var(--ant-margin-xs)] flex justify-center">
         <EmptySvg />
       </div>
-      <div class="ant-text-[var(--ant-color-text)] ant-text-center">暂无数据</div>
+      <div class="text-[var(--ant-color-text)] text-center">暂无数据</div>
     </div>
   )
 }

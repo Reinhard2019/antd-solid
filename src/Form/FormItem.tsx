@@ -81,8 +81,8 @@ const FormItem: Component<FormItemProps> = props => {
   const getLabel = (hidden?: boolean) => (
     <label
       class={cs(
-        'ant-shrink-0 ant-h-32px ant-leading-32px not[:empty]:ant-pr-8px ant-text-right ant-[white-space:nowrap]',
-        hidden && 'ant-absolute ant-opacity-0',
+        'shrink-0 h-32px leading-32px not[:empty]:pr-8px text-right [white-space:nowrap]',
+        hidden && 'absolute opacity-0',
       )}
       {...(hidden
         ? {
@@ -95,7 +95,7 @@ const FormItem: Component<FormItemProps> = props => {
         })}
     >
       <Show when={!isNil(props.required)}>
-        <span class="ant-mr-4px ant-text-[var(--ant-color-error)]">*</span>
+        <span class="mr-4px text-[var(--ant-color-error)]">*</span>
       </Show>
       <Show when={!isNil(props.label)}>
         <label>{props.label}</label>
@@ -104,12 +104,12 @@ const FormItem: Component<FormItemProps> = props => {
   )
 
   return (
-    <div class={cs(props.class, 'ant-flex ant-items-center ant-mb-16px')} style={props.style}>
+    <div class={cs(props.class, 'flex items-center mb-16px')} style={props.style}>
       {/* 第一个 label 仅用于计算实际宽度 */}
       {getLabel(true)}
       {getLabel()}
 
-      <div class="ant-w-full">
+      <div class="w-full">
         <Dynamic
           component={props.component}
           defaultValue={props.initialValue ?? get(initialValues, props.name!)}
@@ -131,7 +131,7 @@ const FormItem: Component<FormItemProps> = props => {
         />
 
         <Show when={errMsg()}>
-          <div class="ant-text-[var(--ant-color-error)]">{errMsg()}</div>
+          <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
         </Show>
       </div>
     </div>

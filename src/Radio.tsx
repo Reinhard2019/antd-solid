@@ -43,15 +43,15 @@ const Radio: Component<RadioProps> & {
   })
 
   return (
-    <label class="ant-inline-flex ant-gap-4px ant-cursor-pointer ant-inline-flex ant-items-center">
+    <label class="inline-flex gap-4px cursor-pointer inline-flex items-center">
       <span
         class={cs(
-          'ant-w-16px ant-h-16px ant-rounded-50% ant-[border:1px_solid_var(--ant-color-border)]',
-          checked() && 'ant-[border:5px_solid_var(--ant-color-primary)]',
+          'w-16px h-16px rounded-50% [border:1px_solid_var(--ant-color-border)]',
+          checked() && '[border:5px_solid_var(--ant-color-primary)]',
         )}
       >
         <input
-          class="ant-m-0 ant-hidden"
+          class="m-0 hidden"
           checked={checked()}
           value={props.value ?? ''}
           type="radio"
@@ -77,13 +77,13 @@ Radio.Button = props => {
   return (
     <label
       class={cs(
-        'ant-px-15px ant-[border:1px_solid_rgb(217,217,217)] first:ant-rounded-l-6px last:ant-rounded-r-6px ant-h-32px ant-inline-flex ant-items-center hover:ant-text-[var(--ant-color-primary)] not[:last-child]:ant-border-r-transparent ant-cursor-pointer ant-flex-grow ant-justify-center',
+        'px-15px [border:1px_solid_rgb(217,217,217)] first:rounded-l-6px last:rounded-r-6px h-32px inline-flex items-center hover:text-[var(--ant-color-primary)] not[:last-child]:border-r-transparent cursor-pointer flex-grow justify-center',
         checked() &&
-          'ant-text-[var(--ant-color-primary)] ant-[border:1px_solid_var(--ant-color-primary)] !ant-border-r-[var(--ant-color-primary)]',
+          'text-[var(--ant-color-primary)] [border:1px_solid_var(--ant-color-primary)] !border-r-[var(--ant-color-primary)]',
       )}
     >
       <input
-        class="ant-w-0 ant-h-0"
+        class="w-0 h-0"
         checked={checked()}
         value={props.value ?? ''}
         type="radio"
@@ -112,8 +112,8 @@ Radio.Group = _props => {
   return (
     <div
       class={cs(
-        props.block ? 'ant-flex' : 'ant-inline-flex',
-        props.optionType === 'default' ? 'ant-gap-8px' : '',
+        props.block ? 'flex' : 'inline-flex',
+        props.optionType === 'default' ? 'gap-8px' : '',
       )}
     >
       <For each={props.options}>

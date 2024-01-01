@@ -5,7 +5,7 @@ import { type JSXElement, createMemo } from 'solid-js'
 import { mapValues } from 'lodash-es'
 
 const _Image = replaceClassName(
-  reactToSolidComponent(configProvider(ImageAntd), () => (<div class="ant-inline-flex" />) as any),
+  reactToSolidComponent(configProvider(ImageAntd), () => (<div class="inline-flex" />) as any),
 )
 
 type ImageProps = Omit<Parameters<typeof _Image>[0], 'placeholder'> & {
@@ -17,7 +17,7 @@ function Image(_props: ImageProps) {
     mapValues(_props, (value, key) => {
       switch (key) {
         case 'placeholder':
-          return solidToReact(value)
+          return solidToReact(value as Element)
         default:
           return value
       }

@@ -59,13 +59,13 @@ const Select: Component<SelectProps> = props => {
         padding: 0,
       }}
       content={close => (
-        <div class="ant-bg-white ant-w-200px" style={{ width: `${width()}px` }}>
+        <div class="bg-white w-200px" style={{ width: `${width()}px` }}>
           <For each={props.options}>
             {item => (
               <div
                 class={cs(
-                  'ant-box-content ant-px-12px ant-py-5px ant-h-22px ant-leading-22px hover:ant-bg-[var(--hover-bg-color)]',
-                  selectedValue(item.value) ? '!ant-bg-[var(--ant-select-option-selected-bg)]' : '',
+                  'box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)]',
+                  selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                 )}
                 onClick={() => {
                   setValue(item.value)
@@ -82,7 +82,7 @@ const Select: Component<SelectProps> = props => {
       <div
         ref={select!}
         class={cs(
-          'ant-h-32px ant-leading-32px ant-rounded-6px ant-[border:1px_solid_var(--ant-color-border)] ant-px-11px focus:ant-[border-color:var(--ant-color-primary)]',
+          'h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] px-11px focus:[border-color:var(--ant-color-primary)]',
           props.class,
         )}
         tabIndex="0"
@@ -94,17 +94,17 @@ const Select: Component<SelectProps> = props => {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         style={{
-          '--ant-arrow-color': 'rgba(146, 146, 146, 1)',
-          '--ant-clear-color': 'rgba(146, 146, 146, 1)',
-          '--ant-clear-color-hover': 'rgba(194, 194, 194, 1)',
+          '--arrow-color': 'rgba(146, 146, 146, 1)',
+          '--clear-color': 'rgba(146, 146, 146, 1)',
+          '--clear-color-hover': 'rgba(194, 194, 194, 1)',
         }}
       >
-        <div class="ant-relative ant-h-full">
+        <div class="relative h-full">
           <Show
             when={!isNil(value())}
             fallback={
               <input
-                class="ant-h-full ant-w-full ant-float-left ant-[outline:none]"
+                class="h-full w-full float-left [outline:none]"
                 readOnly
                 placeholder={props.placeholder}
               />
@@ -113,15 +113,13 @@ const Select: Component<SelectProps> = props => {
             <div>{selectedOption()!.label ?? value()}</div>
           </Show>
 
-          <div class="ant-absolute ant-top-0 ant-bottom-0 ant-right-0">
+          <div class="absolute top-0 bottom-0 right-0">
             <Show
               when={showClearBtn()}
-              fallback={
-                <span class="i-ant-design:down-outlined ant-text-[var(--ant-allow-color)]" />
-              }
+              fallback={<span class="i-ant-design:down-outlined text-[var(--ant-allow-color)]" />}
             >
               <span
-                class="i-ant-design:close-circle-filled ant-cursor-pointer ant-text-[var(--ant-clear-color)] hover:ant-text-[var(--ant-clear-color-hover)]"
+                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-clear-color)] hover:text-[var(--ant-clear-color-hover)]"
                 onClick={e => {
                   e.stopPropagation()
                   setValue(undefined)

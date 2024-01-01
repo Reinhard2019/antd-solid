@@ -8,27 +8,27 @@ export default defineConfig({
     {
       getCSS: () => `
         :root {
-          --hover-bg-color: rgba(0,0,0,.04);
+          --ant-hover-bg-color: rgba(0,0,0,.04);
         
-          --light-error-color: #ff7875;
-          --dark-error-color: #d9363e;
+          --ant-light-error-color: #ff7875;
+          --ant-dark-error-color: #d9363e;
         
-          --error-bg-color: #fff2f0;
-          --error-bg-hover-color: #fff1f0;
+          --ant-error-bg-color: #fff2f0;
+          --ant-error-bg-hover-color: #fff1f0;
         
-          --warning-color: #faad14;
-          --color-warning-border-hover: #ffd666;
+          --ant-warning-color: #faad14;
+          --ant-color-warning-border-hover: #ffd666;
         
-          --secondary-border-color: #f0f0f0;
+          --ant-secondary-border-color: #f0f0f0;
         
-          --light-color: rgba(0, 0, 0, 0.45);
-          --dark-color: rgba(0, 0, 0, 0.88);
+          --ant-light-color: rgba(0, 0, 0, 0.45);
+          --ant-dark-color: rgba(0, 0, 0, 0.88);
         
-          --color-text-secondary: rgba(0, 0, 0, 0.65);
-          --color-text-tertiary: rgba(0, 0, 0, 0.45);
-          --color-text-quaternary: rgba(0, 0, 0, 0.25);
+          --ant-color-text-secondary: rgba(0, 0, 0, 0.65);
+          --ant-color-text-tertiary: rgba(0, 0, 0, 0.45);
+          --ant-color-text-quaternary: rgba(0, 0, 0, 0.25);
         
-          --light-bg-color: #fafafa;
+          --ant-light-bg-color: #fafafa;
 
           --ant-color-primary-active: #0958d9;
           --ant-color-primary: #1677ff;
@@ -81,9 +81,7 @@ export default defineConfig({
     },
   ],
   presets: [
-    presetMini({
-      prefix: 'ant-',
-    }),
+    presetMini(),
     presetIcons({
       collections: {
         'ant-design': async () => await import('@iconify-json/ant-design').then(i => i.icons),
@@ -162,7 +160,6 @@ export default defineConfig({
     },
   ],
   rules: [
-    ['ant-rm-size-btn', { padding: 0, border: 'none', height: 'auto' }],
     [
       /^keyframes-spin$/,
       () => {
@@ -177,7 +174,7 @@ export default defineConfig({
       },
     ],
     [
-      /^ant-keyframes-(.*)(\[.*\])(\[.*\])$/,
+      /^keyframes-(.*)(\[.*\])(\[.*\])$/,
       match => {
         return `@keyframes ${match[1]} {
           from {

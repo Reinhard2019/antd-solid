@@ -97,10 +97,9 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
           <>
             <div
               class={cs(
-                'ant-flex ant-items-center ant-h-28px ant-pb-4px',
-                isDraggable(item()) &&
-                  'ant-[border:1px_solid_var(--ant-color-primary)] ant-bg-white',
-                draggableNode() && 'child[]:ant-pointer-events-none',
+                'flex items-center h-28px pb-4px',
+                isDraggable(item()) && '[border:1px_solid_var(--ant-color-primary)] bg-white',
+                draggableNode() && 'child[]:pointer-events-none',
               )}
               draggable={draggable}
               onDragStart={() => {
@@ -138,15 +137,15 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
                 {Array(props.indent)
                   .fill(0)
                   .map(() => (
-                    <span class="ant-inline-block ant-w-24px" />
+                    <span class="inline-block w-24px" />
                   ))}
               </div>
-              <div class="ant-flex-shrink-0 ant-w-24px ant-h-24px ant-flex ant-items-center ant-justify-center">
+              <div class="flex-shrink-0 w-24px h-24px flex items-center justify-center">
                 <span class="i-ant-design:holder-outlined" />
               </div>
               <div
                 class={cs(
-                  'ant-flex-shrink-0 ant-w-24px ant-h-24px ant-flex ant-items-center ant-justify-center ant-cursor-pointer',
+                  'flex-shrink-0 w-24px h-24px flex items-center justify-center cursor-pointer',
                   isEmpty(props.children(item())) && 'opacity-0',
                 )}
               >
@@ -167,11 +166,11 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
               </div>
               <div
                 class={cs(
-                  'ant-h-full ant-leading-24px hover:ant-bg-[var(--hover-bg-color)] ant-rounded-1 ant-px-1 ant-cursor-pointer ant-relative',
+                  'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative',
                   props.blockNode && 'w-full',
-                  selectedNodes()?.includes(item()) && '!ant-bg-[var(--ant-tree-node-selected-bg)]',
+                  selectedNodes()?.includes(item()) && '!bg-[var(--ant-tree-node-selected-bg)]',
                   isTarget(item()) &&
-                    "before:ant-content-[''] before:ant-inline-block before:ant-w-8px before:ant-h-8px before:ant-absolute before:ant-bottom-0 before:ant-left-0 before:-ant-translate-x-full before:ant-translate-y-1/2 before:ant-rounded-1/2 before:ant-[border:2px_solid_var(--ant-color-primary)] after:ant-content-[''] after:ant-inline-block after:ant-h-2px after:ant-absolute after:ant-left-0 after:ant-right-0 after:ant-bottom--1px after:ant-bg-[var(--ant-color-primary)]",
+                    "before:content-[''] before:inline-block before:w-8px before:h-8px before:absolute before:bottom-0 before:left-0 before:-translate-x-full before:translate-y-1/2 before:rounded-1/2 before:[border:2px_solid_var(--ant-color-primary)] after:content-[''] after:inline-block after:h-2px after:absolute after:left-0 after:right-0 after:bottom--1px after:bg-[var(--ant-color-primary)]",
                 )}
                 onClick={() => {
                   setSelectedNodes([item()])

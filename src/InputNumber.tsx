@@ -26,7 +26,7 @@ export interface InputNumberProps
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
 
 const actionBtnClass =
-  'ant-text-12px ant-flex ant-justify-center ant-items-center ant-h-1/2 ant-cursor-pointer ant-opacity-70 hover:ant-h-100% hover:ant-text-[var(--ant-color-primary)] ant-transition-color ant-transition-height ant-transition-duration-500'
+  'text-12px flex justify-center items-center h-1/2 cursor-pointer opacity-70 hover:h-100% hover:text-[var(--ant-color-primary)] transition-color transition-height transition-duration-500'
 
 const InputNumber: Component<InputNumberProps> = _props => {
   const props = mergeProps(
@@ -88,12 +88,12 @@ const InputNumber: Component<InputNumberProps> = _props => {
     <CommonInput
       {...inputProps}
       actions={
-        <div class="ant-flex ant-flex-col ant-h-full ant-w-24px ant-[border-left:1px_solid_var(--ant-color-border)]">
+        <div class="flex flex-col h-full w-24px [border-left:1px_solid_var(--ant-color-border)]">
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />
           </div>
           <div
-            class={`ant-[border-top:1px_solid_var(--ant-color-border)] ${actionBtnClass}`}
+            class={`[border-top:1px_solid_var(--ant-color-border)] ${actionBtnClass}`}
             onClick={down}
           >
             <div class="i-ant-design:down-outlined" />

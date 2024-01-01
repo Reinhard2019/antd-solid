@@ -306,8 +306,8 @@ const Tooltip: Component<TooltipProps> = _props => {
           <div
             ref={content!}
             class={cs(
-              'ant-z-1000 ant-fixed ant-absolute ant-px-8px ant-py-6px ant-rounded-8px ant-box-content ant-[box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
-              props.mode === 'dark' ? 'ant-bg-[rgba(0,0,0,0.85)] ant-text-white' : 'ant-bg-white',
+              'z-1000 fixed absolute px-8px py-6px rounded-8px box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
+              props.mode === 'dark' ? 'bg-[rgba(0,0,0,0.85)] text-white' : 'bg-white',
             )}
             style={{
               ...contentPositionStyle(),
@@ -321,9 +321,7 @@ const Tooltip: Component<TooltipProps> = _props => {
 
             <Show when={props.arrow}>
               <div
-                class={cs(
-                  'ant-w-8px ant-h-8px ant-absolute ant-border-solid ant-border-4px ant-border-transparent',
-                )}
+                class={cs('w-8px h-8px absolute border-solid border-4px border-transparent')}
                 style={{
                   '--color': props.mode === 'dark' ? 'rgba(0,0,0,0.85)' : 'white',
                   ...arrowStyle(),

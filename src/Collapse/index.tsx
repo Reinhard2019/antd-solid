@@ -28,16 +28,16 @@ const Collapse: Component<CollapseProps> = props => {
   return (
     <div
       class={cs(
-        'ant-rounded-[var(--ant-border-radius-lg)] ant-[border:1px_solid_var(--ant-color-border)] ant-border-b-0',
+        'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] border-b-0',
         props.class,
       )}
       style={props.style}
     >
       <For each={props.items}>
         {item => (
-          <div class="ant-[border-bottom:1px_solid_var(--ant-color-border)] first:ant-rounded-t-[var(--ant-border-radius-lg)] last:ant-rounded-b-[var(--ant-border-radius-lg)] ant-cursor-pointer">
+          <div class="[border-bottom:1px_solid_var(--ant-color-border)] first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] cursor-pointer">
             <div
-              class="ant-bg-[var(--ant-collapse-header-bg)] ant-text-[var(--ant-color-text-heading)] ant-p-[var(--ant-collapse-header-padding)]"
+              class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)]"
               onClick={() => {
                 setActiveKey(keys => {
                   if (keys.includes(item.key)) {
@@ -50,8 +50,8 @@ const Collapse: Component<CollapseProps> = props => {
               <span
                 class={cs(
                   'i-ant-design:right-outlined',
-                  'ant-mr-[var(--ant-margin-sm)] ant-duration-.3s',
-                  activeKey().includes(item.key) && 'ant-rotate-[90deg]',
+                  'mr-[var(--ant-margin-sm)] duration-.3s',
+                  activeKey().includes(item.key) && 'rotate-[90deg]',
                 )}
               />
               {item.label}
@@ -69,8 +69,8 @@ const Collapse: Component<CollapseProps> = props => {
               }}
             >
               <Show when={activeKey().includes(item.key)}>
-                <div class="ant-overflow-hidden">
-                  <div class="ant-p-[var(--ant-padding-sm)] ant-[border-top:1px_solid_var(--ant-color-border)]">
+                <div class="overflow-hidden">
+                  <div class="p-[var(--ant-padding-sm)] [border-top:1px_solid_var(--ant-color-border)]">
                     {item.children}
                   </div>
                 </div>

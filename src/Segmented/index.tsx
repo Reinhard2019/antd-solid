@@ -45,14 +45,14 @@ const Segmented: Component<SegmentedProps> = props => {
   return (
     <div
       class={cs(
-        'ant-bg-[var(--ant-color-bg-layout)] ant-rounded-[var(--ant-border-radius)] ant-p-2px',
-        props.block ? 'ant-flex' : 'ant-inline-flex',
+        'bg-[var(--ant-color-bg-layout)] rounded-[var(--ant-border-radius)] p-2px',
+        props.block ? 'flex' : 'inline-flex',
         props.class,
       )}
       style={{
-        '--ant-segmented-item-color': 'rgba(0, 0, 0, 0.65)',
-        '--ant-segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
-        '--ant-segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
+        '--segmented-item-color': 'rgba(0, 0, 0, 0.65)',
+        '--segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
+        '--segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
         ...props.style,
       }}
     >
@@ -60,18 +60,17 @@ const Segmented: Component<SegmentedProps> = props => {
         {item => (
           <div
             class={cs(
-              props.block && 'ant-basis-0 ant-grow-1',
-              isDisabledValue(item) && 'ant-cursor-not-allowed',
+              props.block && 'basis-0 grow-1',
+              isDisabledValue(item) && 'cursor-not-allowed',
             )}
           >
             <div
               class={cs(
-                'ant-rounded-[var(--ant-border-radius-sm)] ant-px-[var(--ant-padding-sm)] where:ant-cursor-pointer ant-leading-28px where:hover:ant-bg-[var(--ant-segmented-item-hover-bg)] where:active:ant-bg-[var(--ant-segmented-item-active-bg)]',
-                isSelected(unWarpValue(item)) &&
-                  'ant-bg-white ant-shadow-[var(--ant-box-shadow-tertiary)]',
-                props.block && 'ant-flex ant-justify-center',
+                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] where:cursor-pointer leading-28px where:hover:bg-[var(--ant-segmented-item-hover-bg)] where:active:bg-[var(--ant-segmented-item-active-bg)]',
+                isSelected(unWarpValue(item)) && 'bg-white shadow-[var(--ant-box-shadow-tertiary)]',
+                props.block && 'flex justify-center',
                 isDisabledValue(item) &&
-                  'ant-[pointer-events:none] ant-text-[var(--ant-color-text-disabled)]',
+                  '[pointer-events:none] text-[var(--ant-color-text-disabled)]',
               )}
               onClick={e => {
                 setValue(unWarpValue(item))

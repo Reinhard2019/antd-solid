@@ -16,15 +16,15 @@ const Switch: Component<SwitchProps> = props => {
   return (
     <button
       class={cs(
-        'ant-w-44px ant-h-22px ant-rounded-100px ant-relative',
-        checked() ? 'ant-bg-[var(--ant-color-primary)]' : 'ant-bg-[rgba(0,0,0,0.45)]',
+        'w-44px h-22px rounded-100px relative',
+        checked() ? 'bg-[var(--ant-color-primary)]' : 'bg-[rgba(0,0,0,0.45)]',
       )}
       onClick={() => setChecked(c => !c)}
     >
       <div
         class={cs(
-          'ant-w-18px ant-h-18px ant-rounded-50% ant-bg-white ant-absolute ant-top-1/2 -ant-translate-y-1/2 ant-transition-left',
-          checked() ? 'ant-left-[calc(100%-20px)]' : 'ant-left-2px',
+          'w-18px h-18px rounded-50% bg-white absolute top-1/2 -translate-y-1/2 transition-left',
+          checked() ? 'left-[calc(100%-20px)]' : 'left-2px',
         )}
       />
     </button>
