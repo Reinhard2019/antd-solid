@@ -34,6 +34,11 @@ export interface ModalProps {
    */
   destroyOnClose?: boolean
   /**
+   * 是否支持键盘 esc 关闭
+   * 默认 true
+   */
+  keyboard?: boolean
+  /**
    * 返回 true，会自动关闭 modal
    */
   onOk?: () => boolean | Promise<boolean>
@@ -48,29 +53,31 @@ export interface MethodProps
   extends Pick<ModalProps, 'title' | 'children' | 'onOk' | 'afterClose'> {}
 
 function Modal(_props: ModalProps) {
-  const props = mergeProps({ footer: true }, _props)
+  const props = mergeProps({ footer: true, keyboard: true }, _props)
   const [open, setOpen] = createSignal(props.defaultOpen ?? false)
   const [hide, setHide] = createSignal(false)
-  let cleanup: () => void
+  let cleanup: (() => void) | undefined
 
   const instance: ModalInstance = {
     open() {
       setOpen(true)
       setHide(false)
 
-      const originOverflow = document.body.style.overflow
-      document.body.style.overflow = 'hidden'
+      if (props.keyboard) {
+        const originOverflow = document.body.style.overflow
+        document.body.style.overflow = 'hidden'
 
-      const onKeyup = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') {
-          instance.close()
+        const onKeyup = (e: KeyboardEvent) => {
+          if (e.key === 'Escape') {
+            instance.close()
+          }
         }
-      }
-      document.addEventListener('keyup', onKeyup)
+        document.addEventListener('keyup', onKeyup)
 
-      cleanup = () => {
-        document.body.style.overflow = originOverflow
-        document.removeEventListener('keyup', onKeyup)
+        cleanup = () => {
+          document.body.style.overflow = originOverflow
+          document.removeEventListener('keyup', onKeyup)
+        }
       }
     },
     close() {
@@ -81,7 +88,7 @@ function Modal(_props: ModalProps) {
           setHide(true)
         }
 
-        cleanup()
+        cleanup?.()
         props.afterClose?.()
       })
     },
