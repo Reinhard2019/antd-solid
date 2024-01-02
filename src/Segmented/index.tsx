@@ -50,9 +50,9 @@ const Segmented: Component<SegmentedProps> = props => {
         props.class,
       )}
       style={{
-        '--segmented-item-color': 'rgba(0, 0, 0, 0.65)',
-        '--segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
-        '--segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
+        '--ant-segmented-item-color': 'rgba(0, 0, 0, 0.65)',
+        '--ant-segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
+        '--ant-segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
         ...props.style,
       }}
     >
