@@ -6,16 +6,18 @@ import {
   Show,
   createSignal,
   createMemo,
-  untrack,
+  splitProps,
 } from 'solid-js'
 import cs from 'classnames'
 import Compact from '../Compact'
 import './index.scss'
 
-interface ButtonProps extends ParentProps, JSX.CustomAttributes<HTMLButtonElement> {
+export interface ButtonProps
+  extends ParentProps,
+  JSX.CustomAttributes<HTMLButtonElement>,
+  JSX.HTMLAttributes<HTMLButtonElement> {
   type?: 'default' | 'primary' | 'dashed' | 'text' | 'link'
   onClick?: ((e: MouseEvent) => void) | ((e: MouseEvent) => Promise<unknown>)
-  'on:click'?: (e: MouseEvent) => void
   /**
    * 默认: middle
    */
@@ -75,11 +77,13 @@ const typeClassMap = {
 
 const Button: Component<ButtonProps> = props => {
   const mergedProps = mergeProps({ type: 'default', size: 'middle' } as ButtonProps, props)
+  const [, buttonElementProps] = splitProps(mergedProps, ['type', 'size', 'loading', 'danger'])
   const [innerLoading, setLoading] = createSignal(false)
   const loading = createMemo(() => props.loading ?? innerLoading())
 
   return (
     <button
+      {...buttonElementProps}
       ref={mergedProps.ref}
       class={cs(
         `ant-btn ant-btn-${mergedProps.type}`,
@@ -94,9 +98,6 @@ const Button: Component<ButtonProps> = props => {
         Compact.compactItemClass,
       )}
       style={mergedProps.style}
-      // @ts-expect-error on:
-      on:click={untrack(() => props['on:click'])}
-      // eslint-disable-next-line solid/jsx-no-duplicate-props
       onClick={e => {
         const res = mergedProps.onClick?.(e)
         if (res instanceof Promise) {
