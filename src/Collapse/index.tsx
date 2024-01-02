@@ -31,7 +31,10 @@ const Collapse: Component<CollapseProps> = props => {
         'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] border-b-0',
         props.class,
       )}
-      style={props.style}
+      style={{
+        '--ant-collapse-content-padding': '16px',
+        ...props.style,
+      }}
     >
       <For each={props.items}>
         {item => (
@@ -70,7 +73,7 @@ const Collapse: Component<CollapseProps> = props => {
             >
               <Show when={activeKey().includes(item.key)}>
                 <div class="overflow-hidden">
-                  <div class="p-[var(--ant-padding-sm)] [border-top:1px_solid_var(--ant-color-border)]">
+                  <div class="p-[var(--ant-collapse-content-padding)] [border-top:1px_solid_var(--ant-color-border)]">
                     {item.children}
                   </div>
                 </div>
