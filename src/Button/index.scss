@@ -1,8 +1,61 @@
-.ant-compact {
+.ant-compact-horizontal {
+  .ant-btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    &:hover {
+      z-index: 1;
+    }
+  }
+  .ant-btn + .ant-btn {
+    margin-left: -1px;
+  }
+
   .ant-btn-primary:not(:first-child) {
     border-left: 1px solid white;
   }
   .ant-btn-primary:not(:last-child) {
     border-right: 1px solid white;
+  }
+}
+
+.ant-compact-vertical {
+  flex-direction: column;
+
+  .ant-btn {
+    border-radius: 0;
+
+    &:first-child {
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+    }
+
+    &:hover {
+      z-index: 1;
+    }
+  }
+  .ant-btn + .ant-btn {
+    margin-top: -1px;
+  }
+
+  .ant-btn-primary:not(:first-child) {
+    border-top: 1px solid white;
+  }
+  .ant-btn-primary:not(:last-child) {
+    border-bottom: 1px solid white;
   }
 }

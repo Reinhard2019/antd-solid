@@ -9,7 +9,6 @@ import {
   splitProps,
 } from 'solid-js'
 import cs from 'classnames'
-import Compact from '../Compact'
 import './index.scss'
 
 export interface ButtonProps
@@ -32,9 +31,9 @@ export interface ButtonProps
 }
 
 const sizeClassMap = {
-  large: 'px-15px py-6px h-40px rounded-8px',
-  middle: 'px-15px py-4px h-32px rounded-6px',
-  small: 'px-7px h-24px rounded-4px',
+  large: 'px-15px py-6px h-40px rounded-[var(--ant-border-radius-lg)]',
+  middle: 'px-15px py-4px h-32px rounded-[var(--ant-border-radius)]',
+  small: 'px-7px h-24px rounded-[var(--ant-border-radius-sm)]',
 } as const
 
 const typeClassMap = {
@@ -93,9 +92,6 @@ const Button: Component<ButtonProps> = props => {
         sizeClassMap[mergedProps.size!],
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'opacity-65',
-        Compact.compactItemRounded0Class,
-        Compact.compactItemZIndexClass,
-        Compact.compactItemClass,
       )}
       style={mergedProps.style}
       onClick={e => {

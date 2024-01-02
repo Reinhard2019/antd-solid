@@ -1,10 +1,28 @@
-import { type ParentProps } from 'solid-js'
+import { mergeProps, type ParentProps, type JSX } from 'solid-js'
+import cs from 'classnames'
 
-interface CompactProps extends ParentProps {}
+interface CompactProps extends ParentProps {
+  class?: string
+  style?: JSX.CSSProperties
+  /**
+   * 指定排列方向
+   * 默认 'horizontal'
+   */
+  direction?: 'horizontal' | 'vertical'
+}
 
-function Compact(props: CompactProps) {
+function Compact(_props: CompactProps) {
+  const props = mergeProps(
+    {
+      direction: 'horizontal',
+    } as CompactProps,
+    _props,
+  )
   return (
-    <div class="ant-compact flex child[:first-child]>:rounded-l-6px child[:last-child]>:rounded-r-6px">
+    <div
+      class={cs('ant-compact', `ant-compact-${props.direction}`, 'inline-flex', props.class)}
+      style={props.style}
+    >
       {props.children}
     </div>
   )
