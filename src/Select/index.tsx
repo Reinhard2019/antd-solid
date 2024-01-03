@@ -12,7 +12,7 @@ import { type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import cs from 'classnames'
 import { useClickAway } from '../hooks'
-import { compact, isNil, keyBy } from 'lodash-es'
+import { compact, keyBy } from 'lodash-es'
 import { toArray } from '../utils/array'
 
 interface SelectOption {
@@ -52,7 +52,7 @@ const Select: Component<SelectProps> = props => {
 
   const [width, setWidth] = createSignal(0)
   const [hover, setHover] = createSignal(false)
-  const showClearBtn = createMemo(() => props.allowClear && hover() && !isNil(value()))
+  const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
 
   return (
     <Tooltip
@@ -153,7 +153,7 @@ const Select: Component<SelectProps> = props => {
                 class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
                 onClick={e => {
                   e.stopPropagation()
-                  setValue(undefined)
+                  setValue(props.multiple ? [] : undefined)
                 }}
               />
             </Show>
