@@ -5,7 +5,11 @@ import cs from 'classnames'
 
 export interface ModalInstance {
   open: () => Promise<void>
-  close: () => void
+  /**
+   * @param ok 是否点击了确定按钮
+   * @returns
+   */
+  close: (ok?: boolean) => void
 }
 
 export interface ModalProps {
@@ -59,18 +63,6 @@ function Modal(_props: ModalProps) {
   let cleanup: (() => void) | undefined
   let resolve: (() => void) | undefined
   let reject: ((err: string) => void) | undefined
-  const close = () => {
-    untrack(() => {
-      if (props.destroyOnClose) {
-        setOpen(false)
-      } else {
-        setHide(true)
-      }
-
-      cleanup?.()
-      props.afterClose?.()
-    })
-  }
 
   const instance: ModalInstance = {
     async open() {
@@ -99,9 +91,22 @@ function Modal(_props: ModalProps) {
         reject = _reject
       })
     },
-    close() {
-      close()
-      reject?.('close')
+    close(ok) {
+      untrack(() => {
+        if (props.destroyOnClose) {
+          setOpen(false)
+        } else {
+          setHide(true)
+        }
+
+        cleanup?.()
+        if (ok) {
+          resolve?.()
+        } else {
+          reject?.('cancel')
+        }
+        props.afterClose?.()
+      })
     },
   }
   untrack(() => {
@@ -184,8 +189,7 @@ function Modal(_props: ModalProps) {
                             }
                           }
                           if (res) {
-                            close()
-                            resolve?.()
+                            instance.close(true)
                           }
                         }}
                       >
