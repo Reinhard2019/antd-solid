@@ -111,7 +111,10 @@ const Button: Component<ButtonProps> = props => {
             props.danger
               ? '[--color:var(--ant-light-error-color)]'
               : '[--color:var(--ant-color-primary-hover)]',
-            'absolute inset-0 rounded-inherit [background:radial-gradient(var(--color),rgba(0,0,0,0))] z--1 keyframes-button-border[inset:0px][inset:-6px] [animation:button-border_ease-out_.3s]',
+            props.type === 'primary' ? '[--bg-color:var(--color)]' : '[--bg-color:white]',
+            'absolute inset-0 rounded-inherit z--1',
+            'before:content-empty before:absolute before:inset-0 before:rounded-inherit before:[background:radial-gradient(var(--color),rgba(0,0,0,0))] before:keyframes-button-border[inset:0px][inset:-6px] before:[animation:button-border_ease-out_.3s]',
+            'after:content-empty after:absolute after:inset-0 after:rounded-inherit after:bg-[var(--bg-color)]',
           )
           const onAnimationEnd = () => {
             div.remove()
