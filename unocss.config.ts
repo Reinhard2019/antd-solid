@@ -45,6 +45,10 @@ export default defineConfig({
           --ant-color-split: rgba(5, 5, 5, 0.06);
           --ant-color-icon: rgba(0, 0, 0, 0.45);
           --ant-color-icon-hover: rgba(0, 0, 0, 0.88);
+          --ant-color-text: rgba(0, 0, 0, 0.88);
+          --ant-color-text-secondary: rgba(0, 0, 0, 0.65);
+          --ant-color-text-tertiary: rgba(0, 0, 0, 0.45);
+          --ant-color-text-quaternary: rgba(0, 0, 0, 0.25);
 
           --ant-font-weight-strong: 600;
 

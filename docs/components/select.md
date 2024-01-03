@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="select/AllowClear" />
 
+### 多选
+
+多选，从已有条目中选择。
+
+<Code path="select/Multiple" />
+
 ## API
 
 ### Table

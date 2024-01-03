@@ -306,7 +306,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           <div
             ref={content!}
             class={cs(
-              'z-1000 fixed absolute px-8px py-6px rounded-8px box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
+              'z-1000 fixed absolute px-8px py-6px rounded-[var(--ant-border-radius-lg)] overflow-hidden box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
               props.mode === 'dark' ? 'bg-[rgba(0,0,0,0.85)] text-white' : 'bg-white',
             )}
             style={{
