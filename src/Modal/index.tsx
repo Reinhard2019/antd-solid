@@ -4,7 +4,7 @@ import Button from '../Button'
 import cs from 'classnames'
 
 export interface ModalInstance {
-  open: () => void
+  open: () => Promise<void>
   close: () => void
 }
 
@@ -57,9 +57,23 @@ function Modal(_props: ModalProps) {
   const [open, setOpen] = createSignal(props.defaultOpen ?? false)
   const [hide, setHide] = createSignal(false)
   let cleanup: (() => void) | undefined
+  let resolve: (() => void) | undefined
+  let reject: ((err: string) => void) | undefined
+  const close = () => {
+    untrack(() => {
+      if (props.destroyOnClose) {
+        setOpen(false)
+      } else {
+        setHide(true)
+      }
+
+      cleanup?.()
+      props.afterClose?.()
+    })
+  }
 
   const instance: ModalInstance = {
-    open() {
+    async open() {
       setOpen(true)
       setHide(false)
 
@@ -79,18 +93,15 @@ function Modal(_props: ModalProps) {
           document.removeEventListener('keyup', onKeyup)
         }
       }
+
+      await new Promise<void>((_resolve, _reject) => {
+        resolve = _resolve
+        reject = _reject
+      })
     },
     close() {
-      untrack(() => {
-        if (props.destroyOnClose) {
-          setOpen(false)
-        } else {
-          setHide(true)
-        }
-
-        cleanup?.()
-        props.afterClose?.()
-      })
+      close()
+      reject?.('close')
     },
   }
   untrack(() => {
@@ -98,8 +109,6 @@ function Modal(_props: ModalProps) {
       props.ref?.(instance)
     }
   })
-
-  const [confirmLoading, setConfirmLoading] = createSignal(false)
 
   return (
     <Show when={open()}>
@@ -165,18 +174,18 @@ function Modal(_props: ModalProps) {
                       </Button>
                       <Button
                         type="primary"
-                        loading={confirmLoading()}
                         // eslint-disable-next-line solid/reactivity, @typescript-eslint/no-misused-promises
                         onClick={async () => {
-                          if (!props.onOk) return
-
-                          let res = props.onOk?.()
-                          if (res instanceof Promise) {
-                            setConfirmLoading(true)
-                            res = await res.finally(() => setConfirmLoading(false))
+                          let res: boolean | Promise<boolean> = true
+                          if (props.onOk) {
+                            res = props.onOk?.()
+                            if (res instanceof Promise) {
+                              res = await res
+                            }
                           }
                           if (res) {
-                            instance.close()
+                            close()
+                            resolve?.()
                           }
                         }}
                       >
