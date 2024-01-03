@@ -305,10 +305,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
             ref={content!}
-            class={cs(
-              'z-1000 fixed absolute px-8px py-6px rounded-[var(--ant-border-radius-lg)] overflow-hidden box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)]',
-              props.mode === 'dark' ? 'bg-[rgba(0,0,0,0.85)] text-white' : 'bg-white',
-            )}
+            class={cs('z-1000 fixed')}
             style={{
               ...contentPositionStyle(),
               ...props.contentStyle,
@@ -317,7 +314,14 @@ const Tooltip: Component<TooltipProps> = _props => {
               e.stopPropagation()
             }}
           >
-            <Content content={props.content} close={() => setOpen(false)} />
+            <div
+              class={cs(
+                'px-8px py-6px box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)] rounded-[var(--ant-border-radius-lg)] overflow-hidden',
+                props.mode === 'dark' ? 'bg-[rgba(0,0,0,0.85)] text-white' : 'bg-white',
+              )}
+            >
+              <Content content={props.content} close={() => setOpen(false)} />
+            </div>
 
             <Show when={props.arrow}>
               <div
