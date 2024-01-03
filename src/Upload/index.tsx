@@ -56,10 +56,14 @@ export interface UploadProps<T = any> extends ParentProps {
   multiple?: boolean
 }
 
-function request(file: File, customRequest: UploadProps['customRequest']) {
+/**
+ * 根据一个 File 对象创建一个 UploadFile 对象
+ * @param file
+ * @returns
+ */
+function createUploadFile(file: File): UploadFile {
   const id = `upload-${nanoid()}`
-  // eslint-disable-next-line solid/reactivity
-  const uploadFileSignal = createSignal<UploadFile>({
+  return {
     id,
     file,
     name: file.name,
@@ -67,32 +71,42 @@ function request(file: File, customRequest: UploadProps['customRequest']) {
     size: file.size,
     status: 'pending',
     percent: 0,
+  }
+}
+
+async function request<T = any>(
+  uploadFileSignal: Signal<UploadFile<T>>,
+  customRequest: UploadProps['customRequest'],
+) {
+  const [uploadFile, setUploadFile] = uploadFileSignal
+  const { file } = uploadFile()
+  if (!file) return await Promise.reject(new Error('file is required'))
+
+  return await new Promise<UploadFile<T>>((resolve, reject) => {
+    customRequest?.({
+      file,
+      onProgress(event) {
+        setUploadFile(value => ({
+          ...value,
+          status: 'uploading',
+          percent: event.percent ?? 0,
+        }))
+      },
+      onSuccess(response) {
+        const newValue = setUploadFile(value => ({ ...value, status: 'finished', response }))
+        resolve(newValue)
+      },
+      onError(err) {
+        setUploadFile(value => ({ ...value, status: 'error' }))
+        reject(err)
+      },
+    })
   })
-
-  const [, setUploadFile] = uploadFileSignal
-
-  customRequest?.({
-    file,
-    onProgress(event) {
-      setUploadFile(value => ({
-        ...value,
-        status: 'uploading',
-        percent: event.percent ?? 0,
-      }))
-    },
-    onSuccess(response) {
-      setUploadFile(value => ({ ...value, status: 'finished', response }))
-    },
-    onError() {
-      setUploadFile(value => ({ ...value, status: 'error' }))
-    },
-  })
-
-  return uploadFileSignal
 }
 
 const Upload: Component<UploadProps> & {
   request: typeof request
+  createUploadFile: typeof createUploadFile
 } = _props => {
   let input: HTMLInputElement | undefined
   const props = mergeProps(
@@ -126,7 +140,9 @@ const Upload: Component<UploadProps> & {
         onInput={e => {
           const fileList: Array<Signal<UploadFile>> = []
           for (const file of e.target.files ?? []) {
-            const uploadFileSignal = request(file, props.customRequest)
+            // eslint-disable-next-line solid/reactivity
+            const uploadFileSignal = createSignal(createUploadFile(file))
+            request(uploadFileSignal, props.customRequest)
             fileList.push(uploadFileSignal)
           }
 
@@ -139,5 +155,6 @@ const Upload: Component<UploadProps> & {
 }
 
 Upload.request = request
+Upload.createUploadFile = createUploadFile
 
 export default Upload
