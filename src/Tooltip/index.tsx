@@ -9,7 +9,7 @@ import {
   mergeProps,
   onCleanup,
   createMemo,
-  createSignal,
+  untrack,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
@@ -54,6 +54,26 @@ export interface TooltipProps {
    * 默认: true
    */
   arrow?: boolean | { pointAtCenter: boolean }
+}
+
+/**
+ * 获取滚动元素
+ * @param ele
+ * @returns
+ */
+function collectScroll(ele: HTMLElement) {
+  const scrollList: HTMLElement[] = []
+  let current = ele?.parentElement
+
+  while (current) {
+    if (current.scrollHeight > current.clientHeight) {
+      scrollList.push(current)
+    }
+
+    current = current.parentElement
+  }
+
+  return [window, ...scrollList]
 }
 
 export const Content: Component<{
@@ -122,88 +142,124 @@ const Tooltip: Component<TooltipProps> = _props => {
     })
   })
 
-  const [childrenRect, setChildrenRect] = createSignal(new DOMRect())
-  createEffect(() => {
-    if (open()) {
-      const _children = resolvedChildren() as Element
-      setChildrenRect(_children.getBoundingClientRect())
-    }
-  })
+  // const [childrenRect, setChildrenRect] = createSignal(new DOMRect())
+  // createEffect(() => {
+  //   if (open()) {
+  //     const _children = resolvedChildren() as Element
+  //     setChildrenRect(_children.getBoundingClientRect())
+  //   }
+  // })
 
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
-  const contentPositionStyle = createMemo(() => {
-    switch (props.placement) {
-      case 'top':
-        return {
-          top: `${childrenRect().top - arrowOffset()}px`,
-          left: `${childrenRect().left + childrenRect().width / 2}px`,
-          transform: 'translate(-50%, -100%)',
-        } as JSX.CSSProperties
-      case 'topLeft':
-        return {
-          top: `${childrenRect().top - arrowOffset()}px`,
-          left: `${childrenRect().left}px`,
-          transform: 'translate(0, -100%)',
-        } as JSX.CSSProperties
-      case 'topRight':
-        return {
-          top: `${childrenRect().top - arrowOffset()}px`,
-          left: `${childrenRect().right}px`,
-          transform: 'translate(-100%, -100%)',
-        } as JSX.CSSProperties
-      case 'bottom':
-        return {
-          top: `${childrenRect().bottom + arrowOffset()}px`,
-          left: `${childrenRect().left + childrenRect().width / 2}px`,
-          transform: 'translate(-50%, 0)',
-        } as JSX.CSSProperties
-      case 'bottomLeft':
-        return {
-          top: `${childrenRect().bottom + arrowOffset()}px`,
-          left: `${childrenRect().left}px`,
-        } as JSX.CSSProperties
-      case 'bottomRight':
-        return {
-          top: `${childrenRect().bottom + arrowOffset()}px`,
-          left: `${childrenRect().right}px`,
-          transform: 'translate(-100%, 0)',
-        } as JSX.CSSProperties
-      case 'left':
-        return {
-          top: `${childrenRect().top + childrenRect().height / 2}px`,
-          left: `${childrenRect().left - arrowOffset()}px`,
-          transform: 'translate(-100%, -50%)',
-        } as JSX.CSSProperties
-      case 'leftTop':
-        return {
-          top: `${childrenRect().top}px`,
-          left: `${childrenRect().left - arrowOffset()}px`,
-          transform: 'translate(-100%)',
-        } as JSX.CSSProperties
-      case 'leftBottom':
-        return {
-          top: `${childrenRect().bottom}px`,
-          left: `${childrenRect().left - arrowOffset()}px`,
-          transform: 'translate(-100%, -100%)',
-        } as JSX.CSSProperties
-      case 'right':
-        return {
-          top: `${childrenRect().top + childrenRect().height / 2}px`,
-          left: `${childrenRect().right + arrowOffset()}px`,
-          transform: 'translate(0, -50%)',
-        } as JSX.CSSProperties
-      case 'rightTop':
-        return {
-          top: `${childrenRect().top}px`,
-          left: `${childrenRect().right + arrowOffset()}px`,
-        } as JSX.CSSProperties
-      case 'rightBottom':
-        return {
-          top: `${childrenRect().bottom}px`,
-          left: `${childrenRect().right + arrowOffset()}px`,
-          transform: 'translate(0, -100%)',
-        } as JSX.CSSProperties
-    }
+  const setTranslate = () => {
+    untrack(() => {
+      const _children = resolvedChildren() as Element
+      const childrenRect = _children.getBoundingClientRect()
+      switch (props.placement) {
+        case 'top':
+          content.style.setProperty(
+            '--translate-x',
+            `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
+          )
+          content.style.setProperty(
+            '--translate-y',
+            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+          )
+          return
+        case 'topLeft':
+          content.style.setProperty('--translate-x', `${childrenRect.left}px`)
+          content.style.setProperty(
+            '--translate-y',
+            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+          )
+          return
+        case 'topRight':
+          content.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+          content.style.setProperty(
+            '--translate-y',
+            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+          )
+          return
+        case 'bottom':
+          content.style.setProperty(
+            '--translate-x',
+            `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
+          )
+          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          return
+        case 'bottomLeft':
+          content.style.setProperty('--translate-x', `${childrenRect.left}px`)
+          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          return
+        case 'bottomRight':
+          content.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          return
+        case 'left':
+          content.style.setProperty(
+            '--translate-x',
+            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+          )
+          content.style.setProperty(
+            '--translate-y',
+            `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
+          )
+          return
+        case 'leftTop':
+          content.style.setProperty(
+            '--translate-x',
+            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+          )
+          content.style.setProperty('--translate-y', `${childrenRect.top}px`)
+          return
+        case 'leftBottom':
+          content.style.setProperty(
+            '--translate-x',
+            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+          )
+          content.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+          return
+        case 'right':
+          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          content.style.setProperty(
+            '--translate-y',
+            `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
+          )
+          return
+        case 'rightTop':
+          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          content.style.setProperty('--translate-y', `${childrenRect.top}px`)
+          return
+        case 'rightBottom':
+          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          content.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+      }
+    })
+  }
+  createEffect(() => {
+    if (!open()) return
+
+    setTranslate()
+
+    const cleanupFnList: Array<() => void> = []
+
+    const _children = resolvedChildren() as HTMLElement
+    const scrollList = collectScroll(_children)
+    scrollList.forEach(scroll => {
+      const onScroll = () => {
+        setTranslate()
+      }
+      scroll.addEventListener('scroll', onScroll)
+      cleanupFnList.push(() => {
+        scroll.removeEventListener('scroll', onScroll)
+      })
+    })
+
+    onCleanup(() => {
+      cleanupFnList.forEach(fn => {
+        fn()
+      })
+    })
   })
   const arrowStyle = createMemo(() => {
     switch (props.placement) {
@@ -305,8 +361,11 @@ const Tooltip: Component<TooltipProps> = _props => {
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
             ref={content!}
-            class={cs('z-1000 fixed')}
-            style={contentPositionStyle()}
+            class={cs('z-1000 fixed left-0 top-0')}
+            style={{
+              transform:
+                'translate(clamp(0px, var(--translate-x), calc(100vw - 100%)), clamp(0px, var(--translate-y), calc(100vh - 100%)))',
+            }}
             onClick={e => {
               e.stopPropagation()
             }}

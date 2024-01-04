@@ -3,7 +3,7 @@ import { Button, Tooltip } from 'antd-solid'
 
 const buttonWidth = 80
 
-const text = <span>prompt text</span>
+const text = 'prompt text'
 
 const App: Component = () => {
   return (
