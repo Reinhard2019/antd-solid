@@ -5,7 +5,7 @@ export interface Options<T> {
   defaultValue?: T
   defaultValuePropName?: string
   valuePropName?: string
-  trigger?: string | null
+  trigger?: string | undefined | null
 }
 
 export type Props = Record<string, any>
@@ -19,11 +19,15 @@ export interface StandardProps<T> {
 function createControllableValue<T = any>(props: StandardProps<T>): Signal<T>
 function createControllableValue<T = any>(props: Props, options?: Options<T>): Signal<T>
 function createControllableValue<T = any>(props: Props, options: Options<T> = {}) {
-  const {
-    defaultValuePropName = 'defaultValue',
-    valuePropName = 'value',
-    trigger = 'onChange',
-  } = options
+  const defaultOptions = {
+    defaultValuePropName: 'defaultValue',
+    valuePropName: 'value',
+    trigger: 'onChange',
+  }
+  const { defaultValuePropName, valuePropName, trigger } = {
+    ...defaultOptions,
+    ...options,
+  }
 
   const getValue = () => props[valuePropName] as T
   // 为什么不使用 Object.hasOwn？
