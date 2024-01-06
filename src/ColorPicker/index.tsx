@@ -8,4 +8,6 @@ export interface ColorPickerProps {
   onChange?: (value: Color, hex: string) => void
 }
 
-export default reactToSolidComponent(ColorPicker)
+export default reactToSolidComponent(ColorPicker, undefined, {
+  defaultValue: 'black',
+})

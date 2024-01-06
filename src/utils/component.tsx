@@ -50,12 +50,13 @@ export function replaceChildren<
 export function reactToSolidComponent<P extends {} = {}>(
   component: React.FunctionComponent<P> | React.ComponentClass<P>,
   container?: Element | (() => Element),
+  defaultProps?: P,
 ) {
   return function (props: P) {
     return (
       <ReactToSolid
         component={component}
-        props={props}
+        props={{ ...defaultProps, ...props }}
         container={typeof container === 'function' ? container() : container}
       />
     )
