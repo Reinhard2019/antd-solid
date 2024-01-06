@@ -103,10 +103,6 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         setValue(e.target.value)
         // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
         onChange?.(e as any)
-
-        if (Object.keys(props).includes('value')) {
-          e.target.value = value()
-        }
       }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
