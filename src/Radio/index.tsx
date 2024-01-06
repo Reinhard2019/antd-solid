@@ -1,6 +1,5 @@
 import {
   type Component,
-  type JSXElement,
   type ParentProps,
   type JSX,
   untrack,
@@ -11,6 +10,8 @@ import {
 import { Dynamic } from 'solid-js/web'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
+import { type StringOrJSXElement } from '../types'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface RadioProps extends ParentProps {
   defaultChecked?: boolean
@@ -27,7 +28,7 @@ export interface RadioGroupProps {
   value?: string
   onChange?: JSX.ChangeEventHandler<HTMLInputElement, Event>
   optionType?: 'default' | 'button'
-  options: Array<{ label: JSXElement; value: string; disabled?: boolean }>
+  options: Array<{ label: StringOrJSXElement; value: string; disabled?: boolean }>
   block?: boolean
 }
 
@@ -131,7 +132,7 @@ Radio.Group = _props => {
               }) as JSX.ChangeEventHandler<HTMLInputElement, Event>
             }
           >
-            {option.label}
+            {unwrapStringOrJSXElement(option.label)}
           </Dynamic>
         )}
       </For>
