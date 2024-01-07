@@ -96,7 +96,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       class={cs(
         'w-full [outline:none] text-14px',
         !hasPrefixOrSuffix() && inputWrapClass(),
-        inputProps.disabled && 'bg-[var(--ant-color-bg-container-disabled)] cursor-not-allowed',
+        inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
       value={value() ?? ''}
       onInput={e => {
@@ -117,7 +117,15 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   )
 
   return (
-    <div class={cs('flex w-full', Compact.compactItemClass)} style={style}>
+    <div
+      class={cs(
+        'flex w-full',
+        Compact.compactItemClass,
+        inputProps.disabled &&
+          'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
+      )}
+      style={style}
+    >
       <Show when={props.addonBefore}>
         <div
           class={cs(
@@ -133,8 +141,9 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={hasPrefixOrSuffix()} fallback={inputJSX}>
         <div
           class={cs(
-            'flex items-center w-full relative [--input-after-display:none] hover:[--input-after-display:block] p:hover-child[input]:border-[var(--ant-color-primary)]',
+            'flex items-center w-full relative p:hover-child[input]:border-[var(--ant-color-primary)]',
             inputWrapClass(),
+            ['[--actions-display:none]', !inputProps.disabled && 'hover:[--actions-display:block]'],
           )}
         >
           <Show when={props.prefix}>
@@ -148,7 +157,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           </Show>
 
           <Show when={props.actions}>
-            <div class="[display:var(--ant-input-after-display)] absolute top-0 bottom-0 right-0 h-[calc(100%-2px)] translate-y-1px -translate-x-1px">
+            <div class="[display:var(--actions-display)] absolute top-0 bottom-0 right-0 h-[calc(100%-2px)] translate-y-1px -translate-x-1px">
               {props.actions}
             </div>
           </Show>
