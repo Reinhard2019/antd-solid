@@ -1,28 +1,31 @@
-import { type Component } from 'solid-js'
-import { Button, Modal, type ModalInstance } from 'antd-solid'
+import { createSignal, type Component } from 'solid-js'
+import { Button, Modal } from 'antd-solid'
 
 const Index: Component = () => {
-  let ref: ModalInstance
-
-  const showModal = () => {
-    ref.open()
-  }
-
-  const handleOk = () => {
-    console.log('确定')
-    return true
-  }
-
-  const afterClose = () => {
-    console.log('取消')
-  }
-
+  const [open, setOpen] = createSignal(false)
   return (
     <>
-      <Button type="primary" onClick={showModal}>
+      <Button type="primary" onClick={() => setOpen(true)}>
         Open Modal
       </Button>
-      <Modal ref={ref!} title="Basic Modal" onOk={handleOk} afterClose={afterClose}>
+      <Modal
+        open={open()}
+        title="Basic Modal"
+        // eslint-disable-next-line solid/reactivity
+        onOk={async () => {
+          await new Promise<void>(resolve => {
+            setTimeout(() => {
+              console.log('onOk')
+              resolve()
+              setOpen(false)
+            }, 3000)
+          })
+        }}
+        onCancel={() => {
+          console.log('onCancel')
+          setOpen(false)
+        }}
+      >
         <p>Some contents...</p>
         <p>Some contents...</p>
         <p>Some contents...</p>

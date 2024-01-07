@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="modal/Base" />
 
+### CreateModal
+
+CreateModal
+
+<Code path="modal/CreateModal" />
+
 ## API
 
 ### Modal
