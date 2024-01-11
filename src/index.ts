@@ -43,5 +43,7 @@ export type { SegmentedProps } from './Segmented'
 export { default as Segmented } from './Segmented'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
+export { default as useClickAway } from './hooks/useClickAway'
+export { default as useSize } from './hooks/useSize'
 
 export { message } from 'antd'

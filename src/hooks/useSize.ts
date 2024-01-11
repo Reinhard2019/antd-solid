@@ -1,4 +1,4 @@
-import { Accessor, createSignal, onCleanup, onMount } from 'solid-js'
+import { type Accessor, createSignal, onCleanup, onMount } from 'solid-js'
 
 function getTarget(target: Element | Accessor<Element>) {
   return target instanceof Element ? target : target()
@@ -19,7 +19,9 @@ export default function useSize(target: Element | Accessor<Element>) {
       })
     })
     ro.observe(_target)
-    onCleanup(() => ro.disconnect())
+    onCleanup(() => {
+      ro.disconnect()
+    })
   })
 
   return size
