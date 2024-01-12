@@ -1,4 +1,4 @@
-import { type Signal, createSignal, createEffect } from 'solid-js'
+import { type Signal, createSignal, createEffect, untrack } from 'solid-js'
 
 export interface Options<T> {
   defaultValue?: T
@@ -35,9 +35,9 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
 
   let defaultValue = options.defaultValue
   if (isControlled()) {
-    defaultValue = getValue()
+    defaultValue = untrack(getValue)
   } else if (Object.keys(props).includes(defaultValuePropName)) {
-    defaultValue = props[defaultValuePropName]
+    defaultValue = untrack(() => props[defaultValuePropName])
   }
 
   const [value, _setValue] = createSignal(defaultValue)
