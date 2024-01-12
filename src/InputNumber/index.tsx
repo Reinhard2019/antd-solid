@@ -40,7 +40,14 @@ const InputNumber: Component<InputNumberProps> = _props => {
 
   const clampValue = (v: number) => untrack(() => clamp(v, props.min, props.max))
 
-  let prev: number | null = null
+  let defaultValue = null
+  if (Object.keys(props).includes('value')) {
+    defaultValue = untrack(() => props.value)
+  } else if (Object.keys(props).includes('defaultValue')) {
+    defaultValue = untrack(() => props.defaultValue)
+  }
+
+  let prev: number | null = defaultValue!
   const updatePrev = (v: number | null) => {
     if (prev === v) return
 
@@ -48,9 +55,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     props.onChange?.(prev)
   }
 
-  const [value, setValue] = createSignal<number | string | null | undefined>(
-    untrack(() => props.value ?? props.defaultValue),
-  )
+  const [value, setValue] = createSignal<number | string | null | undefined>(defaultValue)
   createEffect(
     on(
       () => props.value,
