@@ -15,7 +15,6 @@ const Index: Component = () => {
             {
               title: 'leaf',
               key: '0-0-0-0',
-              disableCheckbox: true,
             },
             {
               title: 'leaf',
@@ -30,7 +29,7 @@ const Index: Component = () => {
         },
       ],
     },
-  ];
+  ]
 
   return (
     <Tree

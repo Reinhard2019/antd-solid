@@ -3,29 +3,27 @@ import {
   type Accessor,
   createContext,
   createSignal,
-  Index,
   type JSXElement,
   type Setter,
   Show,
   untrack,
   useContext,
   createSelector,
+  For,
+  createMemo,
 } from 'solid-js'
 import cs from 'classnames'
+import createControllableValue from '../hooks/createControllableValue'
 
 export interface TreeProps<T extends {} = {}> {
-  class?: string
-  defaultSelectedNodes?: T[]
+  defaultSelectedNodes?: T[] | undefined
+  selectedNodes?: T[] | undefined
   treeData?: T[]
   /**
    * 是否节点占据一行
    */
   blockNode?: boolean
   defaultExpandAll?: boolean
-  /**
-   * 设置节点可拖拽
-   */
-  draggable?: boolean
   titleRender: (
     node: T,
     info: {
@@ -33,7 +31,11 @@ export interface TreeProps<T extends {} = {}> {
     },
   ) => JSXElement
   children: (node: T) => T[] | undefined
-  onSelect?: (node: T) => void
+  onSelect?: (nodes: T[]) => void
+  /**
+   * 设置节点可拖拽
+   */
+  draggable?: boolean
   onDrop?: (info: {
     dragNode: T
     targetNode: T
@@ -42,7 +44,7 @@ export interface TreeProps<T extends {} = {}> {
   }) => void
 }
 
-interface SingleLevelTreeProps<T extends {} = {}> extends Omit<TreeProps<T>, 'class'> {
+interface SingleLevelTreeProps<T extends {} = {}> extends TreeProps<T> {
   indent: number
   parentIndexes?: number[]
 }
@@ -61,8 +63,6 @@ const TreeContext = createContext(
     targetIndexes: Accessor<number[] | null>
     setTargetIndexes: Setter<number[] | null>
     isTarget: (key: {} | null) => boolean
-    draggable: TreeProps['draggable'] | undefined
-    onDrop: TreeProps['onDrop'] | undefined
   },
 )
 
@@ -84,45 +84,43 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
     targetIndexes,
     setTargetIndexes,
     isTarget,
-    draggable,
-    onDrop,
   } = useContext(TreeContext)
 
   return (
-    <Index each={props.treeData}>
+    <For each={props.treeData}>
       {(item, i) => {
-        const indexes = [...(props.parentIndexes ?? []), i]
+        const indexes = createMemo(() => [...(props.parentIndexes ?? []), i()])
 
         return (
           <>
             <div
               class={cs(
                 'flex items-center h-28px pb-4px',
-                isDraggable(item()) && '[border:1px_solid_var(--ant-color-primary)] bg-white',
+                isDraggable(item) && '[border:1px_solid_var(--ant-color-primary)] bg-white',
                 draggableNode() && 'child[]:pointer-events-none',
               )}
-              draggable={draggable}
+              draggable={props.draggable}
               onDragStart={() => {
-                setDraggableNode(item() as {})
-                setDraggableIndexes(indexes)
+                setDraggableNode(item as {})
+                setDraggableIndexes(indexes())
               }}
               onDragEnter={() => {
-                if (item() !== draggableNode()) {
-                  setTargetNode(item() as {})
-                  setTargetIndexes(indexes)
+                if (item !== draggableNode()) {
+                  setTargetNode(item as {})
+                  setTargetIndexes(indexes())
                 }
               }}
               onDragLeave={e => {
-                if (item() === targetNode() && e.relatedTarget) {
+                if (item === targetNode() && e.relatedTarget) {
                   setTargetNode(null)
                   setTargetIndexes(null)
                 }
               }}
               onDragEnd={() => {
-                onDrop?.({
-                  dragNode: draggableNode()!,
+                props.onDrop?.({
+                  dragNode: draggableNode()! as T,
                   dragIndexes: draggableIndexes()!,
-                  targetNode: targetNode()!,
+                  targetNode: targetNode()! as T,
                   targetIndexes: targetIndexes()!,
                 })
 
@@ -140,13 +138,15 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
                     <span class="inline-block w-24px" />
                   ))}
               </div>
-              <div class="flex-shrink-0 w-24px h-24px flex items-center justify-center">
-                <span class="i-ant-design:holder-outlined" />
-              </div>
+              <Show when={props.draggable}>
+                <div class="flex-shrink-0 w-24px h-24px flex items-center justify-center">
+                  <span class="i-ant-design:holder-outlined" />
+                </div>
+              </Show>
               <div
                 class={cs(
                   'flex-shrink-0 w-24px h-24px flex items-center justify-center cursor-pointer',
-                  isEmpty(props.children(item())) && 'opacity-0',
+                  isEmpty(props.children(item)) && 'opacity-0',
                 )}
               >
                 <Show
@@ -168,40 +168,47 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
                 class={cs(
                   'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative',
                   props.blockNode && 'w-full',
-                  selectedNodes()?.includes(item()) && '!bg-[var(--ant-tree-node-selected-bg)]',
-                  isTarget(item()) &&
+                  selectedNodes()?.includes(item) && '!bg-[var(--ant-tree-node-selected-bg)]',
+                  isTarget(item) &&
                     "before:content-[''] before:inline-block before:w-8px before:h-8px before:absolute before:bottom-0 before:left-0 before:-translate-x-full before:translate-y-1/2 before:rounded-1/2 before:[border:2px_solid_var(--ant-color-primary)] after:content-[''] after:inline-block after:h-2px after:absolute after:left-0 after:right-0 after:bottom--1px after:bg-[var(--ant-color-primary)]",
                 )}
                 onClick={() => {
-                  setSelectedNodes([item()])
-                  props.onSelect?.(item())
+                  setSelectedNodes([item])
+                  props.onSelect?.([item])
                 }}
               >
-                {props.titleRender(item(), { indexes })}
+                {props.titleRender(item, { indexes: indexes() })}
               </div>
             </div>
 
-            <Show when={expanded() && !isEmpty(props.children(item()))}>
+            <Show when={expanded() && !isEmpty(props.children(item))}>
               <SingleLevelTree
-                treeData={props.children(item())}
+                treeData={props.children(item)}
                 indent={props.indent + 1}
-                parentIndexes={indexes}
+                parentIndexes={indexes()}
                 blockNode={props.blockNode}
                 defaultExpandAll={props.defaultExpandAll}
                 titleRender={props.titleRender}
                 children={props.children}
                 onSelect={node => untrack(() => props.onSelect?.(node))}
+                draggable={props.draggable}
+                onDrop={props.onDrop}
               />
             </Show>
           </>
         )
       }}
-    </Index>
+    </For>
   )
 }
 
 function Tree<T extends {} = {}>(props: TreeProps<T>) {
-  const [selectedNodes, setSelectedNodes] = createSignal<T[]>(props.defaultSelectedNodes ?? [])
+  const [selectedNodes, setSelectedNodes] = createControllableValue<T[]>(props, {
+    defaultValuePropName: 'defaultSelectedNodes',
+    valuePropName: 'selectedNodes',
+    trigger: 'onSelect',
+    defaultValue: [],
+  })
 
   const [draggableNode, setDraggableNode] = createSignal<T | null>(null)
   const isDraggable = createSelector<T | null, T | null>(draggableNode)
@@ -226,8 +233,6 @@ function Tree<T extends {} = {}>(props: TreeProps<T>) {
         targetIndexes,
         setTargetIndexes,
         isTarget,
-        draggable: props.draggable,
-        onDrop: props.onDrop,
       }}
     >
       <SingleLevelTree
@@ -238,6 +243,8 @@ function Tree<T extends {} = {}>(props: TreeProps<T>) {
         titleRender={props.titleRender}
         children={props.children}
         onSelect={node => untrack(() => props.onSelect?.(node))}
+        draggable={props.draggable}
+        onDrop={props.onDrop}
       />
     </TreeContext.Provider>
   )

@@ -1,5 +1,4 @@
-import { type Signal, createSignal } from 'solid-js'
-import createUpdateEffect from './createUpdateEffect'
+import { type Signal, createSignal, createEffect } from 'solid-js'
 
 export interface Options<T> {
   defaultValue?: T
@@ -43,7 +42,9 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
 
   const [value, _setValue] = createSignal(defaultValue)
 
-  createUpdateEffect(getValue, () => {
+  // 为什么不使用 on defer？
+  // 因为 value 值如果在初始化和 createEffect 第一次执行期间发生变化，则无法正确更新 value
+  createEffect(() => {
     if (!isControlled()) return
 
     _setValue(getValue() as any)
