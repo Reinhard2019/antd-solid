@@ -131,11 +131,11 @@ const Tooltip: Component<TooltipProps> = _props => {
           )
           break
         case 'focus':
-          _children.addEventListener('focus', reverseOpen)
-          _children.addEventListener('blur', reverseOpen)
+          _children.addEventListener('focusin', reverseOpen)
+          _children.addEventListener('focusout', reverseOpen)
           onCleanup(() => {
-            _children.removeEventListener('focus', reverseOpen)
-            _children.removeEventListener('blur', reverseOpen)
+            _children.removeEventListener('focusin', reverseOpen)
+            _children.removeEventListener('focusout', reverseOpen)
           })
           break
       }
