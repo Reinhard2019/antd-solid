@@ -7,7 +7,6 @@ const Context = createContext(
     formInstance: FormInstance
     rulesDict: Record<string, Schema[]>
     setErrMsgDict: Record<string, Setter<string>>
-    initialValues: {}
     setItemWidthDict: Setter<Record<string, number>>
     maxItemWidth: Accessor<number | undefined>
   },

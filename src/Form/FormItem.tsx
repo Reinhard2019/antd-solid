@@ -8,7 +8,7 @@ import {
   onMount,
   onCleanup,
 } from 'solid-js'
-import { get, isNil } from 'lodash-es'
+import { isNil } from 'lodash-es'
 import { Dynamic } from 'solid-js/web'
 import { nanoid } from 'nanoid'
 import cs from 'classnames'
@@ -16,9 +16,9 @@ import { type Schema } from 'yup'
 import Context from './context'
 
 export interface FormItemComponentProps<T = any> {
-  defaultValue?: T
+  value?: T | undefined
   status?: 'error' | 'warning'
-  onChange?: (value: T) => void
+  onChange: (value: T) => void
 }
 
 export interface FormItemProps {
@@ -33,7 +33,7 @@ export interface FormItemProps {
 }
 
 const FormItem: Component<FormItemProps> = props => {
-  const { formInstance, rulesDict, setErrMsgDict, initialValues, setItemWidthDict, maxItemWidth } =
+  const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth } =
     useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
@@ -109,10 +109,10 @@ const FormItem: Component<FormItemProps> = props => {
       {getLabel(true)}
       {getLabel()}
 
-      <div class="flex" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
+      <div class="flex flex-col" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
         <Dynamic
           component={props.component}
-          defaultValue={props.initialValue ?? get(initialValues, props.name!)}
+          value={props.name ? formInstance.getFieldValue(props.name) : undefined}
           status={errMsg() ? 'error' : undefined}
           onChange={(value: any) => {
             if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)

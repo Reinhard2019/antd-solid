@@ -6,13 +6,16 @@ import {
   onMount,
   createSignal,
   createMemo,
+  untrack,
 } from 'solid-js'
-import { get, max, set } from 'lodash-es'
+import { createStore, produce } from 'solid-js/store'
+import { cloneDeep, get, max, set } from 'lodash-es'
 import Context from './context'
 import { type Schema } from 'yup'
 
 export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
+  getFieldValue: (name: Parameters<typeof get>[1]) => any
   setFieldValue: (name: Parameters<typeof set>[1], value: any) => void
 }
 
@@ -24,7 +27,7 @@ export interface FormProps<T extends {} = {}> {
    */
   layout?: 'horizontal' | 'vertical' | 'inline'
   children: JSXElement
-  initialValues?: T
+  initialValues?: Partial<T>
 }
 
 function Form<T extends {} = {}>(_props: FormProps<T>) {
@@ -32,13 +35,16 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   const rulesDict: Record<string, Schema[]> = {}
   const setErrMsgDict: Record<string, Setter<string>> = {}
 
-  const values = props.initialValues ? { ...props.initialValues } : ({} as T)
+  const [values, setValues] = createStore(
+    untrack(() => (props.initialValues ? cloneDeep(props.initialValues) : ({} as T))),
+  )
   const formInstance: FormInstance<T> = {
     async validateFields() {
+      const cloneValues = untrack(() => cloneDeep(values))
       const promises = Object.entries(rulesDict).flatMap(([name, rules]) => {
         return rules.map(
           async rule =>
-            await rule.validate(get(values, name)).catch(err => {
+            await rule.validate(get(cloneValues, name)).catch(err => {
               setErrMsgDict[name](err.message)
               throw err
             }),
@@ -49,13 +55,20 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
         // eslint-disable-next-line @typescript-eslint/no-throw-literal
         throw {
           errorFields: results.filter(res => res.status === 'rejected'),
-          values,
+          values: cloneValues,
         }
       }
-      return values as T
+      return cloneValues as T
+    },
+    getFieldValue(name) {
+      return get(values, name)
     },
     setFieldValue(name, value) {
-      set(values, name, value)
+      setValues(
+        produce(s => {
+          set(s, name, value)
+        }),
+      )
     },
   }
 
@@ -80,7 +93,6 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
           formInstance,
           rulesDict,
           setErrMsgDict,
-          initialValues: props.initialValues as {},
           setItemWidthDict,
           maxItemWidth,
         }}
