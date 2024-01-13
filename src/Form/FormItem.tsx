@@ -109,7 +109,7 @@ const FormItem: Component<FormItemProps> = props => {
       {getLabel(true)}
       {getLabel()}
 
-      <div class="w-full">
+      <div class="flex" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
         <Dynamic
           component={props.component}
           defaultValue={props.initialValue ?? get(initialValues, props.name!)}

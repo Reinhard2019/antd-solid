@@ -14,6 +14,7 @@ import cs from 'classnames'
 import { useClickAway } from '../hooks'
 import { compact, keyBy } from 'lodash-es'
 import { toArray } from '../utils/array'
+import Compact from '../Compact'
 
 interface SelectOption {
   label: JSXElement
@@ -71,7 +72,7 @@ const Select: Component<SelectProps> = props => {
             {item => (
               <div
                 class={cs(
-                  'box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
+                  'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
                   selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                 )}
                 onClick={() => {
@@ -98,7 +99,14 @@ const Select: Component<SelectProps> = props => {
       <div
         ref={select!}
         class={cs(
-          'h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] px-11px focus:[border-color:var(--ant-color-primary)]',
+          'relative h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] pl-11px pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+          [
+            Compact.compactItemClass,
+            Compact.compactItemRounded0Class,
+            'p[.ant-compact]:first:rounded-l-6px',
+            'p[.ant-compact]:last:rounded-r-6px',
+            Compact.compactItemZIndexClass,
+          ],
           props.class,
         )}
         tabIndex="0"
@@ -114,7 +122,7 @@ const Select: Component<SelectProps> = props => {
           '--ant-select-multiple-item-height': '24px',
         }}
       >
-        <div class="relative h-full">
+        <div class="h-full ellipsis">
           <Show
             when={valueArr().length}
             fallback={
@@ -141,23 +149,23 @@ const Select: Component<SelectProps> = props => {
               </div>
             </Show>
           </Show>
+        </div>
 
-          <div class="absolute top-0 bottom-0 right-0">
-            <Show
-              when={showClearBtn()}
-              fallback={
-                <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
-              }
-            >
-              <span
-                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
-                onClick={e => {
-                  e.stopPropagation()
-                  setValue(props.multiple ? [] : undefined)
-                }}
-              />
-            </Show>
-          </div>
+        <div class="absolute top-0 bottom-0 right-11px">
+          <Show
+            when={showClearBtn()}
+            fallback={
+              <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
+            }
+          >
+            <span
+              class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
+              onClick={e => {
+                e.stopPropagation()
+                setValue(props.multiple ? [] : undefined)
+              }}
+            />
+          </Show>
         </div>
       </div>
     </Tooltip>

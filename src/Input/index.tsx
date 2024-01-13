@@ -34,7 +34,7 @@ const statusClassDict = {
     cs(
       '[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
-        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]',
+        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
     ),
   error: (disabled: boolean) =>
     cs(
@@ -71,12 +71,15 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   const [_, controllableProps] = splitProps(props, ['onChange'])
   const [value, setValue] = createControllableValue(controllableProps)
 
+  const compactItemRoundedLeftClass = 'p[.ant-compact>:first-child]:rounded-l-6px'
+  const compactItemRoundedRightClass = 'p[.ant-compact>:last-child]:rounded-r-6px'
+
   const inputWrapClass = createMemo(() =>
     cs(
       'px-11px py-4px rounded-6px',
       !props.textarea && 'h-32px',
-      props.addonBefore ? 'rounded-l-0' : Compact.compactItemRoundedLeftClass,
-      props.addonAfter ? 'rounded-r-0' : Compact.compactItemRoundedRightClass,
+      props.addonBefore ? 'rounded-l-0' : compactItemRoundedLeftClass,
+      props.addonAfter ? 'rounded-r-0' : compactItemRoundedRightClass,
       statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
@@ -131,7 +134,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           class={cs(
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px text-14px',
             Compact.compactItemRounded0Class,
-            Compact.compactItemRoundedLeftClass,
+            compactItemRoundedLeftClass,
           )}
         >
           {props.addonBefore}
@@ -169,7 +172,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           class={cs(
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px text-14px',
             Compact.compactItemRounded0Class,
-            Compact.compactItemRoundedRightClass,
+            compactItemRoundedRightClass,
           )}
         >
           {props.addonAfter}

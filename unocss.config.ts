@@ -24,10 +24,6 @@ export default defineConfig({
           --ant-light-color: rgba(0, 0, 0, 0.45);
           --ant-dark-color: rgba(0, 0, 0, 0.88);
         
-          --ant-color-text-secondary: rgba(0, 0, 0, 0.65);
-          --ant-color-text-tertiary: rgba(0, 0, 0, 0.45);
-          --ant-color-text-quaternary: rgba(0, 0, 0, 0.25);
-        
           --ant-light-bg-color: #fafafa;
 
           --ant-color-primary-active: #0958d9;
@@ -36,9 +32,6 @@ export default defineConfig({
           --ant-color-primary-border: #95de64;
           --ant-color-error: #ff4d4f;
           --ant-color-success: #52c41a;
-          --ant-color-text: rgba(0, 0, 0, 0.88);
-          --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
-          --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-border: #d9d9d9;
           --ant-color-bg-container-disabled: rgba(0, 0, 0, 0.04);
           --ant-color-bg-layout: #f5f5f5;
@@ -49,6 +42,12 @@ export default defineConfig({
           --ant-color-text-secondary: rgba(0, 0, 0, 0.65);
           --ant-color-text-tertiary: rgba(0, 0, 0, 0.45);
           --ant-color-text-quaternary: rgba(0, 0, 0, 0.25);
+          --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
+          --ant-color-text-heading: rgba(0, 0, 0, 0.88);
+          --ant-color-bg-text-hover: rgba(0, 0, 0, 0.06);
+          --ant-color-bg-text-active: rgba(0, 0, 0, 0.15);
+
+          --ant-control-outline: rgba(5, 145, 255, 0.1);
 
           --ant-font-weight-strong: 600;
 
@@ -82,6 +81,11 @@ export default defineConfig({
           font-size: 14px;
         }
       `,
+    },
+  ],
+  shortcuts: [
+    {
+      ellipsis: 'text-ellipsis overflow-hidden [white-space:nowrap]',
     },
   ],
   presets: [
