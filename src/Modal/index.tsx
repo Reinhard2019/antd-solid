@@ -100,7 +100,7 @@ function warning(props: MethodProps) {
   )
 }
 
-function useModal<T = void>() {
+function useModalProps<T = void>() {
   return useContext(ModalContext) as Omit<typeof ModalContext.defaultValue, 'onOk' | 'resolve'> & {
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
     onOk: (value: T | PromiseLike<T>) => Promise<unknown> | void
@@ -108,44 +108,94 @@ function useModal<T = void>() {
   }
 }
 
-function createModal<P extends {} = {}, T = void>(component: Component<P>) {
+/**
+ * createModal
+ * @param component
+ * @param contextHolder 如果为 true，则会返回 getContextHolder
+ */
+function createModal<P extends {} = {}, T = void>(
+  component: Component<P>,
+): {
+  show: (props?: P) => Promise<T>
+}
+function createModal<P extends {} = {}, T = void>(
+  component: Component<P>,
+  contextHolder: true,
+): {
+  show: (props?: P) => Promise<T>
+  getContextHolder: () => JSXElement
+}
+function createModal<P extends {} = {}, T = void>(
+  component: Component<P>,
+  contextHolder?: true,
+):
+  | {
+    show: (props?: P) => Promise<T>
+  }
+  | {
+    show: (props?: P) => Promise<T>
+    getContextHolder: () => JSXElement
+  } {
+  const [open, setOpen] = createSignal(false)
+  const [props, setProps] = createSignal<P>({} as P)
+  let resolve: (value: T | PromiseLike<T>) => void
+  let reject: (reason?: any) => void
+  let dispose: (() => void) | undefined
+
+  const hide = () => {
+    setOpen(false)
+    dispose?.()
+  }
+  const onOk = (value?: T | PromiseLike<T>) => {
+    hide()
+    resolve(value!)
+  }
+  const onCancel = () => {
+    hide()
+    // eslint-disable-next-line prefer-promise-reject-errors
+    reject()
+  }
+  const getContextHolder = () => (
+    <ModalContext.Provider
+      value={{
+        open,
+        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+        onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
+        onCancel,
+        resolve: resolve as (value: void | PromiseLike<void>) => void,
+        reject,
+        hide,
+      }}
+    >
+      <Dynamic component={component} {...props()!} />
+    </ModalContext.Provider>
+  )
+
+  if (contextHolder) {
+    return {
+      async show(_props?: P) {
+        if (_props) setProps(_props as any)
+        setOpen(true)
+        return await new Promise<T>((_resolve, _reject) => {
+          resolve = _resolve
+          reject = _reject
+        })
+      },
+      getContextHolder,
+    }
+  }
+
   return {
-    async show(props?: P) {
-      return await new Promise<T>((resolve, reject) => {
+    async show(_props?: P) {
+      if (_props) setProps(_props as any)
+      setOpen(true)
+      return await new Promise<T>((_resolve, _reject) => {
         const div = document.createElement('div')
         document.body.appendChild(div)
-        const [open, setOpen] = createSignal(true)
-        const hide = () => {
-          setOpen(false)
-          dispose()
-        }
-        const onOk = (value?: T | PromiseLike<T>) => {
-          hide()
-          resolve(value!)
-        }
-        const onCancel = () => {
-          hide()
-          // eslint-disable-next-line prefer-promise-reject-errors
-          reject()
-        }
-        const dispose = render(
-          () => (
-            <ModalContext.Provider
-              value={{
-                open,
-                // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-                onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
-                onCancel,
-                resolve: resolve as (value: void | PromiseLike<void>) => void,
-                reject,
-                hide,
-              }}
-            >
-              <Dynamic component={component} {...props!} />
-            </ModalContext.Provider>
-          ),
-          div,
-        )
+        dispose = render(getContextHolder, div)
+
+        resolve = _resolve
+        reject = _reject
       })
     },
   }
@@ -153,7 +203,7 @@ function createModal<P extends {} = {}, T = void>(component: Component<P>) {
 
 const Modal: Component<ModalProps> & {
   warning: typeof warning
-  useModal: typeof useModal
+  useModalProps: typeof useModalProps
   createModal: typeof createModal
 } = _props => {
   const props = mergeProps(
@@ -265,7 +315,7 @@ const Modal: Component<ModalProps> & {
   )
 }
 
-Modal.useModal = useModal
+Modal.useModalProps = useModalProps
 Modal.warning = warning
 Modal.createModal = createModal
 

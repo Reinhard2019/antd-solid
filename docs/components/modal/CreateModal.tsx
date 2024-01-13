@@ -9,7 +9,7 @@ interface ExampleModalResolveValue {
 }
 const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveValue>(
   (props: ExampleModalProps) => {
-    const { open, onCancel, resolve, hide } = Modal.useModal<ExampleModalResolveValue>()
+    const { open, onCancel, onOk } = Modal.useModalProps<ExampleModalResolveValue>()
     return (
       <Modal
         open={open()}
@@ -20,8 +20,7 @@ const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveVal
           await new Promise<void>(_resolve => {
             setTimeout(() => {
               _resolve()
-              resolve({ msg: '点击确定成功' })
-              hide()
+              onOk({ msg: '点击确定成功' })
             }, 3000)
           })
         }}
