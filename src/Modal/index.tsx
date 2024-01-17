@@ -61,9 +61,6 @@ const ModalContext = createContext({
   // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
   onOk: (() => {}) as (value: void | PromiseLike<void>) => Promise<unknown> | void,
   onCancel: () => {},
-  resolve: (() => {}) as (value: void | PromiseLike<void>) => void,
-  reject: () => {},
-  hide: () => {},
 })
 
 function warning(props: MethodProps) {
@@ -101,10 +98,19 @@ function warning(props: MethodProps) {
 }
 
 function useModalProps<T = void>() {
-  return useContext(ModalContext) as Omit<typeof ModalContext.defaultValue, 'onOk' | 'resolve'> & {
+  const { open, onOk, onCancel } = useContext(ModalContext)
+  return {
+    open,
     // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    onOk: (value: T | PromiseLike<T>) => Promise<unknown> | void
-    resolve: (value: T | PromiseLike<T>) => void
+    onOk: onOk as (value: T | PromiseLike<T>) => Promise<unknown> | void,
+    onCancel,
+    getProps: () => {
+      return {
+        open: open(),
+        onOk,
+        onCancel,
+      }
+    },
   }
 }
 
@@ -162,9 +168,6 @@ function createModal<P extends {} = {}, T = void>(
         // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
         onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
         onCancel,
-        resolve: resolve as (value: void | PromiseLike<void>) => void,
-        reject,
-        hide,
       }}
     >
       <Dynamic component={component} {...props()!} />
