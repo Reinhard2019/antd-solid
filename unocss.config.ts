@@ -46,6 +46,14 @@ export default defineConfig({
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
           --ant-color-bg-text-hover: rgba(0, 0, 0, 0.06);
           --ant-color-bg-text-active: rgba(0, 0, 0, 0.15);
+          --ant-color-success-border: #b7eb8f;
+          --ant-color-success-bg: #f6ffed;
+          --ant-color-info-border: #91caff;
+          --ant-color-info-bg: #e6f4ff;
+          --ant-color-warning-bg: #fffbe6;
+          --ant-color-warning-border: #ffe58f;
+          --ant-color-error-bg: #fff2f0;
+          --ant-color-error-border: #ffccc7;
 
           --ant-control-outline: rgba(5, 145, 255, 0.1);
 
@@ -56,6 +64,7 @@ export default defineConfig({
           --ant-line-height-lg: 1.5;
 
           --ant-line-width: 1px;
+          --ant-line-type: solid;
 
           --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
