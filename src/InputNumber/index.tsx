@@ -59,7 +59,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
   createEffect(
     on(
       () => props.value,
-      () => {
+      input => {
+        if (Number(input) === Number(value())) return
         setValue(props.value)
       },
       {
