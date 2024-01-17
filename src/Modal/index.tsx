@@ -162,16 +162,18 @@ function createModal<P extends {} = {}, T = void>(
     reject()
   }
   const getContextHolder = () => (
-    <ModalContext.Provider
-      value={{
-        open,
-        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-        onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
-        onCancel,
-      }}
-    >
-      <Dynamic component={component} {...props()!} />
-    </ModalContext.Provider>
+    <Show when={open()}>
+      <ModalContext.Provider
+        value={{
+          open,
+          // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+          onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
+          onCancel,
+        }}
+      >
+        <Dynamic component={component} {...props()!} />
+      </ModalContext.Provider>
+    </Show>
   )
 
   if (contextHolder) {
