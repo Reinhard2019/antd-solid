@@ -99,7 +99,8 @@ const Select: Component<SelectProps> = props => {
       <div
         ref={select!}
         class={cs(
-          'relative h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] pl-11px pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+          'relative h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+          valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
           [
             Compact.compactItemClass,
             Compact.compactItemRounded0Class,
@@ -134,7 +135,7 @@ const Select: Component<SelectProps> = props => {
             }
           >
             <Show when={props.multiple} fallback={getOptionLabel(valueArr()[0])}>
-              <div class="flex gap-4px h-full items-center ml--7px">
+              <div class="flex gap-4px h-full items-center">
                 <For each={valueArr()}>
                   {item => (
                     <span class="bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
