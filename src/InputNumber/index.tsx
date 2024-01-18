@@ -47,12 +47,32 @@ const InputNumber: Component<InputNumberProps> = _props => {
     defaultValue = untrack(() => props.defaultValue)
   }
 
-  let prev: number | null = defaultValue!
-  const updatePrev = (v: number | null) => {
-    if (prev === v) return
+  /**
+   * 返回 false 代表非有效值
+   * 返回 number | null 代表有效值
+   * @param v
+   * @returns
+   */
+  const getValidValue = (v: number | string | null | undefined) => {
+    let valueNum: number | null = null
 
-    prev = v
-    props.onChange?.(prev)
+    if (!isEmptyValue(v)) {
+      valueNum = Number(v)
+      if (Number.isNaN(valueNum) || valueNum !== clampValue(valueNum)) return false
+    }
+
+    return valueNum
+  }
+  let validValue: number | null = null
+  const validDefaultValue = getValidValue(validValue)
+  if (validDefaultValue !== false) {
+    validValue = validDefaultValue
+  }
+  const updateValidValue = (v: number | null) => {
+    if (validValue === v) return
+
+    validValue = v
+    props.onChange?.(validValue)
   }
 
   const [value, setValue] = createSignal<number | string | null | undefined>(defaultValue)
@@ -81,7 +101,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     if (!Object.keys(props).includes('value')) {
       setValue(newValue)
     }
-    updatePrev(newValue)
+    updateValidValue(newValue)
   }
   const up = () => {
     add(1)
@@ -122,19 +142,21 @@ const InputNumber: Component<InputNumberProps> = _props => {
         const newValue = e.target.value
         setValue(newValue)
 
-        let newValueNum: number | null = Number(newValue)
-        if (Number.isNaN(newValueNum)) return
-
-        if (isEmptyValue(newValue)) {
-          newValueNum = null
-        } else {
-          newValueNum = clampValue(newValueNum)
-        }
-
-        updatePrev(newValueNum)
+        const newValidValue = getValidValue(newValue)
+        if (newValidValue === false) return
+        updateValidValue(newValidValue)
       }}
       onBlur={e => {
-        setValue(props.value ?? prev)
+        if (isEmptyValue(value()) || Number.isNaN(Number(value()))) {
+          setValue(validValue)
+        } else {
+          const valueNum = Number(value())
+          if (valueNum !== validValue) {
+            const clampedValue = clampValue(valueNum)
+            setValue(clampedValue)
+            props.onChange?.(clampedValue)
+          }
+        }
 
         dispatchEventHandlerUnion(props.onBlur, e)
       }}
