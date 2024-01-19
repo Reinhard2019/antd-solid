@@ -7,8 +7,9 @@ import {
   createSignal,
   mergeProps,
 } from 'solid-js'
+import { clamp, floor, isNil } from 'lodash-es'
+import NP from 'number-precision'
 import { CommonInput, type InputProps } from '../Input'
-import { clamp, isNil } from 'lodash-es'
 import { dispatchEventHandlerUnion } from '../utils/solid'
 
 export interface InputNumberProps
@@ -21,6 +22,7 @@ export interface InputNumberProps
   onChange?: (value: number | null) => void
   min?: number
   max?: number
+  precision?: number
 }
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
@@ -39,6 +41,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
   const [_, inputProps] = splitProps(props, ['defaultValue', 'value', 'onChange', 'onBlur'])
 
   const clampValue = (v: number) => untrack(() => clamp(v, props.min, props.max))
+  const floorValue = (v: number) =>
+    untrack(() => (typeof props.precision === 'number' ? floor(v, props.precision) : v))
 
   let defaultValue = null
   if (Object.keys(props).includes('value')) {
@@ -47,33 +51,40 @@ const InputNumber: Component<InputNumberProps> = _props => {
     defaultValue = untrack(() => props.defaultValue)
   }
 
-  /**
-   * 返回 false 代表非有效值
-   * 返回 number | null 代表有效值
-   * @param v
-   * @returns
-   */
-  const getValidValue = (v: number | string | null | undefined) => {
+  let validValue: number | null = null
+  const updateValidValue = (
+    v: number | string | null | undefined,
+    options?: {
+      ignoreValid?: boolean
+      ignoreOnChange?: boolean
+    },
+  ) => {
     let valueNum: number | null = null
 
     if (!isEmptyValue(v)) {
       valueNum = Number(v)
-      if (Number.isNaN(valueNum) || valueNum !== clampValue(valueNum)) return false
+
+      if (options?.ignoreValid) {
+        if (Number.isNaN(valueNum)) {
+          valueNum = null
+        } else {
+          valueNum = clampValue(floorValue(valueNum!))
+        }
+      } else if (
+        Number.isNaN(valueNum) ||
+        valueNum !== clampValue(valueNum!) ||
+        valueNum !== floorValue(valueNum!)
+      ) {
+        return
+      }
     }
 
-    return valueNum
-  }
-  let validValue: number | null = null
-  const validDefaultValue = getValidValue(validValue)
-  if (validDefaultValue !== false) {
-    validValue = validDefaultValue
-  }
-  const updateValidValue = (v: number | null) => {
-    if (validValue === v) return
+    if (validValue === valueNum) return
 
-    validValue = v
-    props.onChange?.(validValue)
+    validValue = valueNum
+    if (!options?.ignoreOnChange) untrack(() => props.onChange?.(validValue))
   }
+  updateValidValue(defaultValue, { ignoreOnChange: true })
 
   const [value, setValue] = createSignal<number | string | null | undefined>(defaultValue)
   createEffect(
@@ -92,16 +103,14 @@ const InputNumber: Component<InputNumberProps> = _props => {
   const add = (addon: number) => {
     let newValue: number | null
     if (isEmptyValue(value())) {
-      newValue = clampValue(addon)
+      newValue = addon
     } else {
       const num = Number(value())
-      newValue = Number.isNaN(num) ? null : clampValue(num + addon)
+      newValue = Number.isNaN(num) ? null : NP.plus(num, addon)
     }
 
-    if (!Object.keys(props).includes('value')) {
-      setValue(newValue)
-    }
-    updateValidValue(newValue)
+    updateValidValue(newValue, { ignoreValid: true })
+    setValue(validValue)
   }
   const up = () => {
     add(1)
@@ -141,22 +150,11 @@ const InputNumber: Component<InputNumberProps> = _props => {
       onChange={e => {
         const newValue = e.target.value
         setValue(newValue)
-
-        const newValidValue = getValidValue(newValue)
-        if (newValidValue === false) return
-        updateValidValue(newValidValue)
+        updateValidValue(newValue)
       }}
       onBlur={e => {
-        if (isEmptyValue(value()) || Number.isNaN(Number(value()))) {
-          setValue(validValue)
-        } else {
-          const valueNum = Number(value())
-          if (valueNum !== validValue) {
-            const clampedValue = clampValue(valueNum)
-            setValue(clampedValue)
-            props.onChange?.(clampedValue)
-          }
-        }
+        updateValidValue(value(), { ignoreValid: true })
+        setValue(validValue)
 
         dispatchEventHandlerUnion(props.onBlur, e)
       }}
