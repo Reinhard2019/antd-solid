@@ -5,8 +5,10 @@ import {
   Show,
   useContext,
   createSignal,
-  onMount,
   onCleanup,
+  createEffect,
+  createMemo,
+  on,
 } from 'solid-js'
 import { isNil } from 'lodash-es'
 import { Dynamic } from 'solid-js/web'
@@ -14,6 +16,7 @@ import { nanoid } from 'nanoid'
 import cs from 'classnames'
 import { type Schema } from 'yup'
 import Context from './context'
+import { type FormInstance } from './Form'
 
 export interface FormItemComponentProps<T = any> {
   value?: T | undefined
@@ -29,7 +32,13 @@ export interface FormItemProps {
   name?: string
   initialValue?: any
   rules?: Schema[]
-  component: Component<FormItemComponentProps>
+  when?: boolean | ((formInstance: FormInstance<{}>) => boolean)
+  /**
+   * 是否隐藏
+   * 和 when 的区别，只是不会显示，但值依然会存在
+   */
+  hidden?: boolean
+  component?: Component<FormItemComponentProps>
 }
 
 const FormItem: Component<FormItemProps> = props => {
@@ -37,104 +46,113 @@ const FormItem: Component<FormItemProps> = props => {
     useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
-
-  onMount(() => {
-    if (isNil(props.name)) return
-
-    if (!isNil(props.initialValue)) {
-      formInstance.setFieldValue(props.name, props.initialValue)
-    }
-
-    if (!isNil(props.rules)) {
-      rulesDict[props.name] = props.rules
-    }
-
-    setErrMsgDict[props.name] = setErrMsg
+  const when = createMemo(() => {
+    if (typeof props.when === 'function') return props.when(formInstance)
+    return props.when ?? true
   })
 
-  let label: HTMLLabelElement
-  onMount(() => {
-    const resizeObserver = new ResizeObserver(entries => {
-      const [entry] = entries
-      // Firefox implements `borderBoxSize` as a single content rect, rather than an array
-      const borderBoxSize: ResizeObserverSize = Array.isArray(entry.borderBoxSize)
-        ? entry.borderBoxSize[0]
-        : entry.borderBoxSize
-      setItemWidthDict(dict => ({
-        ...dict,
-        [id]: borderBoxSize.inlineSize,
-      }))
-    })
+  createEffect(
+    on(when, input => {
+      if (isNil(props.name) || !input) return
 
-    resizeObserver.observe(label)
+      if (!isNil(props.initialValue)) {
+        formInstance.setFieldValue(props.name, props.initialValue)
+      }
 
-    onCleanup(() => {
-      setItemWidthDict(dict => {
+      if (!isNil(props.rules)) {
+        rulesDict[props.name] = props.rules
+        setErrMsgDict[props.name] = setErrMsg
+      }
+
+      onCleanup(() => {
+        formInstance.removeFieldValue(props.name!)
         // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete dict[id]
-        return { ...dict }
+        delete rulesDict[props.name!]
+        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+        delete setErrMsgDict[props.name!]
       })
-      resizeObserver.disconnect()
-    })
-  })
+    }),
+  )
 
-  const getLabel = (hidden?: boolean) => (
-    <label
-      class={cs(
-        'shrink-0 h-32px leading-32px not[:empty]:pr-8px text-right [white-space:nowrap]',
-        hidden && 'absolute opacity-0',
-      )}
-      {...(hidden
-        ? {
-          ref: el => {
-            label = el
-          },
-        }
-        : {
-          style: { width: `${maxItemWidth() ?? 0}px` },
-        })}
-    >
-      <Show when={!isNil(props.required)}>
-        <span class="mr-4px text-[var(--ant-color-error)]">*</span>
-      </Show>
-      <Show when={!isNil(props.label)}>
-        <label>{props.label}</label>
-      </Show>
-    </label>
+  let label: HTMLLabelElement | undefined
+  createEffect(
+    on(
+      () => when() && !props.hidden,
+      input => {
+        if (!input) return
+
+        const resizeObserver = new ResizeObserver(entries => {
+          const [entry] = entries
+          // Firefox implements `borderBoxSize` as a single content rect, rather than an array
+          const borderBoxSize: ResizeObserverSize = Array.isArray(entry.borderBoxSize)
+            ? entry.borderBoxSize[0]
+            : entry.borderBoxSize
+          setItemWidthDict(dict => ({
+            ...dict,
+            [id]: borderBoxSize.inlineSize,
+          }))
+        })
+
+        resizeObserver.observe(label!)
+
+        onCleanup(() => {
+          setItemWidthDict(dict => {
+            // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+            delete dict[id]
+            return { ...dict }
+          })
+          resizeObserver.disconnect()
+        })
+      },
+    ),
   )
 
   return (
-    <div class={cs(props.class, 'flex items-center mb-16px')} style={props.style}>
-      {/* 第一个 label 仅用于计算实际宽度 */}
-      {getLabel(true)}
-      {getLabel()}
+    <Show when={when() && !props.hidden}>
+      <div class={cs(props.class, 'flex items-center mb-16px')} style={props.style}>
+        <div class="relative flex items-center" style={{ width: `${maxItemWidth() ?? 0}px` }}>
+          <label
+            ref={label}
+            class={cs(
+              'absolute shrink-0 h-32px leading-32px not[:empty]:pr-8px text-right [white-space:nowrap]',
+            )}
+          >
+            <Show when={!isNil(props.label)}>
+              <label class="mr-4px">{props.label}</label>
+            </Show>
+            <Show when={!isNil(props.required)}>
+              <span class="text-[var(--ant-color-error)]">*</span>
+            </Show>
+          </label>
+        </div>
 
-      <div class="flex flex-col" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
-        <Dynamic
-          component={props.component}
-          value={props.name ? formInstance.getFieldValue(props.name) : undefined}
-          status={errMsg() ? 'error' : undefined}
-          onChange={(value: any) => {
-            if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
+        <div class="flex flex-col" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
+          <Dynamic
+            component={props.component}
+            value={props.name ? formInstance.getFieldValue(props.name) : undefined}
+            status={errMsg() ? 'error' : undefined}
+            onChange={(value: any) => {
+              if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
 
-            props.rules?.forEach(rule => {
-              rule
-                .validate(value)
-                .then(() => {
-                  setErrMsg('')
-                })
-                .catch(err => {
-                  setErrMsg(err.message)
-                })
-            })
-          }}
-        />
+              props.rules?.forEach(rule => {
+                rule
+                  .validate(value)
+                  .then(() => {
+                    setErrMsg('')
+                  })
+                  .catch(err => {
+                    setErrMsg(err.message)
+                  })
+              })
+            }}
+          />
 
-        <Show when={errMsg()}>
-          <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
-        </Show>
+          <Show when={errMsg()}>
+            <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
+          </Show>
+        </div>
       </div>
-    </div>
+    </Show>
   )
 }
 

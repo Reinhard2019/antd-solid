@@ -9,7 +9,7 @@ import {
   untrack,
 } from 'solid-js'
 import { createStore, produce } from 'solid-js/store'
-import { cloneDeep, get, max, set } from 'lodash-es'
+import { cloneDeep, get, max, set, unset } from 'lodash-es'
 import Context from './context'
 import { type Schema } from 'yup'
 
@@ -17,6 +17,7 @@ export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
   getFieldValue: (name: Parameters<typeof get>[1]) => any
   setFieldValue: (name: Parameters<typeof set>[1], value: any) => void
+  removeFieldValue: (name: Parameters<typeof set>[1]) => void
 }
 
 export interface FormProps<T extends {} = {}> {
@@ -67,6 +68,13 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
       setValues(
         produce(s => {
           set(s, name, value)
+        }),
+      )
+    },
+    removeFieldValue(name) {
+      setValues(
+        produce(s => {
+          unset(s, name)
         }),
       )
     },
