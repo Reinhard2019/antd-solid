@@ -179,7 +179,7 @@ function createModal<P extends {} = {}, T = void>(
   if (contextHolder) {
     return {
       async show(_props?: P) {
-        if (_props) setProps(_props as any)
+        setProps((_props as any) ?? {})
         setOpen(true)
         return await new Promise<T>((_resolve, _reject) => {
           resolve = _resolve
