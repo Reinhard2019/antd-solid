@@ -29,6 +29,7 @@ interface SelectProps {
   options: SelectOption[]
   placeholder?: string
   allowClear?: boolean
+  disabled?: boolean
   class?: string
 }
 
@@ -56,120 +57,133 @@ const Select: Component<SelectProps> = props => {
   const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
 
   return (
-    <Tooltip
-      mode="light"
-      open={open()}
-      onOpenChange={setOpen}
-      trigger={[]}
-      placement="bottomLeft"
-      arrow={false}
-      contentStyle={{
-        padding: 0,
-      }}
-      content={close => (
-        <div ref={tooltipContent} class="bg-white w-200px p-2px" style={{ width: `${width()}px` }}>
-          <For each={props.options}>
-            {item => (
-              <div
-                class={cs(
-                  'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
-                  selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
-                )}
-                onClick={() => {
-                  if (!props.multiple) {
-                    setValue(item.value)
-                    close()
-                    return
-                  }
-
-                  if (valueArr().includes(item.value)) {
-                    setValue(valueArr().filter(v => v !== item.value))
-                  } else {
-                    setValue([...valueArr(), item.value])
-                  }
-                }}
-              >
-                {item.label}
-              </div>
-            )}
-          </For>
-        </div>
+    <div
+      class={cs(
+        'rounded-6px',
+        [
+          Compact.compactItemClass,
+          Compact.compactItemRounded0Class,
+          'p[.ant-compact]:first:rounded-l-6px',
+          'p[.ant-compact]:last:rounded-r-6px',
+          Compact.compactItemZIndexClass,
+        ],
+        props.class,
+        props.disabled && 'cursor-not-allowed',
       )}
+      style={{
+        '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
+        '--ant-select-multiple-item-height': '24px',
+      }}
     >
-      <div
-        ref={select!}
-        class={cs(
-          'relative h-32px leading-32px rounded-6px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
-          valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
-          [
-            Compact.compactItemClass,
-            Compact.compactItemRounded0Class,
-            'p[.ant-compact]:first:rounded-l-6px',
-            'p[.ant-compact]:last:rounded-r-6px',
-            Compact.compactItemZIndexClass,
-          ],
-          props.class,
-        )}
-        tabIndex="0"
-        onClick={e => {
-          setOpen(true)
-          setWidth(e.currentTarget.offsetWidth)
-          e.currentTarget.focus()
+      <Tooltip
+        mode="light"
+        open={open()}
+        onOpenChange={setOpen}
+        trigger={[]}
+        placement="bottomLeft"
+        arrow={false}
+        contentStyle={{
+          padding: 0,
         }}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        style={{
-          '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
-          '--ant-select-multiple-item-height': '24px',
-        }}
-      >
-        <div class="h-full ellipsis">
-          <Show
-            when={valueArr().length}
-            fallback={
-              <input
-                class="h-full w-full float-left [outline:none]"
-                readOnly
-                placeholder={props.placeholder}
-              />
-            }
+        content={close => (
+          <div
+            ref={tooltipContent}
+            class="bg-white w-200px p-2px"
+            style={{ width: `${width()}px` }}
           >
-            <Show when={props.multiple} fallback={getOptionLabel(valueArr()[0])}>
-              <div class="flex gap-4px h-full items-center">
-                <For each={valueArr()}>
-                  {item => (
-                    <span class="bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                      {getOptionLabel(item)}
-                      <span
-                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                        onClick={() => setValue(valueArr().filter(v => v !== item))}
-                      />
-                    </span>
+            <For each={props.options}>
+              {item => (
+                <div
+                  class={cs(
+                    'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
+                    selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                   )}
-                </For>
-              </div>
-            </Show>
-          </Show>
-        </div>
+                  onClick={() => {
+                    if (!props.multiple) {
+                      setValue(item.value)
+                      close()
+                      return
+                    }
 
-        <div class="absolute top-0 bottom-0 right-11px">
-          <Show
-            when={showClearBtn()}
-            fallback={
-              <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
-            }
-          >
-            <span
-              class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
-              onClick={e => {
-                e.stopPropagation()
-                setValue(props.multiple ? [] : undefined)
-              }}
-            />
-          </Show>
+                    if (valueArr().includes(item.value)) {
+                      setValue(valueArr().filter(v => v !== item.value))
+                    } else {
+                      setValue([...valueArr(), item.value])
+                    }
+                  }}
+                >
+                  {item.label}
+                </div>
+              )}
+            </For>
+          </div>
+        )}
+      >
+        <div
+          ref={select!}
+          class={cs(
+            'relative h-32px leading-32px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)] rounded-inherit',
+            valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
+            props.disabled &&
+              '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
+          )}
+          tabIndex="0"
+          onClick={e => {
+            setOpen(true)
+            setWidth(e.currentTarget.offsetWidth)
+            e.currentTarget.focus()
+          }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+        >
+          <div class="h-full ellipsis">
+            <Show
+              when={valueArr().length}
+              fallback={
+                <input
+                  class="h-full w-full float-left [outline:none] bg-inherit"
+                  readOnly
+                  placeholder={props.placeholder}
+                />
+              }
+            >
+              <Show when={props.multiple} fallback={getOptionLabel(valueArr()[0])}>
+                <div class="flex gap-4px h-full items-center">
+                  <For each={valueArr()}>
+                    {item => (
+                      <span class="bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
+                        {getOptionLabel(item)}
+                        <span
+                          class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
+                          onClick={() => setValue(valueArr().filter(v => v !== item))}
+                        />
+                      </span>
+                    )}
+                  </For>
+                </div>
+              </Show>
+            </Show>
+          </div>
+
+          <div class="absolute top-0 bottom-0 right-11px">
+            <Show
+              when={showClearBtn()}
+              fallback={
+                <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
+              }
+            >
+              <span
+                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
+                onClick={e => {
+                  e.stopPropagation()
+                  setValue(props.multiple ? [] : undefined)
+                }}
+              />
+            </Show>
+          </div>
         </div>
-      </div>
-    </Tooltip>
+      </Tooltip>
+    </div>
   )
 }
 
