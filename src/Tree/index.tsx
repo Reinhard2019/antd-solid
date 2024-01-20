@@ -166,7 +166,7 @@ function SingleLevelTree<T extends {} = {}>(props: SingleLevelTreeProps<T>) {
               </div>
               <div
                 class={cs(
-                  'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative',
+                  'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative min-w-0',
                   props.blockNode && 'w-full',
                   selectedNodes()?.includes(item) && '!bg-[var(--ant-tree-node-selected-bg)]',
                   isTarget(item) &&

@@ -141,7 +141,7 @@ const Select: Component<SelectProps> = props => {
               when={valueArr().length}
               fallback={
                 <input
-                  class="h-full w-full float-left [outline:none] bg-inherit"
+                  class="h-full w-full float-left [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
                   readOnly
                   placeholder={props.placeholder}
                 />

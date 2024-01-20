@@ -29,7 +29,7 @@ export default defineConfig({
           --ant-color-primary-active: #0958d9;
           --ant-color-primary: #1677ff;
           --ant-color-primary-hover: #4096ff;
-          --ant-color-primary-border: #95de64;
+          --ant-color-primary-border: #91caff;
           --ant-color-error: #ff4d4f;
           --ant-color-success: #52c41a;
           --ant-color-border: #d9d9d9;

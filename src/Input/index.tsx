@@ -97,7 +97,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       }
       {...(inputProps as JSX.InputHTMLAttributes<HTMLInputElement>)}
       class={cs(
-        'w-full [outline:none] text-14px',
+        'w-full [outline:none] text-14px placeholder-text-[rgba(0,0,0,.25)]',
         !hasPrefixOrSuffix() && inputWrapClass(),
         inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
