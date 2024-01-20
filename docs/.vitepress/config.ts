@@ -35,6 +35,7 @@ export default defineConfig({
       {
         text: '数据录入',
         items: [
+          { text: 'Checkbox 多选框', link: '/components/checkbox' },
           { text: 'ColorPicker 颜色选择器', link: '/components/color-picker' },
           { text: 'DatePicker 日期选择框', link: '/components/date-picker' },
           { text: 'Input 输入框', link: '/components/input' },

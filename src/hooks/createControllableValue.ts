@@ -4,7 +4,7 @@ export interface Options<T> {
   defaultValue?: T
   defaultValuePropName?: string
   valuePropName?: string
-  trigger?: string | undefined | null
+  trigger?: string | undefined | null | false
 }
 
 export type Props = Record<string, any>

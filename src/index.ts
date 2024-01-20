@@ -43,6 +43,8 @@ export type { SegmentedProps } from './Segmented'
 export { default as Segmented } from './Segmented'
 export type { AlertProps } from './Alert'
 export { default as Alert } from './Alert'
+export { default as Checkbox } from './Checkbox'
+export type { CheckboxProps } from './Checkbox'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'

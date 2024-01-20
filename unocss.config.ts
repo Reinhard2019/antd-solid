@@ -54,7 +54,7 @@ export default defineConfig({
           --ant-color-warning-border: #ffe58f;
           --ant-color-error-bg: #fff2f0;
           --ant-color-error-border: #ffccc7;
-
+          
           --ant-control-outline: rgba(5, 145, 255, 0.1);
 
           --ant-font-weight-strong: 600;
@@ -76,6 +76,7 @@ export default defineConfig({
 
           --ant-box-shadow-tertiary: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
 
+          --ant-line-width-bold: 2px;
           --ant-border-radius-sm: 4px;
           --ant-border-radius: 6px;
           --ant-border-radius-lg: 8px;

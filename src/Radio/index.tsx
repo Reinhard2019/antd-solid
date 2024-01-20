@@ -6,6 +6,7 @@ import {
   For,
   createSelector,
   mergeProps,
+  Show,
 } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import cs from 'classnames'
@@ -44,7 +45,7 @@ const Radio: Component<RadioProps> & {
   })
 
   return (
-    <label class="inline-flex gap-4px cursor-pointer inline-flex items-center">
+    <label class="inline-flex cursor-pointer inline-flex items-center">
       <span
         class={cs(
           'w-16px h-16px rounded-50% [border:1px_solid_var(--ant-color-border)]',
@@ -62,7 +63,10 @@ const Radio: Component<RadioProps> & {
           }}
         />
       </span>
-      {props.children}
+
+      <Show when={props.children}>
+        <span class="px-8px">{props.children}</span>
+      </Show>
     </label>
   )
 }
