@@ -25,7 +25,9 @@ const Index: Component = () => {
         {
           title: 'parent 1-1',
           key: '0-0-1',
-          children: [{ title: <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' }],
+          children: [
+            { title: () => <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' },
+          ],
         },
       ],
     },
@@ -34,9 +36,12 @@ const Index: Component = () => {
   return (
     <Tree
       blockNode
-      titleRender={node => node.title}
-      children={node => node.children as any}
+      checkable
+      defaultExpandAll
       treeData={treeData}
+      onCheck={keys => {
+        console.log('onCheck', keys)
+      }}
     />
   )
 }

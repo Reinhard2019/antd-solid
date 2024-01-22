@@ -18,15 +18,14 @@ export interface StandardProps<T> {
 function createControllableValue<T = any>(props: StandardProps<T>): Signal<T>
 function createControllableValue<T = any>(props: Props, options?: Options<T>): Signal<T>
 function createControllableValue<T = any>(props: Props, options: Options<T> = {}) {
-  const defaultOptions = {
-    defaultValuePropName: 'defaultValue',
-    valuePropName: 'value',
-    trigger: 'onChange',
-  }
-  const { defaultValuePropName, valuePropName, trigger } = {
-    ...defaultOptions,
-    ...options,
-  }
+  const { defaultValuePropName, valuePropName, trigger } = Object.assign(
+    {
+      defaultValuePropName: 'defaultValue',
+      valuePropName: 'value',
+      trigger: 'onChange',
+    },
+    options,
+  )
 
   const getValue = () => props[valuePropName] as T
   // 为什么不使用 Object.hasOwn？
