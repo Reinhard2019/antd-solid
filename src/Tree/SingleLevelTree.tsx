@@ -2,19 +2,17 @@
  * 单层级 tree
  */
 import { isEmpty, uniq } from 'lodash-es'
-import { Show, For, createMemo, type Accessor, type Setter } from 'solid-js'
+import { Show, For, createMemo, type Accessor, type Setter, type JSXElement } from 'solid-js'
 import cs from 'classnames'
-import { unwrapStringOrJSXElement } from '../utils/solid'
 import Checkbox, { type CheckboxProps } from '../Checkbox'
 import { type TreeNode, type TreeProps } from '.'
-import { type StringOrJSXElement, type Key } from '../types'
 
 interface SingleLevelTreeProps<T extends {} = TreeNode>
   extends Pick<TreeProps<T>, 'treeData' | 'draggable' | 'onDrop' | 'blockNode' | 'checkable'> {
   indent: number
   parentIndexes?: number[]
-  selectedKeys: Accessor<Key[]>
-  setSelectedKeys: Setter<Key[]>
+  selectedNodes: Accessor<T[]>
+  setSelectedNodes: Setter<T[]>
   draggableNode: Accessor<T | null>
   setDraggableNode: Setter<T | null>
   draggableIndexes: Accessor<number[] | null>
@@ -25,13 +23,17 @@ interface SingleLevelTreeProps<T extends {} = TreeNode>
   targetIndexes: Accessor<number[] | null>
   setTargetIndexes: Setter<number[] | null>
   isTarget: (key: T | null) => boolean
-  expandedKeys: Accessor<Key[]>
-  setExpandedKeys: Setter<Key[]>
-  checkedKeys: Accessor<Key[]>
-  setCheckedKeys: Setter<Key[]>
-  checkedMap: Accessor<Map<Key, CheckboxProps>>
-  getTitle: (node: T) => StringOrJSXElement
-  getKey: (node: T) => Key
+  expandedNodes: Accessor<T[]>
+  setExpandedNodes: Setter<T[]>
+  checkedNodes: Accessor<T[]>
+  setCheckedNodes: Setter<T[]>
+  checkedMap: Accessor<Map<T, CheckboxProps>>
+  getTitle: (
+    node: T,
+    info: {
+      indexes: number[]
+    },
+  ) => JSXElement
   getChildren: (node: T) => T[] | undefined
 }
 
@@ -40,7 +42,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
     <For each={props.treeData}>
       {(item, i) => {
         const indexes = createMemo(() => [...(props.parentIndexes ?? []), i()])
-        const isExpanded = createMemo(() => props.expandedKeys().includes(props.getKey(item)))
+        const isExpanded = createMemo(() => props.expandedNodes().includes(item))
         const children = createMemo(() => props.getChildren(item))
         const isEndNode = createMemo(() => isEmpty(children()))
 
@@ -108,8 +110,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                     <span
                       class="i-ant-design:caret-right-outlined"
                       onClick={() => {
-                        const key = props.getKey(item)
-                        props.setExpandedKeys(l => [...l, key])
+                        props.setExpandedNodes(l => [...l, item])
                       }}
                     />
                   }
@@ -117,8 +118,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                   <span
                     class="i-ant-design:caret-down-outlined"
                     onClick={() => {
-                      const key = props.getKey(item)
-                      props.setExpandedKeys(l => l.filter(k => k !== key))
+                      props.setExpandedNodes(l => l.filter(k => k !== item))
                     }}
                   />
                 </Show>
@@ -126,36 +126,36 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
               <Show when={props.checkable}>
                 <Checkbox
                   class="mr-8px mt-2px"
-                  checked={props.checkedMap().get(props.getKey(item))?.checked}
-                  indeterminate={props.checkedMap().get(props.getKey(item))?.indeterminate}
+                  checked={props.checkedMap().get(item)?.checked}
+                  indeterminate={props.checkedMap().get(item)?.indeterminate}
                   onChange={e => {
-                    const key = props.getKey(item)
+                    const key = item
 
                     if (isEndNode()) {
                       if (e.target.checked) {
-                        props.setCheckedKeys(keys => [...keys, key])
+                        props.setCheckedNodes(keys => [...keys, key])
                       } else {
-                        props.setCheckedKeys(keys => keys.filter(k => k !== key))
+                        props.setCheckedNodes(keys => keys.filter(k => k !== key))
                       }
                       return
                     }
 
-                    const getAllChildrenKey = (list: T[]): Key[] => {
-                      return list.flatMap<Key>(v => {
+                    const getAllChildrenKey = (list: T[]): T[] => {
+                      return list.flatMap<T>(v => {
                         const nextLevelChildren = props.getChildren(v)
                         if (!isEmpty(nextLevelChildren)) {
                           return getAllChildrenKey(nextLevelChildren!)
                         }
-                        return props.getKey(v)
+                        return v
                       })
                     }
                     const allChildrenKey = getAllChildrenKey(children()!)
 
                     if (e.target.checked) {
-                      props.setCheckedKeys(keys => uniq([...keys, ...allChildrenKey]))
+                      props.setCheckedNodes(keys => uniq([...keys, ...allChildrenKey]))
                     } else {
                       const allChildrenDict = new Map(allChildrenKey.map(k => [k, true]))
-                      props.setCheckedKeys(keys => keys.filter(k => !allChildrenDict.get(k)))
+                      props.setCheckedNodes(keys => keys.filter(k => !allChildrenDict.get(k)))
                     }
                   }}
                 />
@@ -164,16 +164,15 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                 class={cs(
                   'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative min-w-0',
                   props.blockNode && 'w-full',
-                  props.selectedKeys()?.includes(props.getKey(item)) &&
-                    '!bg-[var(--ant-tree-node-selected-bg)]',
+                  props.selectedNodes()?.includes(item) && '!bg-[var(--ant-tree-node-selected-bg)]',
                   props.isTarget(item) &&
                     "before:content-[''] before:inline-block before:w-8px before:h-8px before:absolute before:bottom-0 before:left-0 before:-translate-x-full before:translate-y-1/2 before:rounded-1/2 before:[border:2px_solid_var(--ant-color-primary)] after:content-[''] after:inline-block after:h-2px after:absolute after:left-0 after:right-0 after:bottom--1px after:bg-[var(--ant-color-primary)]",
                 )}
                 onClick={() => {
-                  props.setSelectedKeys([props.getKey(item)])
+                  props.setSelectedNodes([item])
                 }}
               >
-                {unwrapStringOrJSXElement(props.getTitle(item))}
+                {props.getTitle(item, { indexes: indexes() })}
               </div>
             </div>
 
