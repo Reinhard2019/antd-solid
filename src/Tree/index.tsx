@@ -12,6 +12,10 @@ export interface TreeNode {
 }
 
 export interface TreeProps<T extends {} = TreeNode> {
+  /**
+   * 支持点选多个节点（节点本身）
+   */
+  multiple?: boolean
   defaultSelectedNodes?: T[] | undefined
   selectedNodes?: T[] | undefined
   onSelect?: (selectedNodes: T[]) => void

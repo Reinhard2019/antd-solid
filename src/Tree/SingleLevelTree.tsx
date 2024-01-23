@@ -8,7 +8,10 @@ import Checkbox, { type CheckboxProps } from '../Checkbox'
 import { type TreeNode, type TreeProps } from '.'
 
 interface SingleLevelTreeProps<T extends {} = TreeNode>
-  extends Pick<TreeProps<T>, 'treeData' | 'draggable' | 'onDrop' | 'blockNode' | 'checkable'> {
+  extends Pick<
+  TreeProps<T>,
+  'treeData' | 'draggable' | 'onDrop' | 'blockNode' | 'checkable' | 'multiple'
+  > {
   indent: number
   parentIndexes?: number[]
   selectedNodes: Accessor<T[]>
@@ -169,7 +172,16 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                     "before:content-[''] before:inline-block before:w-8px before:h-8px before:absolute before:bottom-0 before:left-0 before:-translate-x-full before:translate-y-1/2 before:rounded-1/2 before:[border:2px_solid_var(--ant-color-primary)] after:content-[''] after:inline-block after:h-2px after:absolute after:left-0 after:right-0 after:bottom--1px after:bg-[var(--ant-color-primary)]",
                 )}
                 onClick={() => {
-                  props.setSelectedNodes([item])
+                  if (props.multiple) {
+                    props.setSelectedNodes(nodes => {
+                      if (nodes.includes(item)) {
+                        return nodes.filter(n => n !== item)
+                      }
+                      return [...nodes, item]
+                    })
+                  } else {
+                    props.setSelectedNodes([item])
+                  }
                 }}
               >
                 {props.getTitle(item, { indexes: indexes() })}
