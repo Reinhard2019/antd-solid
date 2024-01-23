@@ -16,6 +16,7 @@ import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
+import DelayShow from '../DelayShow'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -356,12 +357,12 @@ const Tooltip: Component<TooltipProps> = _props => {
     <>
       {resolvedChildren()}
 
-      <Show when={open()}>
+      <DelayShow when={open()}>
         <Portal>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
             ref={content!}
-            class={cs('z-1000 fixed left-0 top-0')}
+            class={cs('z-1000 fixed left-0 top-0', open() ? 'block' : 'hidden')}
             style={{
               transform:
                 'translate(clamp(0px, var(--translate-x), calc(100vw - 100%)), clamp(0px, var(--translate-y), calc(100vh - 100%)))',
@@ -391,7 +392,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             </Show>
           </div>
         </Portal>
-      </Show>
+      </DelayShow>
     </>
   )
 }
