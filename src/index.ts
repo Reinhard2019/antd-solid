@@ -45,6 +45,8 @@ export type { AlertProps } from './Alert'
 export { default as Alert } from './Alert'
 export { default as Checkbox } from './Checkbox'
 export type { CheckboxProps } from './Checkbox'
+export { default as TreeSelect } from './TreeSelect'
+export type { TreeSelectProps } from './TreeSelect'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'

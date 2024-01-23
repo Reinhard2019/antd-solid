@@ -44,6 +44,7 @@ export default defineConfig({
           { text: 'Form 表单', link: '/components/form' },
           { text: 'Select 选择器', link: '/components/select' },
           { text: 'Switch 开关', link: '/components/switch' },
+          { text: 'TreeSelect 树选择', link: '/components/tree-select' },
         ],
       },
       {
