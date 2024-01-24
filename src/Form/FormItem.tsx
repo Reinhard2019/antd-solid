@@ -8,6 +8,7 @@ import {
   createEffect,
   createMemo,
   on,
+  type Component,
 } from 'solid-js'
 import { isNil } from 'lodash-es'
 import { nanoid } from 'nanoid'
@@ -15,11 +16,13 @@ import cs from 'classnames'
 import { type Schema } from 'yup'
 import Context from './context'
 import { type FormInstance } from './Form'
+import { Dynamic } from 'solid-js/web'
 
-export interface FormItemComponentProps<T = any> {
+export interface FormItemComponentProps<T = any, F extends {} = {}> {
   value?: T | undefined
   status?: 'error' | 'warning'
   onChange: (value: T) => void
+  formInstance: FormInstance<F>
 }
 
 export interface FormItemProps<T extends {} = {}> {
@@ -36,7 +39,7 @@ export interface FormItemProps<T extends {} = {}> {
    * 和 when 的区别，只是不会显示，但值依然会存在
    */
   hidden?: boolean
-  component?: (props: FormItemComponentProps, formInstance: FormInstance<T>) => JSXElement
+  component?: Component<FormItemComponentProps>
 }
 
 const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
@@ -125,27 +128,26 @@ const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
         </div>
 
         <div class="flex flex-col" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
-          {props.component?.(
-            {
-              value: props.name ? formInstance.getFieldValue(props.name) : undefined,
-              status: errMsg() ? 'error' : undefined,
-              onChange: (value: any) => {
-                if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
+          <Dynamic
+            component={props.component}
+            value={props.name ? formInstance.getFieldValue(props.name) : undefined}
+            status={errMsg() ? 'error' : undefined}
+            onChange={(value: any) => {
+              if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
 
-                props.rules?.forEach(rule => {
-                  rule
-                    .validate(value)
-                    .then(() => {
-                      setErrMsg('')
-                    })
-                    .catch(err => {
-                      setErrMsg(err.message)
-                    })
-                })
-              },
-            },
-            formInstance as FormInstance<T>,
-          )}
+              props.rules?.forEach(rule => {
+                rule
+                  .validate(value)
+                  .then(() => {
+                    setErrMsg('')
+                  })
+                  .catch(err => {
+                    setErrMsg(err.message)
+                  })
+              })
+            }}
+            formInstance={formInstance}
+          />
 
           <Show when={errMsg()}>
             <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
