@@ -32,7 +32,12 @@ interface SingleLevelTreeProps<T extends {} = TreeNode>
   checkedKeys: Accessor<Key[]>
   setCheckedKeys: Setter<Key[]>
   checkedMap: Accessor<Map<Key, CheckboxProps>>
-  getTitle: (node: T) => JSXElement
+  getTitle: (
+    node: T,
+    info: {
+      indexPath: number[]
+    },
+  ) => JSXElement
   getKey: (node: T) => Key
   getChildren: (node: T) => T[] | undefined
 }
@@ -185,7 +190,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                   }
                 }}
               >
-                {props.getTitle(item)}
+                {props.getTitle(item, { indexPath: indexes() })}
               </div>
             </div>
 
