@@ -2,12 +2,21 @@ import { splitProps, type JSXElement, untrack, createMemo } from 'solid-js'
 import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { get, isEmpty } from 'lodash-es'
-import Tree, { type TreeProps, type TreeNode } from '../Tree'
+import Tree, { type TreeProps } from '../Tree'
 import SelectInput, { type SelectInputProps } from '../Select/SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 
-export interface TreeSelectProps<T extends {} = TreeNode>
-  extends Omit<SelectInputProps<T>, 'optionLabelRender' | 'content'>,
+export interface TreeSelectNode {
+  value: Key
+  label: JSXElement
+  children?: TreeSelectNode[] | undefined
+}
+
+export interface TreeSelectProps<T extends {} = TreeSelectNode>
+  extends Pick<
+  SelectInputProps<Key>,
+  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder'
+  >,
   Omit<TreeProps<T>, 'fieldNames'> {
   /**
    * 自定义节点 label、value、children 的字段
@@ -20,7 +29,7 @@ export interface TreeSelectProps<T extends {} = TreeNode>
   }
 }
 
-const TreeSelect = <T extends {} = TreeNode>(props: TreeSelectProps<T>) => {
+const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) => {
   const [selectInputProps] = splitProps(props, [
     'multiple',
     'allowClear',
@@ -89,7 +98,6 @@ const TreeSelect = <T extends {} = TreeNode>(props: TreeSelectProps<T>) => {
           <Tree
             selectedKeys={value()}
             onSelect={selectedKeys => {
-              console.log('selectedKeys', selectedKeys)
               setValue(selectedKeys)
               if (!props.multiple) close()
             }}

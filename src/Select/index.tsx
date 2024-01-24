@@ -19,9 +19,9 @@ interface SelectOption {
 }
 
 interface SelectProps
-  extends Omit<
+  extends Pick<
   SelectInputProps<Key>,
-  'defaultValue' | 'value' | 'onChange' | 'optionLabelRender' | 'content'
+  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder'
   > {
   defaultValue?: Key | Key[]
   value?: Key | Key[]
