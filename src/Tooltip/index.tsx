@@ -143,14 +143,6 @@ const Tooltip: Component<TooltipProps> = _props => {
     })
   })
 
-  // const [childrenRect, setChildrenRect] = createSignal(new DOMRect())
-  // createEffect(() => {
-  //   if (open()) {
-  //     const _children = resolvedChildren() as Element
-  //     setChildrenRect(_children.getBoundingClientRect())
-  //   }
-  // })
-
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
   const setTranslate = () => {
     untrack(() => {
@@ -237,6 +229,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       }
     })
   }
+  // 监听滚动
   createEffect(() => {
     if (!open()) return
 
@@ -260,6 +253,17 @@ const Tooltip: Component<TooltipProps> = _props => {
       cleanupFnList.forEach(fn => {
         fn()
       })
+    })
+  })
+  // 监听 children 的 size 变化
+  createEffect(() => {
+    const _children = resolvedChildren() as HTMLElement
+    const ro = new ResizeObserver(() => {
+      setTranslate()
+    })
+    ro.observe(_children)
+    onCleanup(() => {
+      ro.disconnect()
     })
   })
   const arrowStyle = createMemo(() => {
