@@ -80,8 +80,9 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         <div
           ref={select!}
           class={cs(
-            'relative h-32px leading-32px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)] rounded-inherit',
+            'relative min-h-32px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)] rounded-inherit',
             valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
+            props.multiple && 'py-1px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
           )}
@@ -94,36 +95,41 @@ function SelectInput<T>(props: SelectInputProps<T>) {
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          <div class="h-full ellipsis">
+          <Show
+            when={valueArr().length}
+            fallback={
+              <input
+                class="h-28px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                readOnly
+                placeholder={props.placeholder}
+              />
+            }
+          >
             <Show
-              when={valueArr().length}
+              when={props.multiple}
               fallback={
-                <input
-                  class="h-full w-full float-left [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-                  readOnly
-                  placeholder={props.placeholder}
-                />
+                <div class="h-30px ellipsis leading-30px">
+                  {props.optionLabelRender(valueArr()[0])}
+                </div>
               }
             >
-              <Show when={props.multiple} fallback={props.optionLabelRender(valueArr()[0])}>
-                <div class="flex gap-4px h-full items-center">
-                  <For each={valueArr()}>
-                    {item => (
-                      <span class="bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                        {props.optionLabelRender(item)}
-                        <span
-                          class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                          onClick={() => setValue(valueArr().filter(v => v !== item))}
-                        />
-                      </span>
-                    )}
-                  </For>
-                </div>
-              </Show>
+              <For each={valueArr()}>
+                {item => (
+                  <span class="inline-block">
+                    <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
+                      {props.optionLabelRender(item)}
+                      <span
+                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
+                        onClick={() => setValue(valueArr().filter(v => v !== item))}
+                      />
+                    </span>
+                  </span>
+                )}
+              </For>
             </Show>
-          </div>
+          </Show>
 
-          <div class="absolute top-0 bottom-0 right-11px">
+          <div class="absolute top-0 bottom-0 right-11px flex items-center">
             <Show
               when={showClearBtn()}
               fallback={
