@@ -93,7 +93,7 @@ const options = [
 ]
 
 const Base: Component = () => {
-  return <TreeSelect placeholder="请选择" treeData={options} multiple />
+  return <TreeSelect placeholder="请选择" treeData={options} multiple allowClear />
 }
 
 export default Base

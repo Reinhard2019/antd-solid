@@ -20,8 +20,8 @@ export interface SelectInputProps<T> {
 }
 
 function SelectInput<T>(props: SelectInputProps<T>) {
-  let select: HTMLDivElement
-  let tooltipContent: HTMLDivElement
+  let select: HTMLDivElement | undefined
+  let tooltipContent: HTMLDivElement | undefined
 
   const [value, setValue] = createControllableValue<T[] | undefined>(props, {
     defaultValue: [],
@@ -67,15 +67,15 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         contentStyle={{
           padding: 0,
         }}
-        content={close => (
+        content={
           <div
             ref={tooltipContent}
             class="bg-white w-200px max-h-400px overflow-auto"
             style={{ width: `${width()}px` }}
           >
-            {props.content(close)}
+            {props.content(() => setOpen(false))}
           </div>
-        )}
+        }
       >
         <div
           ref={select!}
@@ -141,6 +141,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
                 onClick={e => {
                   e.stopPropagation()
                   setValue([])
+                  setOpen(false)
                 }}
               />
             </Show>
