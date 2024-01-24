@@ -100,7 +100,7 @@ const Tooltip: Component<TooltipProps> = _props => {
   )
 
   const resolvedChildren = children(() => _props.children)
-  let content: HTMLDivElement
+  let content: HTMLDivElement | undefined
   const [open, setOpen] = createControllableValue(_props, {
     defaultValue: false,
     valuePropName: 'open',
@@ -109,6 +109,8 @@ const Tooltip: Component<TooltipProps> = _props => {
   const reverseOpen = () => setOpen(v => !v)
 
   createEffect(() => {
+    if (!content) return
+
     const _children = resolvedChildren() as Element
     toArray(props.trigger).forEach(trigger => {
       switch (trigger) {
@@ -146,6 +148,8 @@ const Tooltip: Component<TooltipProps> = _props => {
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
   const setTranslate = () => {
     untrack(() => {
+      if (!content) return
+
       const _children = resolvedChildren() as Element
       const childrenRect = _children.getBoundingClientRect()
       switch (props.placement) {
@@ -365,7 +369,7 @@ const Tooltip: Component<TooltipProps> = _props => {
         <Portal>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
-            ref={content!}
+            ref={content}
             class={cs('z-1000 fixed left-0 top-0', open() ? 'block' : 'hidden')}
             style={{
               transform:
