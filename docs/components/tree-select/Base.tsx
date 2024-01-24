@@ -3,90 +3,117 @@ import { TreeSelect } from 'antd-solid'
 
 const options = [
   {
-    title: 'Rubber Soul',
+    label: 'Rubber Soul',
+    value: 'Rubber Soul',
     children: [
       {
-        title: "Everybody's Got Something to Hide Except Me and My Monkey",
+        label: "Everybody's Got Something to Hide Except Me and My Monkey",
+        value: "Everybody's Got Something to Hide Except Me and My Monkey",
       },
       {
-        title: 'Drive My Car',
+        label: 'Drive My Car',
+        value: 'Drive My Car',
         disabled: true,
       },
       {
-        title: 'Norwegian Wood',
+        label: 'Norwegian Wood',
+        value: 'Norwegian Wood',
       },
       {
-        title: "You Won't See",
+        label: "You Won't See",
+        value: "You Won't See",
         disabled: true,
       },
       {
-        title: 'Nowhere Man',
+        label: 'Nowhere Man',
+        value: 'Nowhere Man',
       },
       {
-        title: 'Think For Yourself',
+        label: 'Think For Yourself',
+        value: 'Think For Yourself',
       },
       {
-        title: 'The Word',
+        label: 'The Word',
+        value: 'The Word',
       },
       {
-        title: 'Michelle',
+        label: 'Michelle',
+        value: 'Michelle',
         disabled: true,
       },
       {
-        title: 'What goes on',
+        label: 'What goes on',
+        value: 'What goes on',
       },
       {
-        title: 'Girl',
+        label: 'Girl',
+        value: 'Girl',
       },
       {
-        title: "I'm looking through you",
+        label: "I'm looking through you",
+        value: "I'm looking through you",
       },
       {
-        title: 'In My Life',
+        label: 'In My Life',
+        value: 'In My Life',
       },
       {
-        title: 'Wait',
+        label: 'Wait',
+        value: 'Wait',
       },
     ],
   },
   {
-    title: 'Let It Be',
+    label: 'Let It Be',
+    value: 'Let It Be Album',
     children: [
       {
-        title: 'Two Of Us',
+        label: 'Two Of Us',
+        value: 'Two Of Us',
       },
       {
-        title: 'Dig A Pony',
+        label: 'Dig A Pony',
+        value: 'Dig A Pony',
       },
       {
-        title: 'Across The Universe',
+        label: 'Across The Universe',
+        value: 'Across The Universe',
       },
       {
-        title: 'I Me Mine',
+        label: 'I Me Mine',
+        value: 'I Me Mine',
       },
       {
-        title: 'Dig It',
+        label: 'Dig It',
+        value: 'Dig It',
       },
       {
-        title: 'Let It Be',
+        label: 'Let It Be',
+        value: 'Let It Be',
       },
       {
-        title: 'Maggie Mae',
+        label: 'Maggie Mae',
+        value: 'Maggie Mae',
       },
       {
-        title: "I've Got A Feeling",
+        label: "I've Got A Feeling",
+        value: "I've Got A Feeling",
       },
       {
-        title: 'One After 909',
+        label: 'One After 909',
+        value: 'One After 909',
       },
       {
-        title: 'The Long And Winding Road',
+        label: 'The Long And Winding Road',
+        value: 'The Long And Winding Road',
       },
       {
-        title: 'For You Blue',
+        label: 'For You Blue',
+        value: 'For You Blue',
       },
       {
-        title: 'Get Back',
+        label: 'Get Back',
+        value: 'Get Back',
       },
     ],
   },

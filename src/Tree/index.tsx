@@ -1,13 +1,13 @@
 import { createSignal, untrack, createSelector, createMemo, type JSXElement } from 'solid-js'
 import createControllableValue from '../hooks/createControllableValue'
-import { type StringOrJSXElement } from '../types'
+import { type Key } from '../types'
 import SingleLevelTree from './SingleLevelTree'
 import { get, isEmpty } from 'lodash-es'
 import { type CheckboxProps } from '../Checkbox'
-import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface TreeNode {
-  title: StringOrJSXElement
+  key: Key
+  title: JSXElement
   children?: TreeNode[] | undefined
 }
 
@@ -16,9 +16,9 @@ export interface TreeProps<T extends {} = TreeNode> {
    * 支持点选多个节点（节点本身）
    */
   multiple?: boolean
-  defaultSelectedNodes?: T[] | undefined
-  selectedNodes?: T[] | undefined
-  onSelect?: (selectedNodes: T[]) => void
+  defaultSelectedKeys?: Key[] | undefined
+  selectedKeys?: Key[] | undefined
+  onSelect?: (selectedKeys: Key[]) => void
   treeData?: T[]
   /**
    * 是否节点占据一行
@@ -39,22 +39,16 @@ export interface TreeProps<T extends {} = TreeNode> {
   /**
    * 默认选中复选框的树节点
    */
-  defaultCheckedNodes?: T[]
-  checkedNodes?: T[]
-  onCheck?: (checkedNodes: T[]) => void
+  defaultCheckedKeys?: Key[]
+  checkedKeys?: Key[]
+  onCheck?: (checkedKeys: Key[]) => void
   /**
    * 自定义节点 title、key、children 的字段
-   * 默认 { title: 'title', children: 'children' }
+   * 默认 { title: 'title', key: 'key', children: 'children' }
    */
   fieldNames?: {
-    title?:
-    | string
-    | ((
-      node: T,
-      info: {
-        indexes: number[]
-      },
-    ) => JSXElement)
+    title?: string | ((node: T) => JSXElement)
+    key?: string | ((node: T) => Key)
     children?: string | ((node: T) => T[] | undefined)
   }
 }
@@ -63,20 +57,18 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
   const fieldNames = Object.assign(
     {
       title: 'title' as string | ((node: T) => JSXElement),
+      key: 'key' as string | ((node: T) => Key),
       children: 'children' as string | ((node: T) => T[] | undefined),
     },
     untrack(() => props.fieldNames),
   )
-  const getTitle = (
-    node: T,
-    info: {
-      indexes: number[]
-    },
-  ): JSXElement => {
+  const getTitle = (node: T): JSXElement => {
     const titleFieldName = fieldNames.title
-    return typeof titleFieldName === 'function'
-      ? titleFieldName(node, info)
-      : unwrapStringOrJSXElement(get(node, titleFieldName) as StringOrJSXElement)
+    return typeof titleFieldName === 'function' ? titleFieldName(node) : get(node, titleFieldName)
+  }
+  const getKey = (node: T): Key => {
+    const keyFieldName = fieldNames.key
+    return typeof keyFieldName === 'function' ? keyFieldName(node) : get(node, keyFieldName)
   }
   const getChildren = (node: T): T[] | undefined => {
     const childrenFieldName = fieldNames.children
@@ -85,46 +77,46 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
       : get(node, childrenFieldName)
   }
 
-  const [selectedNodes, setSelectedNodes] = createControllableValue<T[]>(props, {
-    defaultValuePropName: 'defaultSelectedNodes',
-    valuePropName: 'selectedNodes',
+  const [selectedKeys, setSelectedKeys] = createControllableValue<Key[]>(props, {
+    defaultValuePropName: 'defaultSelectedKeys',
+    valuePropName: 'selectedKeys',
     trigger: 'onSelect',
     defaultValue: [],
   })
 
-  const [expandedNodes, setExpandedNodes] = createSignal<T[]>(
+  const [expandedKeys, setExpandedKeys] = createSignal<Key[]>(
     untrack(() => {
       if (!props.defaultExpandAll) return []
-      const collectKeys = (list: T[] | undefined): T[] => {
+      const collectKeys = (list: T[] | undefined): Key[] => {
         if (!list) return []
-        return list.flatMap(item => [item, ...collectKeys(getChildren(item))])
+        return list.flatMap(item => [getKey(item), ...collectKeys(getChildren(item))])
       }
       return collectKeys(props.treeData)
     }),
   )
 
-  const [checkedNodes, setCheckedNodes] = createControllableValue<T[]>(props, {
+  const [checkedKeys, setCheckedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultCheckedKeys',
-    valuePropName: 'checkedNodes',
+    valuePropName: 'checkedKeys',
     trigger: 'onCheck',
     defaultValue: [],
   })
   const checkedMap = createMemo(() => {
-    const map = new Map<T, CheckboxProps>()
-    const checkedNodeMap = new Map(checkedNodes().map(k => [k, true]))
+    const map = new Map<Key, CheckboxProps>()
+    const checkedKeyDict = Object.fromEntries(checkedKeys().map(k => [k, true]))
 
     const treeForEach = (list: T[] | undefined): CheckboxProps => {
       let checked = true
       let indeterminate = false
 
       list?.forEach(item => {
-        const key = item
+        const key = getKey(item)
         const children = getChildren(item)
 
         let res: CheckboxProps
         if (isEmpty(children)) {
           res = {
-            checked: !!checkedNodeMap.get(key),
+            checked: !!checkedKeyDict[key],
           }
         } else {
           res = treeForEach(children!)
@@ -165,8 +157,8 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
       {...props}
       treeData={props.treeData}
       indent={0}
-      selectedNodes={selectedNodes}
-      setSelectedNodes={setSelectedNodes}
+      selectedKeys={selectedKeys}
+      setSelectedKeys={setSelectedKeys}
       draggableNode={draggableNode}
       setDraggableNode={setDraggableNode}
       draggableIndexes={draggableIndexes}
@@ -177,11 +169,12 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
       targetIndexes={targetIndexes}
       setTargetIndexes={setTargetIndexes}
       isTarget={isTarget}
-      expandedNodes={expandedNodes}
-      setExpandedNodes={setExpandedNodes}
-      checkedNodes={checkedNodes}
-      setCheckedNodes={setCheckedNodes}
+      expandedKeys={expandedKeys}
+      setExpandedKeys={setExpandedKeys}
+      checkedKeys={checkedKeys}
+      setCheckedKeys={setCheckedKeys}
       getTitle={getTitle}
+      getKey={getKey}
       getChildren={getChildren}
       checkedMap={checkedMap}
     />
