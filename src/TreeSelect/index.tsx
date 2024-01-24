@@ -84,7 +84,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
   })
 
   const [value, setValue] = createControllableValue<Key[] | undefined>(props, {
-    defaultValue: [],
+    valueConvertor: v => (Array.isArray(v) ? v : []),
   })
 
   return (

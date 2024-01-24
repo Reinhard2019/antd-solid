@@ -95,7 +95,7 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
     defaultValuePropName: 'defaultSelectedKeys',
     valuePropName: 'selectedKeys',
     trigger: 'onSelect',
-    defaultValue: [],
+    valueConvertor: v => (Array.isArray(v) ? v : []),
   })
 
   const [expandedKeys, setExpandedKeys] = createSignal<Key[]>(
@@ -113,7 +113,7 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
     defaultValuePropName: 'defaultCheckedKeys',
     valuePropName: 'checkedKeys',
     trigger: 'onCheck',
-    defaultValue: [],
+    valueConvertor: v => (Array.isArray(v) ? v : []),
   })
   const checkedMap = createMemo(() => {
     const map = new Map<Key, CheckboxProps>()
