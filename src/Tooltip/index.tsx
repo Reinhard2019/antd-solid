@@ -109,8 +109,6 @@ const Tooltip: Component<TooltipProps> = _props => {
   const reverseOpen = () => setOpen(v => !v)
 
   createEffect(() => {
-    if (!content) return
-
     const _children = resolvedChildren() as Element
     toArray(props.trigger).forEach(trigger => {
       switch (trigger) {
