@@ -137,7 +137,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
               }
             >
               <span
-                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)]"
+                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)] active:text-[var(--ant-color-text)]"
                 onClick={e => {
                   e.stopPropagation()
                   setValue([])
