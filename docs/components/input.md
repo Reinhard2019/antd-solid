@@ -32,6 +32,12 @@ outline: deep
 
 <Code path="input/PrefixAndSuffix" />
 
+### 可清空
+
+让输入值可以清除（当有值的时候）。
+
+<Code path="input/AllowClear" />
+
 ### 不可用状态
 
 Input 不可用状态

@@ -32,6 +32,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
      */
     size?: 'small' | 'default' | 'large'
     autoFocus?: boolean
+    allowClear?: boolean
     onChange?: JSX.InputEventHandler<T, InputEvent>
     onPressEnter?: JSX.EventHandler<T, KeyboardEvent>
     onKeyDown?: JSX.EventHandler<T, KeyboardEvent>
@@ -86,6 +87,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
 
   const [_, controllableProps] = splitProps(props, ['onChange'])
   const [value, setValue] = createControllableValue(controllableProps)
+  const showClearBtn = createMemo(() => props.allowClear && value())
 
   const compactItemRoundedLeftClass = 'p[.ant-compact>:first-child]:rounded-l-6px'
   const compactItemRoundedRightClass = 'p[.ant-compact>:last-child]:rounded-r-6px'
@@ -151,7 +153,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   return (
     <div
       class={cs(
-        'flex w-full',
+        'flex w-full relative',
         Compact.compactItemClass,
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
@@ -206,6 +208,17 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         >
           {props.addonAfter}
         </div>
+      </Show>
+
+      <Show when={showClearBtn()}>
+        <span
+          class="i-ant-design:close-circle-filled absolute top-1/2 right-11px -translate-y-1/2 cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)] active:text-[var(--ant-color-text)]"
+          onClick={e => {
+            e.stopPropagation()
+            setValue('')
+            input?.focus()
+          }}
+        />
       </Show>
     </div>
   )
