@@ -8,8 +8,8 @@ import Compact from '../Compact'
 
 export interface SelectInputProps<T> {
   multiple?: boolean
-  defaultValue?: T[]
-  value?: T[]
+  defaultValue?: T[] | null
+  value?: T[] | null
   onChange?: (value: T[]) => void
   optionLabelRender: (v: T) => JSXElement
   placeholder?: string
@@ -99,7 +99,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             when={valueArr().length}
             fallback={
               <input
-                class="h-28px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
                 readOnly
                 placeholder={props.placeholder}
               />

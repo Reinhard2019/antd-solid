@@ -16,8 +16,8 @@ export interface TreeProps<T extends {} = TreeNode> {
    * 支持点选多个节点（节点本身）
    */
   multiple?: boolean
-  defaultSelectedKeys?: Key[] | undefined
-  selectedKeys?: Key[] | undefined
+  defaultSelectedKeys?: Key[] | undefined | null
+  selectedKeys?: Key[] | undefined | null
   onSelect?: (selectedKeys: Key[]) => void
   treeData?: T[]
   /**

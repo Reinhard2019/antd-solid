@@ -1,7 +1,7 @@
 import { splitProps, type JSXElement, untrack, createMemo } from 'solid-js'
 import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
-import { get, isEmpty } from 'lodash-es'
+import { get, isEmpty, isNil } from 'lodash-es'
 import Tree, { type TreeProps } from '../Tree'
 import SelectInput, { type SelectInputProps } from '../Select/SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
@@ -17,7 +17,8 @@ export interface TreeSelectProps<T extends {} = TreeSelectNode>
   SelectInputProps<Key>,
   'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder'
   >,
-  Omit<TreeProps<T>, 'fieldNames'> {
+  Pick<TreeProps<T>, 'treeData'> {
+  onChange?: (value: Key | Key[] | undefined) => void
   /**
    * 自定义节点 label、value、children 的字段
    * 默认 { label: 'label', value: 'value', children: 'children' }
@@ -65,7 +66,6 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
 
   const optionMap = createMemo(() => {
     const map = new Map<Key, T>()
-    // const checkedKeyDict = Object.fromEntries(checkedKeys().map(k => [k, true]))
 
     const treeForEach = (list: T[] | undefined) => {
       list?.forEach(item => {
@@ -83,22 +83,30 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     return map
   })
 
-  const [value, setValue] = createControllableValue<Key[] | undefined>(props, {
-    valueConvertor: v => (Array.isArray(v) ? v : []),
-  })
+  const [value, setValue] = createControllableValue<Key | Key[] | undefined | null>(props)
+  const valueArr = createMemo<Key[] | undefined | null>(() =>
+    props.multiple
+      ? (value() as Key[])
+      : isNil(value())
+        ? (value() as undefined | null)
+        : ([value()] as Key[]),
+  )
+  const setValueArr = (v: Key[] | undefined) => {
+    setValue(props.multiple ? v : v?.[0])
+  }
 
   return (
     <SelectInput
       {...selectInputProps}
       optionLabelRender={v => getLabel(optionMap().get(v)!)}
-      value={value()}
-      onChange={setValue}
+      value={valueArr()}
+      onChange={setValueArr}
       content={close => (
         <div class="px-4px py-8px">
           <Tree
-            selectedKeys={value()}
+            selectedKeys={valueArr()}
             onSelect={selectedKeys => {
-              setValue(selectedKeys)
+              setValueArr(selectedKeys)
               if (!props.multiple) close()
             }}
             treeData={props.treeData}
