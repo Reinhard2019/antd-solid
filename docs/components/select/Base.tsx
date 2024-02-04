@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { Select } from 'antd-solid'
 
-const Base: Component = () => {
+const App: Component = () => {
   return (
     <Select
       placeholder="请选择"
@@ -14,4 +14,4 @@ const Base: Component = () => {
   )
 }
 
-export default Base
+export default App

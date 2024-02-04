@@ -17,6 +17,31 @@ export interface SelectInputProps<T> {
   disabled?: boolean
   class?: string
   content: (close: () => void) => JSXElement
+  /**
+   * 设置校验状态
+   */
+  status?: 'error' | 'warning'
+}
+
+const statusClassDict = {
+  default: (disabled: boolean) =>
+    cs(
+      '[border:1px_solid_var(--ant-color-border)]',
+      !disabled &&
+        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+    ),
+  error: (disabled: boolean) =>
+    cs(
+      '[border:1px_solid_var(--ant-color-error)]',
+      !disabled &&
+        'hover:border-[var(--ant-light-error-color)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+    ),
+  warning: (disabled: boolean) =>
+    cs(
+      '[border:1px_solid_var(--ant-warning-color)]',
+      !disabled &&
+        'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+    ),
 }
 
 function SelectInput<T>(props: SelectInputProps<T>) {
@@ -80,11 +105,12 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         <div
           ref={select!}
           class={cs(
-            'relative min-h-32px [border:1px_solid_var(--ant-color-border)] pr-25px hover:border-[var(--ant-color-primary)] focus:[border-color:var(--ant-color-primary)] focus:[box-shadow:0_0_0_2px_var(--ant-control-outline)] rounded-inherit',
+            'relative min-h-32px pr-25px rounded-inherit',
             valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
             props.multiple && 'py-1px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
+            statusClassDict[props.status ?? 'default'](!!props.disabled),
           )}
           tabIndex="0"
           onClick={e => {

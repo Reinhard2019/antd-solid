@@ -15,7 +15,7 @@ export interface TreeSelectNode {
 export interface TreeSelectProps<T extends {} = TreeSelectNode>
   extends Pick<
   SelectInputProps<Key>,
-  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder'
+  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
   >,
   Pick<TreeProps<T>, 'treeData'> {
   onChange?: (value: Key | Key[] | undefined) => void
@@ -37,6 +37,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     'class',
     'disabled',
     'placeholder',
+    'status',
   ])
 
   const fieldNames = Object.assign(

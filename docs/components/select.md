@@ -26,6 +26,12 @@ outline: deep
 
 <Code path="select/Multiple" />
 
+### 自定义状态
+
+使用 `status` 为 Select 添加状态，可选 `error` 或者 `warning`。
+
+<Code path="select/Status" />
+
 ## API
 
 ### Table

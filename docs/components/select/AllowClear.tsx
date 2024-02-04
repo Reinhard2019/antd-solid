@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { Select } from 'antd-solid'
 
-const AllowClear: Component = () => {
+const App: Component = () => {
   return (
     <Select
       placeholder="请选择"
@@ -15,4 +15,4 @@ const AllowClear: Component = () => {
   )
 }
 
-export default AllowClear
+export default App
