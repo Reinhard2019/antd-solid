@@ -1,10 +1,11 @@
-import { splitProps, type JSXElement, untrack, createMemo } from 'solid-js'
+import { splitProps, type JSXElement, untrack, createMemo, Show } from 'solid-js'
 import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { get, isEmpty, isNil } from 'lodash-es'
 import Tree, { type TreeProps } from '../Tree'
 import SelectInput, { type SelectInputProps } from '../Select/SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import Empty from '../Empty'
 
 export interface TreeSelectNode {
   value: Key
@@ -103,23 +104,25 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
       value={valueArr()}
       onChange={setValueArr}
       content={close => (
-        <div class="px-4px py-8px">
-          <Tree
-            selectedKeys={valueArr()}
-            onSelect={selectedKeys => {
-              setValueArr(selectedKeys)
-              if (!props.multiple) close()
-            }}
-            treeData={props.treeData}
-            multiple={props.multiple}
-            blockNode
-            fieldNames={{
-              title: fieldNames.label,
-              key: fieldNames.value,
-              children: fieldNames.children,
-            }}
-          />
-        </div>
+        <Show when={!isEmpty(props.treeData)} fallback={<Empty.PRESENTED_IMAGE_SIMPLE />}>
+          <div class="px-4px py-8px">
+            <Tree
+              selectedKeys={valueArr()}
+              onSelect={selectedKeys => {
+                setValueArr(selectedKeys)
+                if (!props.multiple) close()
+              }}
+              treeData={props.treeData}
+              multiple={props.multiple}
+              blockNode
+              fieldNames={{
+                title: fieldNames.label,
+                key: fieldNames.value,
+                children: fieldNames.children,
+              }}
+            />
+          </div>
+        </Show>
       )}
     />
   )
