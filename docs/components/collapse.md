@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="collapse/Base" />
 
+### 额外节点
+
+自定义渲染每个面板右上角的内容。
+
+<Code path="collapse/Extra" />
+
 ## API
 
 ### Collapse

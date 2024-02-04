@@ -1,13 +1,18 @@
-import { type JSX, type JSXElement, type Component, For, Show } from 'solid-js'
+import { type JSX, type Component, For, Show } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
-import { type Key } from '../types'
+import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface CollapseItem {
   key: Key
-  label: JSXElement
-  children: JSXElement
+  label: StringOrJSXElement
+  children: StringOrJSXElement
+  /**
+   * 自定义渲染每个面板右上角的内容
+   */
+  extra?: StringOrJSXElement
 }
 
 export interface CollapseProps {
@@ -40,7 +45,7 @@ const Collapse: Component<CollapseProps> = props => {
         {item => (
           <div class="[border-bottom:1px_solid_var(--ant-color-border)] first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] cursor-pointer">
             <div
-              class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)]"
+              class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)] flex justify-between items-center"
               onClick={() => {
                 setActiveKey(keys => {
                   if (keys.includes(item.key)) {
@@ -50,14 +55,20 @@ const Collapse: Component<CollapseProps> = props => {
                 })
               }}
             >
-              <span
-                class={cs(
-                  'i-ant-design:right-outlined',
-                  'mr-[var(--ant-margin-sm)] duration-.3s',
-                  activeKey().includes(item.key) && 'rotate-[90deg]',
-                )}
-              />
-              {item.label}
+              <span>
+                <span
+                  class={cs(
+                    'i-ant-design:right-outlined',
+                    'mr-[var(--ant-margin-sm)] duration-.3s',
+                    activeKey().includes(item.key) && 'rotate-[90deg]',
+                  )}
+                />
+                {unwrapStringOrJSXElement(item.label)}
+              </span>
+
+              <Show when={item.extra}>
+                <span>{unwrapStringOrJSXElement(item.extra)}</span>
+              </Show>
             </div>
             <Transition
               onEnter={(el, done) => {
@@ -74,7 +85,7 @@ const Collapse: Component<CollapseProps> = props => {
               <Show when={activeKey().includes(item.key)}>
                 <div class="overflow-hidden">
                   <div class="p-[var(--ant-collapse-content-padding)] [border-top:1px_solid_var(--ant-color-border)]">
-                    {item.children}
+                    {unwrapStringOrJSXElement(item.children)}
                   </div>
                 </div>
               </Show>
