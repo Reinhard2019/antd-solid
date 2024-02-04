@@ -215,7 +215,11 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           class="i-ant-design:close-circle-filled absolute top-1/2 right-11px -translate-y-1/2 cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)] active:text-[var(--ant-color-text)]"
           onClick={e => {
             e.stopPropagation()
-            setValue('')
+
+            input!.value = ''
+            const inputEvent = new InputEvent('input', { bubbles: true })
+            input!.dispatchEvent(inputEvent)
+
             input?.focus()
           }}
         />
