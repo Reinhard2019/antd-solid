@@ -19,6 +19,12 @@ export interface CollapseProps {
   class?: string
   defaultActiveKey?: Key[]
   activeKey?: Key[]
+  /**
+   * 切换面板的回调
+   * @param value
+   * @returns
+   */
+  onChange?: (value: Key[]) => void
   items: CollapseItem[]
   style?: JSX.CSSProperties
 }
