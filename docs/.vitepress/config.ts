@@ -30,7 +30,10 @@ export default defineConfig({
       },
       {
         text: '布局',
-        items: [{ text: 'Compact 压缩', link: '/components/compact' }],
+        items: [
+          { text: 'Divider 分割线', link: '/components/divider' },
+          { text: 'Compact 压缩', link: '/components/compact' },
+        ],
       },
       {
         text: '数据录入',

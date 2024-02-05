@@ -47,6 +47,7 @@ export { default as Checkbox } from './Checkbox'
 export type { CheckboxProps } from './Checkbox'
 export { default as TreeSelect } from './TreeSelect'
 export type { TreeSelectProps, TreeSelectNode } from './TreeSelect'
+export { default as Divider } from './Divider'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'

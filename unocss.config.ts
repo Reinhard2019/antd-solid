@@ -68,6 +68,8 @@ export default defineConfig({
 
           --ant-margin-xs: 8px;
           --ant-margin-sm: 12px;
+          --ant-margin: 16px;
+          --ant-margin-lg: 24px;
           --ant-margin-xl: 32px;
 
           --ant-padding-sm: 12px;
@@ -87,6 +89,8 @@ export default defineConfig({
           --ant-select-option-selected-bg: #e6f4ff;
           
           --ant-tree-node-selected-bg: #e6f4ff;
+
+          --ant-color-split: rgba(5, 5, 5, 0.06);
         
           font-size: 14px;
         }

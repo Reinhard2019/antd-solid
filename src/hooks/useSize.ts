@@ -1,13 +1,15 @@
-import { type Accessor, createSignal, onCleanup, onMount } from 'solid-js'
+import { type Accessor, createSignal, onCleanup, createEffect } from 'solid-js'
 
-export default function useSize(target: Accessor<Element>) {
+export default function useSize(target: Accessor<Element | undefined>) {
   const [size, setSize] = createSignal<{
     width: number
     height: number
   }>()
 
-  onMount(() => {
+  createEffect(() => {
     const _target = target()
+    if (!_target) return
+
     const ro = new ResizeObserver(() => {
       setSize({
         width: _target.clientWidth,
