@@ -3,7 +3,6 @@ import {
   type Ref,
   mergeProps,
   type Setter,
-  onMount,
   createSignal,
   createMemo,
   untrack,
@@ -12,6 +11,7 @@ import { createStore, produce } from 'solid-js/store'
 import { cloneDeep, get, max, set, unset } from 'lodash-es'
 import Context from './context'
 import { type Schema } from 'yup'
+import { setRef } from '../utils/solid'
 
 export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
@@ -80,11 +80,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
     },
   }
 
-  onMount(() => {
-    if (typeof _props.ref === 'function') {
-      _props.ref?.(formInstance)
-    }
-  })
+  setRef(_props, formInstance)
 
   // 存储 form item 的 dom 节点宽度
   const [itemWidthDict, setItemWidthDict] = createSignal<Record<string, number>>({})
