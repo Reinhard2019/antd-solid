@@ -19,6 +19,8 @@ export interface TreeSelectProps<T extends {} = TreeSelectNode>
   'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
   >,
   Pick<TreeProps<T>, 'treeData'> {
+  defaultValue?: Key | Key[] | undefined
+  value?: Key | Key[] | undefined
   onChange?: (value: Key | Key[] | undefined) => void
   /**
    * 自定义节点 label、value、children 的字段
