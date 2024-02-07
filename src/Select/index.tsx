@@ -58,12 +58,17 @@ const Select: Component<SelectProps> = props => {
       }}
       content={close => (
         <Show when={!isEmpty(props.options)} fallback={<Empty.PRESENTED_IMAGE_SIMPLE />}>
-          <div class="p-2px">
+          <div
+            class="p-2px"
+            style={{
+              '--ant-select-option-active-bg': 'rgba(0, 0, 0, 0.04)',
+            }}
+          >
             <For each={props.options}>
               {item => (
                 <div
                   class={cs(
-                    'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-hover-bg-color)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
+                    'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-select-option-active-bg)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
                     selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                   )}
                   onClick={() => {

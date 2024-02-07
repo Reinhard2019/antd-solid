@@ -41,35 +41,35 @@ const typeClassMap = {
     cs(
       'bg-white',
       danger
-        ? '[border:1px_solid_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:text-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:text-[var(--ant-dark-error-color)]'
-        : '[border:1px_solid_var(--ant-color-border)] text-[var(--ant-dark-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
+        ? '[border:1px_solid_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-color-error-border-hover)] hover:text-[var(--ant-color-error-border-hover)] active:[border-color:var(--ant-color-error-active)] active:text-[var(--ant-color-error-active)]'
+        : '[border:1px_solid_var(--ant-color-border)] text-[var(--ant-button-default-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
     ),
   primary: (danger: boolean) =>
     cs(
       'text-white',
       danger
-        ? '[border:1px_solid_var(--ant-color-error)] bg-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:bg-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:bg-[var(--ant-dark-error-color)]'
+        ? '[border:1px_solid_var(--ant-color-error)] bg-[var(--ant-color-error)] hover:[border-color:var(--ant-color-error-border-hover)] hover:bg-[var(--ant-color-error-border-hover)] active:[border-color:var(--ant-color-error-active)] active:bg-[var(--ant-color-error-active)]'
         : '[border:1px_solid_var(--ant-color-primary)] bg-[var(--ant-color-primary)] hover:[border-color:var(--ant-color-primary-hover)] hover:bg-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:bg-[var(--ant-color-primary-active)]',
     ),
   dashed: (danger: boolean) =>
     cs(
       ' bg-white',
       danger
-        ? '[border:1px_dashed_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-light-error-color)] hover:text-[var(--ant-light-error-color)] active:[border-color:var(--ant-dark-error-color)] active:text-[var(--ant-dark-error-color)]'
-        : '[border:1px_dashed_var(--ant-color-border)] text-[var(--ant-dark-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
+        ? '[border:1px_dashed_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-color-error-border-hover)] hover:text-[var(--ant-color-error-border-hover)] active:[border-color:var(--ant-color-error-active)] active:text-[var(--ant-color-error-active)]'
+        : '[border:1px_dashed_var(--ant-color-border)] text-[var(--ant-button-default-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
     ),
   text: (danger: boolean) =>
     cs(
       'border-none bg-transparent',
       danger
-        ? 'text-[var(--ant-color-error)] hover:bg-[var(--ant-error-bg-color)] active:bg-[var(--ant-error-bg-color)]'
-        : 'text-[var(--ant-dark-color)] hover:bg-[var(--ant-color-bg-text-hover)] active:bg-[var(--ant-color-bg-text-active)]',
+        ? 'text-[var(--ant-color-error)] hover:bg-[var(--ant-color-error-bg)] active:bg-[var(--ant-color-error-bg)]'
+        : 'text-[var(--ant-button-default-color)] hover:bg-[var(--ant-color-bg-text-hover)] active:bg-[var(--ant-color-bg-text-active)]',
     ),
   link: (danger: boolean) =>
     cs(
       'border-none bg-transparent',
       danger
-        ? 'text-[var(--ant-color-error)] hover:text-[var(--ant-light-error-color)] active:text-[var(--ant-dark-error-color)]'
+        ? 'text-[var(--ant-color-error)] hover:text-[var(--ant-color-error-border-hover)] active:text-[var(--ant-color-error-active)]'
         : 'text-[var(--ant-color-primary)] hover:text-[var(--ant-color-primary-hover)] active:text-[var(--ant-color-primary-active)]',
     ),
 } as const
@@ -93,7 +93,10 @@ const Button: Component<ButtonProps> = props => {
         typeClassMap[mergedProps.type!](props.danger ?? false),
         loading() && 'opacity-65',
       )}
-      style={mergedProps.style}
+      style={{
+        ...mergedProps.style,
+        '--ant-button-default-color': 'rgba(0, 0, 0, 0.88)',
+      }}
       onClick={e => {
         const res = mergedProps.onClick?.(e)
         if (res instanceof Promise) {
@@ -109,7 +112,7 @@ const Button: Component<ButtonProps> = props => {
           const div = document.createElement('div')
           div.className = cs(
             props.danger
-              ? '[--color:var(--ant-light-error-color)]'
+              ? '[--color:var(--ant-color-error-border-hover)]'
               : '[--color:var(--ant-color-primary-hover)]',
             props.type === 'primary' ? '[--bg-color:var(--color)]' : '[--bg-color:white]',
             'absolute inset-0 rounded-inherit z--1',

@@ -8,24 +8,6 @@ export default defineConfig({
     {
       getCSS: () => `
         :root {
-          --ant-hover-bg-color: rgba(0,0,0,.04);
-        
-          --ant-light-error-color: #ff7875;
-          --ant-dark-error-color: #d9363e;
-        
-          --ant-error-bg-color: #fff2f0;
-          --ant-error-bg-hover-color: #fff1f0;
-        
-          --ant-warning-color: #faad14;
-          --ant-color-warning-border-hover: #ffd666;
-        
-          --ant-secondary-border-color: #f0f0f0;
-        
-          --ant-light-color: rgba(0, 0, 0, 0.45);
-          --ant-dark-color: rgba(0, 0, 0, 0.88);
-        
-          --ant-light-bg-color: #fafafa;
-
           --ant-color-primary-active: #0958d9;
           --ant-color-primary: #1677ff;
           --ant-color-primary-hover: #4096ff;
@@ -50,10 +32,14 @@ export default defineConfig({
           --ant-color-success-bg: #f6ffed;
           --ant-color-info-border: #91caff;
           --ant-color-info-bg: #e6f4ff;
+          --ant-color-warning: #faad14;
+          --ant-color-warning-border-hover: #ffd666;
           --ant-color-warning-bg: #fffbe6;
           --ant-color-warning-border: #ffe58f;
           --ant-color-error-bg: #fff2f0;
           --ant-color-error-border: #ffccc7;
+          --ant-color-error-border-hover: #ffa39e;
+          --ant-color-error-active: #d9363e;
           
           --ant-control-outline: rgba(5, 145, 255, 0.1);
 

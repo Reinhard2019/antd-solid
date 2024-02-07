@@ -13,13 +13,19 @@ export interface TableProps<R extends {}> {
 
 const Table = <R extends {}>(props: TableProps<R>) => {
   return (
-    <div>
+    <div
+      style={{
+        '--ant-table-header-bg': '#fafafa',
+        '--ant-table-row-hover-bg': '#fafafa',
+        '--ant-table-border-color': '#f0f0f0',
+      }}
+    >
       <table class="w-full">
         <thead>
           <tr>
             <For each={props.columns}>
               {item => (
-                <th class="p-16px bg-[var(--ant-light-bg-color)] font-bold [border-bottom:1px_solid_var(--ant-secondary-border-color)] text-left">
+                <th class="p-16px bg-[var(--ant-table-header-bg)] font-bold [border-bottom:1px_solid_var(--ant-table-border-color)] text-left">
                   {item.title}
                 </th>
               )}
@@ -29,10 +35,10 @@ const Table = <R extends {}>(props: TableProps<R>) => {
         <tbody>
           <For each={props.dataSource}>
             {row => (
-              <tr class="hover:bg-[var(--ant-light-bg-color)]">
+              <tr class="hover:bg-[var(--ant-table-row-hover-bg)]">
                 <For each={props.columns}>
                   {item => (
-                    <td class="p-16px [border-bottom:1px_solid_var(--ant-secondary-border-color)]">
+                    <td class="p-16px [border-bottom:1px_solid_var(--ant-table-border-color)]">
                       {item.render(row)}
                     </td>
                   )}

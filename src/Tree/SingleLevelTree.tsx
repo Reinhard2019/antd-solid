@@ -169,7 +169,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
               </Show>
               <div
                 class={cs(
-                  'h-full leading-24px hover:bg-[var(--ant-hover-bg-color)] rounded-1 px-1 cursor-pointer relative min-w-0',
+                  'h-full leading-24px hover:bg-[var(--ant-tree-node-hover-bg)] rounded-1 px-1 cursor-pointer relative min-w-0',
                   props.blockNode && 'w-full',
                   props.selectedKeys()?.includes(props.getKey(item)) &&
                     '!bg-[var(--ant-tree-node-selected-bg)]',

@@ -167,31 +167,37 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
   const [targetIndexes, setTargetIndexes] = createSignal<number[] | null>(null)
 
   return (
-    <SingleLevelTree
-      {...props}
-      treeData={props.treeData}
-      indent={0}
-      selectedKeys={selectedKeys}
-      setSelectedKeys={setSelectedKeys}
-      draggableNode={draggableNode}
-      setDraggableNode={setDraggableNode}
-      draggableIndexes={draggableIndexes}
-      setDraggableIndexes={setDraggableIndexes}
-      isDraggable={isDraggable}
-      targetNode={targetNode}
-      setTargetNode={setTargetNode}
-      targetIndexes={targetIndexes}
-      setTargetIndexes={setTargetIndexes}
-      isTarget={isTarget}
-      expandedKeys={expandedKeys}
-      setExpandedKeys={setExpandedKeys}
-      checkedKeys={checkedKeys}
-      setCheckedKeys={setCheckedKeys}
-      getTitle={getTitle}
-      getKey={getKey}
-      getChildren={getChildren}
-      checkedMap={checkedMap}
-    />
+    <div
+      style={{
+        '--ant-tree-node-hover-bg': 'rgba(0, 0, 0, 0.04)',
+      }}
+    >
+      <SingleLevelTree
+        {...props}
+        treeData={props.treeData}
+        indent={0}
+        selectedKeys={selectedKeys}
+        setSelectedKeys={setSelectedKeys}
+        draggableNode={draggableNode}
+        setDraggableNode={setDraggableNode}
+        draggableIndexes={draggableIndexes}
+        setDraggableIndexes={setDraggableIndexes}
+        isDraggable={isDraggable}
+        targetNode={targetNode}
+        setTargetNode={setTargetNode}
+        targetIndexes={targetIndexes}
+        setTargetIndexes={setTargetIndexes}
+        isTarget={isTarget}
+        expandedKeys={expandedKeys}
+        setExpandedKeys={setExpandedKeys}
+        checkedKeys={checkedKeys}
+        setCheckedKeys={setCheckedKeys}
+        getTitle={getTitle}
+        getKey={getKey}
+        getChildren={getChildren}
+        checkedMap={checkedMap}
+      />
+    </div>
   )
 }
 

@@ -75,7 +75,7 @@ function warning(props: MethodProps) {
         {...props}
         title={
           <>
-            <span class="i-ant-design:exclamation-circle text-22px mr-12px text-[var(--ant-warning-color)]" />
+            <span class="i-ant-design:exclamation-circle text-22px mr-12px text-[var(--ant-color-warning)]" />
             {props.title}
           </>
         }

@@ -34,11 +34,11 @@ const statusClassDict = {
     cs(
       '[border:1px_solid_var(--ant-color-error)]',
       !disabled &&
-        'hover:border-[var(--ant-light-error-color)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+        'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
     ),
   warning: (disabled: boolean) =>
     cs(
-      '[border:1px_solid_var(--ant-warning-color)]',
+      '[border:1px_solid_var(--ant-color-warning)]',
       !disabled &&
         'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
     ),
