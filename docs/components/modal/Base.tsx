@@ -1,7 +1,7 @@
 import { createSignal, type Component } from 'solid-js'
 import { Button, Modal } from 'antd-solid'
 
-const Index: Component = () => {
+const App: Component = () => {
   const [open, setOpen] = createSignal(false)
   return (
     <>
@@ -35,4 +35,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App

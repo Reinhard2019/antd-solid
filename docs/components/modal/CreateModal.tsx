@@ -10,6 +10,7 @@ interface ExampleModalResolveValue {
 const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveValue>(
   (props: ExampleModalProps) => {
     const { open, onCancel, onOk } = Modal.useModalProps<ExampleModalResolveValue>()
+    console.log('ExampleModal')
     return (
       <Modal
         open={open()}
@@ -34,7 +35,7 @@ const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveVal
   },
 )
 
-const Index: Component = () => {
+const App: Component = () => {
   return (
     <>
       <Button
@@ -57,4 +58,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App

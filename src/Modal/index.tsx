@@ -14,6 +14,7 @@ import { Dynamic, Portal, render } from 'solid-js/web'
 import Button from '../Button'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
+import DelayShow from '../DelayShow'
 
 export interface ModalProps {
   title?: JSXElement
@@ -42,6 +43,10 @@ export interface ModalProps {
    * 默认 true
    */
   keyboard?: boolean
+  /**
+   * 关闭时销毁 Modal 里的子元素
+   */
+  destroyOnClose?: boolean
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -241,11 +246,12 @@ const Modal: Component<ModalProps> & {
   })
 
   return (
-    <Show when={open()}>
+    <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
       <Portal>
         <div
           class={cs(
-            'fixed justify-center inset-0 bg-[rgba(0,0,0,.45)] flex z-1000',
+            open() ? 'flex' : 'hidden',
+            'fixed justify-center inset-0 bg-[rgba(0,0,0,.45)] z-1000',
             props.centered && 'items-center',
           )}
           onClick={() => {
@@ -316,7 +322,7 @@ const Modal: Component<ModalProps> & {
           </Show>
         </div>
       </Portal>
-    </Show>
+    </Dynamic>
   )
 }
 
