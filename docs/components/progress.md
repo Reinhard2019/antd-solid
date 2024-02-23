@@ -8,11 +8,17 @@ outline: deep
 
 ## 代码演示
 
-### 基本
+### 进度条
 
 标准的进度条。
 
 <Code path="progress/Base" />
+
+### 进度圈
+
+圈形的进度条。
+
+<Code path="progress/Circle" />
 
 ## API
 

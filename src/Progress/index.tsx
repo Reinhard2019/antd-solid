@@ -1,5 +1,6 @@
-import { mergeProps, type Component, Switch, Match, Show, createMemo } from 'solid-js'
+import { type Component, Switch, Match, mergeProps, Show, createMemo } from 'solid-js'
 import cs from 'classnames'
+import Circle from './Circle'
 
 export interface ProgressProps {
   /**
@@ -12,7 +13,7 @@ export interface ProgressProps {
    */
   status?: 'normal' | 'success' | 'error'
   /**
-   * 'line' 类型进度条的高度
+   * 进度条的高度
    * 默认 8
    */
   height?: number
@@ -23,7 +24,9 @@ export interface ProgressProps {
   showInfo?: boolean
 }
 
-const Progress: Component<ProgressProps> = _props => {
+const Progress: Component<ProgressProps> & {
+  Circle: typeof Circle
+} = _props => {
   const props = mergeProps(
     {
       percent: 0,
@@ -42,12 +45,12 @@ const Progress: Component<ProgressProps> = _props => {
     <div
       class="flex items-center"
       style={{
-        '--progress-remaining-color': 'rgba(0, 0, 0, 0.06)',
+        '--ant-progress-remaining-color': 'rgba(0, 0, 0, 0.06)',
       }}
     >
       <div
         class={cs(
-          'w-full bg-[var(--progress-remaining-color)]',
+          'w-full bg-[var(--ant-progress-remaining-color)]',
           'before:content-empty before:block before:bg-[var(--color)] before:w-[var(--percent)] before:h-full before:rounded-inherit',
         )}
         style={{
@@ -77,5 +80,7 @@ const Progress: Component<ProgressProps> = _props => {
     </div>
   )
 }
+
+Progress.Circle = Circle
 
 export default Progress

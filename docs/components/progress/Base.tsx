@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { Progress } from 'antd-solid'
 
-const Index: Component = () => {
+const App: Component = () => {
   return (
     <div style={{ display: 'flex', 'flex-direction': 'column', gap: '8px' }}>
       <Progress percent={30} />
@@ -12,4 +12,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App
