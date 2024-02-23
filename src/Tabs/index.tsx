@@ -15,6 +15,7 @@ import cs from 'classnames'
 import Segmented from '../Segmented'
 import { type StringOrJSXElement } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import DelayShow from '../DelayShow'
 
 export interface Tab {
   key: string
@@ -123,7 +124,17 @@ const Tabs: Component<TabsProps> = _props => {
         </Match>
       </Switch>
 
-      <div class={props.contentClass}>{unwrapStringOrJSXElement(selectedItem()?.children)}</div>
+      <div class={props.contentClass}>
+        <For each={props.items}>
+          {item => (
+            <DelayShow when={isSelectedItem(item.key)}>
+              <div style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}>
+                {unwrapStringOrJSXElement(item.children)}
+              </div>
+            </DelayShow>
+          )}
+        </For>
+      </div>
     </div>
   )
 }
