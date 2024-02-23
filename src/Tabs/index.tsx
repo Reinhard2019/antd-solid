@@ -114,6 +114,7 @@ const Tabs: Component<TabsProps> = _props => {
         </Match>
         <Match when={props.type === 'segment'}>
           <Segmented
+            class={cs('mb-16px', props.navClass)}
             block
             options={props.items.map(item => ({
               label: item.label,
