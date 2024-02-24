@@ -20,7 +20,7 @@ interface SelectOption {
   value: Key
 }
 
-interface SelectProps
+export interface SelectProps
   extends Pick<
   SelectInputProps<Key>,
   'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
@@ -28,7 +28,7 @@ interface SelectProps
   defaultValue?: Key | Key[]
   value?: Key | Key[]
   onChange?: (value: Key | Key[]) => void
-  options: SelectOption[]
+  options?: SelectOption[]
 }
 
 const Select: Component<SelectProps> = props => {
