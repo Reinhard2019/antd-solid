@@ -1,22 +1,29 @@
-import { type JSXElement, For, createSignal, Show, createMemo } from 'solid-js'
+import {
+  type JSXElement,
+  type JSX,
+  createSignal,
+  Show,
+  createMemo,
+  createEffect,
+  on,
+} from 'solid-js'
 import cs from 'classnames'
-import { compact } from 'lodash-es'
+import { compact, isNil } from 'lodash-es'
 import Tooltip from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Compact from '../Compact'
 
-export interface SelectInputProps<T> {
+export interface RangeInputProps<T> {
   multiple?: boolean
-  defaultValue?: T[] | null
-  value?: T[] | null
+  defaultValue?: T[] | undefined | null
+  value?: T[] | undefined | null
   onChange?: (value: T[]) => void
-  optionLabelRender: (v: T) => JSXElement
   placeholder?: string
   allowClear?: boolean
   disabled?: boolean
   class?: string
-  content: (close: () => void) => JSXElement
+  content: (setSingleValue: (value: T) => void) => JSXElement
   /**
    * 设置校验状态
    */
@@ -44,24 +51,93 @@ const statusClassDict = {
     ),
 }
 
-function SelectInput<T>(props: SelectInputProps<T>) {
-  let select: HTMLDivElement | undefined
+function RangeInput<T = string>(props: RangeInputProps<T>) {
+  let container: HTMLDivElement | undefined
+  let startInput: HTMLInputElement | undefined
+  let endInput: HTMLInputElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
+  const [currentFocusType, setCurrentFocusType] = createSignal<'start' | 'end'>('start')
   const [value, setValue] = createControllableValue<T[] | undefined>(props, {
     defaultValue: [],
   })
-  const valueArr = createMemo(() => value() ?? [])
+
+  // 用于统计聚焦后的设置次数，大于等于 2 时退出聚焦
+  let setSingleValueCount = 0
+  const [tempValue, setTempValue] = createSignal<Array<T | undefined>>([])
+  createEffect(() => {
+    setTempValue(value() ?? [])
+  })
+  const setSingleValue = (v: T) => {
+    setSingleValueCount++
+
+    if (currentFocusType() === 'start') {
+      setTempValue(arr => [v, arr[1]])
+      if (setSingleValueCount > 1) {
+        startInput?.blur()
+        setOpen(false)
+      } else {
+        setCurrentFocusType('end')
+      }
+    } else {
+      setTempValue(arr => [arr[0], v])
+      if (setSingleValueCount > 1) {
+        endInput?.blur()
+        setOpen(false)
+      } else {
+        setCurrentFocusType('start')
+      }
+    }
+  }
 
   const [open, setOpen] = createSignal(false)
   useClickAway(
     () => setOpen(false),
-    () => compact([select, tooltipContent]),
+    () => compact([container, tooltipContent]),
+  )
+  createEffect(
+    on(
+      open,
+      input => {
+        setSingleValueCount = 0
+
+        if (!input) {
+          const [start, end] = tempValue()
+          if (!isNil(start) && !isNil(end)) {
+            setValue(tempValue() as T[])
+          } else {
+            setTempValue(value() ?? [])
+          }
+        }
+      },
+      {
+        defer: true,
+      },
+    ),
   )
 
   const [width, setWidth] = createSignal(0)
   const [hover, setHover] = createSignal(false)
-  const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
+  const showClearBtn = createMemo(() => props.allowClear && hover() && tempValue().length > 0)
+
+  const [activeBarStyle, setActiveBarStyle] = createSignal<JSX.CSSProperties>()
+  const setActiveBarStyleByDom = (dom: HTMLElement) => {
+    setActiveBarStyle({
+      left: `${dom.offsetLeft}px`,
+      width: `${dom.clientWidth}px`,
+    })
+  }
+  createEffect(() => {
+    if (!open()) return
+
+    if (currentFocusType() === 'start') {
+      setActiveBarStyleByDom(startInput!)
+      startInput!.focus()
+    } else {
+      setActiveBarStyleByDom(endInput!)
+      endInput!.focus()
+    }
+  })
 
   return (
     <div
@@ -98,15 +174,15 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             class="bg-white w-200px max-h-400px overflow-auto"
             style={{ width: `${width()}px` }}
           >
-            {props.content(() => setOpen(false))}
+            {props.content(setSingleValue)}
           </div>
         }
       >
         <div
-          ref={select!}
+          ref={container}
           class={cs(
-            'relative min-h-32px pr-25px rounded-inherit',
-            valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
+            'relative min-h-32px pr-25px rounded-inherit grid [grid-template-columns:1fr_auto_1fr] items-center',
+            tempValue().length && props.multiple ? 'pl-4px' : 'pl-11px',
             props.multiple && 'py-1px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
@@ -116,44 +192,33 @@ function SelectInput<T>(props: SelectInputProps<T>) {
           onClick={e => {
             setOpen(true)
             setWidth(e.currentTarget.offsetWidth)
-            e.currentTarget.focus()
+            setCurrentFocusType(e.target !== endInput ? 'start' : 'end')
           }}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          <Show
-            when={valueArr().length}
-            fallback={
-              <input
-                class="w-full h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-                readOnly
-                placeholder={props.placeholder}
-              />
-            }
-          >
-            <Show
-              when={props.multiple}
-              fallback={
-                <div class="h-30px ellipsis leading-30px">
-                  {props.optionLabelRender(valueArr()[0])}
-                </div>
-              }
-            >
-              <For each={valueArr()}>
-                {item => (
-                  <span class="inline-block">
-                    <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                      {props.optionLabelRender(item)}
-                      <span
-                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                        onClick={() => setValue(valueArr().filter(v => v !== item))}
-                      />
-                    </span>
-                  </span>
-                )}
-              </For>
-            </Show>
-          </Show>
+          <input
+            ref={startInput}
+            value={(tempValue()[0] as string) ?? ''}
+            class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+            placeholder={props.placeholder}
+          />
+          <span class="i-ant-design:swap-right-outlined w-32px" />
+          <input
+            ref={endInput}
+            value={(tempValue()[1] as string) ?? ''}
+            class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+            placeholder={props.placeholder}
+          />
+
+          <div
+            aria-label="active-bar"
+            class="h-1px bg-[var(--ant-color-primary)] absolute bottom-0 transition-left"
+            style={{
+              display: open() ? 'block' : 'none',
+              ...activeBarStyle(),
+            }}
+          />
 
           <div class="absolute top-0 bottom-0 right-11px flex items-center">
             <Show
@@ -178,4 +243,4 @@ function SelectInput<T>(props: SelectInputProps<T>) {
   )
 }
 
-export default SelectInput
+export default RangeInput
