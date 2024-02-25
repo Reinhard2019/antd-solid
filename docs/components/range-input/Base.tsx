@@ -19,7 +19,7 @@ const App: Component = () => {
             <For each={options}>
               {item => (
                 <div
-                  class="text-center cursor-pointer hover:bg-[rgba(0,0,0,0.04)]"
+                  class="text-center cursor-pointer hover:bg-[var(--ant-select-option-active-bg)]"
                   onClick={() => {
                     setSingleValue(item)
                   }}

@@ -7,10 +7,10 @@ import {
   splitProps,
   Show,
 } from 'solid-js'
-import { type Key } from '../types'
-import createControllableValue from '../hooks/createControllableValue'
 import cs from 'classnames'
 import { isEmpty, keyBy } from 'lodash-es'
+import { type Key } from '../types'
+import createControllableValue from '../hooks/createControllableValue'
 import { toArray } from '../utils/array'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
@@ -58,12 +58,7 @@ const Select: Component<SelectProps> = props => {
       }}
       content={close => (
         <Show when={!isEmpty(props.options)} fallback={<Empty.PRESENTED_IMAGE_SIMPLE />}>
-          <div
-            class="p-2px"
-            style={{
-              '--ant-select-option-active-bg': 'rgba(0, 0, 0, 0.04)',
-            }}
-          >
+          <div class="p-2px">
             <For each={props.options}>
               {item => (
                 <div

@@ -73,6 +73,7 @@ export default defineConfig({
           --ant-collapse-header-padding: 12px 16px;
 
           --ant-select-option-selected-bg: #e6f4ff;
+          --ant-select-option-active-bg: rgba(0, 0, 0, 0.04);
           
           --ant-tree-node-selected-bg: #e6f4ff;
 
