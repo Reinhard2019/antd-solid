@@ -6,6 +6,7 @@ import {
   createMemo,
   createEffect,
   on,
+  type Accessor,
 } from 'solid-js'
 import cs from 'classnames'
 import { compact, isNil } from 'lodash-es'
@@ -19,11 +20,16 @@ export interface RangeInputProps<T> {
   defaultValue?: T[] | undefined | null
   value?: T[] | undefined | null
   onChange?: (value: T[]) => void
+  optionLabelRender?: (v: T) => JSXElement
   placeholder?: string
   allowClear?: boolean
   disabled?: boolean
   class?: string
-  content: (setSingleValue: (value: T) => void) => JSXElement
+  content: (options: {
+    currentFocusType: Accessor<'start' | 'end'>
+    tempValue: Accessor<Array<T | undefined>>
+    setSingleValue: (value: T) => void
+  }) => JSXElement
   /**
    * 设置校验状态
    */
@@ -31,30 +37,34 @@ export interface RangeInputProps<T> {
 }
 
 const statusClassDict = {
-  default: (disabled: boolean) =>
+  default: (disabled: boolean, focus: boolean) =>
     cs(
       '[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
         'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+      focus &&
+        'border-[var(--ant-color-primary)] [box-shadow:0_0_0_2px_var(--ant-control-outline)]',
     ),
-  error: (disabled: boolean) =>
+  error: (disabled: boolean, focus: boolean) =>
     cs(
       '[border:1px_solid_var(--ant-color-error)]',
       !disabled &&
         'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+      focus && '[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
     ),
-  warning: (disabled: boolean) =>
+  warning: (disabled: boolean, focus: boolean) =>
     cs(
       '[border:1px_solid_var(--ant-color-warning)]',
       !disabled &&
         'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+      focus && '[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
     ),
 }
 
 function RangeInput<T = string>(props: RangeInputProps<T>) {
   let container: HTMLDivElement | undefined
-  let startInput: HTMLInputElement | undefined
-  let endInput: HTMLInputElement | undefined
+  let startDom: HTMLDivElement | undefined
+  let endDom: HTMLDivElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
   const [currentFocusType, setCurrentFocusType] = createSignal<'start' | 'end'>('start')
@@ -74,7 +84,6 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     if (currentFocusType() === 'start') {
       setTempValue(arr => [v, arr[1]])
       if (setSingleValueCount > 1) {
-        startInput?.blur()
         setOpen(false)
       } else {
         setCurrentFocusType('end')
@@ -82,7 +91,6 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     } else {
       setTempValue(arr => [arr[0], v])
       if (setSingleValueCount > 1) {
-        endInput?.blur()
         setOpen(false)
       } else {
         setCurrentFocusType('start')
@@ -131,13 +139,14 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     if (!open()) return
 
     if (currentFocusType() === 'start') {
-      setActiveBarStyleByDom(startInput!)
-      startInput!.focus()
+      setActiveBarStyleByDom(startDom!)
     } else {
-      setActiveBarStyleByDom(endInput!)
-      endInput!.focus()
+      setActiveBarStyleByDom(endDom!)
     }
   })
+
+  const optionLabelRender = (v: T) =>
+    props.optionLabelRender ? props.optionLabelRender(v) : String(v)
 
   return (
     <div
@@ -174,7 +183,11 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
             class="bg-white w-200px max-h-400px overflow-auto"
             style={{ width: `${width()}px` }}
           >
-            {props.content(setSingleValue)}
+            {props.content({
+              currentFocusType,
+              tempValue,
+              setSingleValue,
+            })}
           </div>
         }
       >
@@ -186,30 +199,46 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
             props.multiple && 'py-1px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
-            statusClassDict[props.status ?? 'default'](!!props.disabled),
+            statusClassDict[props.status ?? 'default'](!!props.disabled, open()),
           )}
           tabIndex="0"
           onClick={e => {
             setOpen(true)
             setWidth(e.currentTarget.offsetWidth)
-            setCurrentFocusType(e.target !== endInput ? 'start' : 'end')
+            setCurrentFocusType(e.target !== endDom ? 'start' : 'end')
           }}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          <input
-            ref={startInput}
-            value={(tempValue()[0] as string) ?? ''}
-            class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-            placeholder={props.placeholder}
-          />
+          <div ref={startDom} class="truncate">
+            <Show
+              when={!isNil(tempValue()[0])}
+              fallback={
+                <input
+                  class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                  placeholder={props.placeholder}
+                  readOnly
+                />
+              }
+            >
+              {optionLabelRender(tempValue()[0]!)}
+            </Show>
+          </div>
           <span class="i-ant-design:swap-right-outlined w-32px" />
-          <input
-            ref={endInput}
-            value={(tempValue()[1] as string) ?? ''}
-            class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-            placeholder={props.placeholder}
-          />
+          <div ref={endDom} class="truncate">
+            <Show
+              when={!isNil(tempValue()[1])}
+              fallback={
+                <input
+                  class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                  placeholder={props.placeholder}
+                  readOnly
+                />
+              }
+            >
+              {optionLabelRender(tempValue()[1]!)}
+            </Show>
+          </div>
 
           <div
             aria-label="active-bar"

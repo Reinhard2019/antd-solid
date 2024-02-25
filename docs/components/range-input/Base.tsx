@@ -14,7 +14,7 @@ const App: Component = () => {
         value={value()}
         onChange={setValue}
         placeholder="请选择"
-        content={setSingleValue => (
+        content={({ setSingleValue }) => (
           <div style={{ padding: '4px' }}>
             <For each={options}>
               {item => (
