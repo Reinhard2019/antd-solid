@@ -13,7 +13,13 @@ module.exports = {
     project: ['./tsconfig.json'],
   },
   rules: {
-    "no-shadow": "error",
+    'import/order': [
+      'error',
+      {
+        groups: [['builtin', 'external', 'internal']],
+      },
+    ],
+    'no-shadow': 'error',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
     '@typescript-eslint/no-unused-vars': [
