@@ -3,7 +3,7 @@ import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { get, isEmpty, isNil } from 'lodash-es'
 import Tree, { type TreeProps } from '../Tree'
-import SelectInput, { type SelectInputProps } from '../Select/SelectInput'
+import SelectInput, { type SelectInputProps } from '../SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Empty from '../Empty'
 

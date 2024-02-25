@@ -12,7 +12,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import cs from 'classnames'
 import { isEmpty, keyBy } from 'lodash-es'
 import { toArray } from '../utils/array'
-import SelectInput, { type SelectInputProps } from './SelectInput'
+import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
 
 interface SelectOption {
