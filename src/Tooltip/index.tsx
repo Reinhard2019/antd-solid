@@ -77,15 +77,8 @@ function collectScroll(ele: HTMLElement) {
   return [window, ...scrollList]
 }
 
-export const Content: Component<{
-  content: TooltipProps['content']
-  close: () => void
-}> = props => {
-  return (
-    <Show when={typeof props.content === 'function'} fallback={props.content as JSXElement}>
-      {typeof props.content === 'function' && props.content(props.close)}
-    </Show>
-  )
+export const getContent = (content: TooltipProps['content'], close: () => void) => {
+  return typeof content === 'function' ? content(close) : content
 }
 
 const Tooltip: Component<TooltipProps> = _props => {
@@ -384,7 +377,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               )}
               style={props.contentStyle}
             >
-              <Content content={props.content} close={() => setOpen(false)} />
+              {getContent(props.content, () => setOpen(false))}
             </div>
 
             <Show when={props.arrow}>

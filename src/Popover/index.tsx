@@ -1,5 +1,5 @@
 import { type Component, type JSXElement, Show } from 'solid-js'
-import Tooltip, { Content, type TooltipProps } from '../Tooltip'
+import Tooltip, { getContent, type TooltipProps } from '../Tooltip'
 
 interface PopoverProps extends TooltipProps {
   title?: JSXElement
@@ -18,9 +18,7 @@ const Popover: Component<PopoverProps> = props => {
             </div>
           </Show>
 
-          <div class="text-[rgba(0,0,0,0.88)]">
-            <Content content={props.content} close={close} />
-          </div>
+          <div class="text-[rgba(0,0,0,0.88)]">{getContent(props.content, close)}</div>
         </div>
       )}
     />
