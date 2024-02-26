@@ -10,8 +10,16 @@ const App: Component = () => {
         gap: '8px',
       }}
     >
-      <RangeInput placeholder="请选择" status="error" content={() => <div>content</div>} />
-      <RangeInput placeholder="请选择" status="warning" content={() => <div>content</div>} />
+      <RangeInput
+        placeholder={['开始', '结束']}
+        status="error"
+        content={() => <div>content</div>}
+      />
+      <RangeInput
+        placeholder={['开始', '结束']}
+        status="warning"
+        content={() => <div>content</div>}
+      />
     </div>
   )
 }

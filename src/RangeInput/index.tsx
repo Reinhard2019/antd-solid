@@ -21,7 +21,7 @@ export interface RangeInputProps<T> {
   value?: T[] | undefined | null
   onChange?: (value: T[]) => void
   optionLabelRender?: (v: T) => JSXElement
-  placeholder?: string
+  placeholder?: [string?, string?]
   allowClear?: boolean
   disabled?: boolean
   class?: string
@@ -216,7 +216,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
               fallback={
                 <input
                   class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-                  placeholder={props.placeholder}
+                  placeholder={props.placeholder?.[0]}
                   readOnly
                 />
               }
@@ -231,7 +231,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
               fallback={
                 <input
                   class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
-                  placeholder={props.placeholder}
+                  placeholder={props.placeholder?.[1]}
                   readOnly
                 />
               }

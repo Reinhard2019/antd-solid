@@ -13,7 +13,7 @@ const App: Component = () => {
       <RangeInput
         value={value()}
         onChange={setValue}
-        placeholder="请选择"
+        placeholder={['开始', '结束']}
         allowClear
         content={({ setSingleValue }) => (
           <div style={{ padding: '4px' }}>
