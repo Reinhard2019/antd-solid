@@ -16,7 +16,13 @@ export interface TreeSelectNode {
 export interface TreeSelectProps<T extends {} = TreeSelectNode>
   extends Pick<
   SelectInputProps<Key>,
-  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
+  | 'multiple'
+  | 'allowClear'
+  | 'class'
+  | 'disabled'
+  | 'placeholder'
+  | 'status'
+  | 'optionLabelRender'
   >,
   Pick<TreeProps<T>, 'treeData' | 'checkable' | 'checkStrategy'> {
   defaultValue?: Key | Key[] | undefined
@@ -41,6 +47,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     'disabled',
     'placeholder',
     'status',
+    'optionLabelRender',
   ])
   const [treeProps] = splitProps(props, ['treeData', 'checkable', 'checkStrategy'])
 
@@ -103,7 +110,9 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
   return (
     <SelectInput
       {...selectInputProps}
-      optionLabelRender={v => getLabel(optionMap().get(v)!)}
+      optionLabelRender={v =>
+        props.optionLabelRender ? props.optionLabelRender(v) : getLabel(optionMap().get(v)!) ?? v
+      }
       value={valueArr()}
       onChange={setValueArr}
       content={close => (

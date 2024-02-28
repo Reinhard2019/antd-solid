@@ -157,7 +157,6 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   const checkedMap = createMemo(() => {
     const map = new Map<Key, CheckNode<T>>()
     const checkedKeyDict = new Map(checkedKeys()?.map(k => [k, true]))
-    console.log('checkedMap', map)
 
     const treeForEach = (
       list: T[] | undefined,

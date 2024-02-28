@@ -11,7 +11,7 @@ export interface SelectInputProps<T> {
   defaultValue?: T[] | null
   value?: T[] | null
   onChange?: (value: T[]) => void
-  optionLabelRender: (v: T) => JSXElement
+  optionLabelRender?: (v: T) => JSXElement
   placeholder?: string
   allowClear?: boolean
   disabled?: boolean
@@ -62,6 +62,9 @@ function SelectInput<T>(props: SelectInputProps<T>) {
   const [width, setWidth] = createSignal(0)
   const [hover, setHover] = createSignal(false)
   const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
+
+  const optionLabelRender = (v: T) =>
+    props.optionLabelRender ? props.optionLabelRender(v) : String(v)
 
   return (
     <div
@@ -133,16 +136,14 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             <Show
               when={props.multiple}
               fallback={
-                <div class="h-28px ellipsis leading-30px">
-                  {props.optionLabelRender(valueArr()[0])}
-                </div>
+                <div class="h-28px ellipsis leading-30px">{optionLabelRender(valueArr()[0])}</div>
               }
             >
               <For each={valueArr()}>
                 {item => (
                   <span class="inline-block">
                     <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                      {props.optionLabelRender(item)}
+                      {optionLabelRender(item)}
                       <span
                         class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
                         onClick={() => setValue(valueArr().filter(v => v !== item))}
