@@ -50,9 +50,8 @@ const Checkbox: Component<CheckboxProps> & {
         <input
           class="m-0 hidden"
           type="checkbox"
-          checked={checked()}
           onChange={e => {
-            setChecked(e.target.checked)
+            e.target.checked = setChecked(v => !v)
             props.onChange?.(e)
           }}
         />
