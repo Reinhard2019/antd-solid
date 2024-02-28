@@ -120,6 +120,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
               {...(props.checkable
                 ? {
                   selectedKeys: [],
+                  checkedKeys: valueArr(),
                   checkOnClick: true,
                   onCheck: checkedKeys => {
                     setValueArr(checkedKeys)
