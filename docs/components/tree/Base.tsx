@@ -1,37 +1,54 @@
-import { type Component } from 'solid-js'
+import { createSignal, type Component } from 'solid-js'
 import { Tree } from 'antd-solid'
 
+type Key = string | number
+
+const treeData = [
+  {
+    title: '0-0',
+    key: '0-0',
+    children: [
+      {
+        title: '0-0-0',
+        key: '0-0-0',
+        children: [
+          { title: '0-0-0-0', key: '0-0-0-0' },
+          { title: '0-0-0-1', key: '0-0-0-1' },
+          { title: '0-0-0-2', key: '0-0-0-2' },
+        ],
+      },
+      {
+        title: '0-0-1',
+        key: '0-0-1',
+        children: [
+          { title: '0-0-1-0', key: '0-0-1-0' },
+          { title: '0-0-1-1', key: '0-0-1-1' },
+          { title: '0-0-1-2', key: '0-0-1-2' },
+        ],
+      },
+      {
+        title: '0-0-2',
+        key: '0-0-2',
+      },
+    ],
+  },
+  {
+    title: '0-1',
+    key: '0-1',
+    children: [
+      { title: '0-1-0-0', key: '0-1-0-0' },
+      { title: '0-1-0-1', key: '0-1-0-1' },
+      { title: '0-1-0-2', key: '0-1-0-2' },
+    ],
+  },
+  {
+    title: '0-2',
+    key: '0-2',
+  },
+]
+
 const Index: Component = () => {
-  const treeData = [
-    {
-      title: 'parent 1',
-      key: '0-0',
-      children: [
-        {
-          title: 'parent 1-0',
-          key: '0-0-0',
-          disabled: true,
-          children: [
-            {
-              title: 'leaf',
-              key: '0-0-0-0',
-            },
-            {
-              title: 'leaf',
-              key: '0-0-0-1',
-            },
-          ],
-        },
-        {
-          title: 'parent 1-1',
-          key: '0-0-1',
-          children: [
-            { title: () => <span style={{ color: '#1677ff' }}>sss</span>, key: '0-0-1-0' },
-          ],
-        },
-      ],
-    },
-  ]
+  const [checkedKeys, setCheckedKeys] = createSignal<Key[]>(['0-0-0'])
 
   return (
     <Tree
@@ -39,7 +56,9 @@ const Index: Component = () => {
       checkable
       defaultExpandAll
       treeData={treeData}
+      checkedKeys={checkedKeys()}
       onCheck={keys => {
+        setCheckedKeys(keys)
         console.log('onCheck', keys)
       }}
     />

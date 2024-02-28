@@ -76,6 +76,7 @@ export default defineConfig({
           --ant-select-option-active-bg: rgba(0, 0, 0, 0.04);
           
           --ant-tree-node-selected-bg: #e6f4ff;
+          --ant-tree-node-hover-bg: rgba(0, 0, 0, 0.04);
 
           --ant-color-split: rgba(5, 5, 5, 0.06);
         

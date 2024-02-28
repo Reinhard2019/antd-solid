@@ -1,9 +1,24 @@
-import { createSignal, untrack, createSelector, createMemo, type JSXElement } from 'solid-js'
+import {
+  createSignal,
+  untrack,
+  createSelector,
+  createMemo,
+  type JSXElement,
+  mergeProps,
+} from 'solid-js'
+import { get, isEmpty, pull } from 'lodash-es'
 import createControllableValue from '../hooks/createControllableValue'
 import { type Key } from '../types'
 import SingleLevelTree from './SingleLevelTree'
-import { get, isEmpty } from 'lodash-es'
 import { type CheckboxProps } from '../Checkbox'
+
+export interface CheckNode<T extends {} = TreeNode> extends CheckboxProps {
+  key: Key
+  parent?: CheckNode<T>
+  treeNode: T
+  checkedChildCount?: number
+  totalChildCount?: number
+}
 
 export interface TreeNode {
   key: Key
@@ -41,7 +56,13 @@ export interface TreeProps<T extends {} = TreeNode> {
    */
   defaultCheckedKeys?: Key[]
   checkedKeys?: Key[]
-  onCheck?: (checkedKeys: Key[]) => void
+  onCheck?: (
+    checkedKeys: Key[],
+    e: {
+      checked: boolean
+      halfCheckedKeys: Key[]
+    },
+  ) => void
   /**
    * 自定义节点 title、key、children 的字段
    * 默认 { title: 'title', key: 'key', children: 'children' }
@@ -58,9 +79,24 @@ export interface TreeProps<T extends {} = TreeNode> {
     key?: string | ((node: T) => Key)
     children?: string | ((node: T) => T[] | undefined)
   }
+  /**
+   * 默认 'all'
+   * 设置勾选策略来指定勾选回调返回的值，all 表示回调函数值为全部选中节点；parent 表示回调函数值为父节点（当父节点下所有子节点都选中时）；child 表示回调函数值为子节点
+   */
+  checkStrategy?: 'all' | 'parent' | 'child'
+  /**
+   * 是否允许点击节点进行勾选，仅在 checkable 为 true 时生效
+   */
+  checkOnClick?: boolean
 }
 
-function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
+function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
+  const props = mergeProps(
+    {
+      checkStrategy: 'all' as const,
+    },
+    _props,
+  )
   const fieldNames = Object.assign(
     {
       title: 'title' as string | ((node: T) => JSXElement),
@@ -116,34 +152,86 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
     valueConvertor: v => (Array.isArray(v) ? v : []),
   })
   const checkedMap = createMemo(() => {
-    const map = new Map<Key, CheckboxProps>()
-    const checkedKeyDict = Object.fromEntries(checkedKeys().map(k => [k, true]))
+    const map = new Map<Key, CheckNode<T>>()
+    const checkedKeyDict = new Map(checkedKeys()?.map(k => [k, true]))
 
-    const treeForEach = (list: T[] | undefined): CheckboxProps => {
+    const treeForEach = (
+      list: T[] | undefined,
+      parent?: CheckNode<T>,
+    ): Omit<CheckNode<T>, 'key' | 'parent' | 'treeNode'> => {
       let checked = true
       let indeterminate = false
+      let checkedChildCount = 0
 
       list?.forEach(item => {
         const key = getKey(item)
         const children = getChildren(item)
 
-        let res: CheckboxProps
-        if (isEmpty(children)) {
-          res = {
-            checked: !!checkedKeyDict[key],
-          }
-        } else {
-          res = treeForEach(children!)
+        const checkNode: CheckNode<T> = {
+          key,
+          checked: checkedKeyDict.has(key),
+          indeterminate: false,
+          parent,
+          treeNode: item,
         }
 
-        map.set(key, res)
+        // 对外部传值进行修补
+        switch (props.checkStrategy) {
+          case 'all': {
+            if (parent?.checked) {
+              checkNode.checked = true
+              if (!checkedKeyDict.has(key)) {
+                checkedKeyDict.set(key, true)
+                checkedKeys().push(key)
+              }
+            }
+            break
+          }
+          case 'parent': {
+            if (parent?.checked) {
+              checkNode.checked = true
+              if (checkedKeyDict.has(key)) {
+                checkedKeyDict.delete(key)
+                pull(checkedKeys(), key)
+              } else {
+                checkedKeyDict.set(key, true)
+              }
+            }
+            break
+          }
+          case 'child': {
+            if (isEmpty(children)) {
+              if (!checkedKeyDict.has(key) && parent?.checked) {
+                checkedKeyDict.set(key, true)
+                checkedKeys().push(key)
+              }
+            } else {
+              if (checkedKeyDict.has(key)) {
+                checkedKeyDict.delete(key)
+                pull(checkedKeys(), key)
+              }
+            }
+            break
+          }
+        }
 
-        if (!res.checked) {
+        if (isEmpty(children)) {
+          checkNode.checked = !!parent?.checked || checkedKeyDict.has(key)
+        } else {
+          Object.assign(checkNode, treeForEach(children!, checkNode))
+          checkNode.totalChildCount = children?.length
+        }
+
+        map.set(key, checkNode)
+
+        if (!checkNode.checked) {
           checked = false
+        } else {
+          checkedChildCount++
         }
 
         // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-        if (res.checked || res.indeterminate) {
+        if (checkNode.checked || checkNode.indeterminate) {
           indeterminate = true
         }
       })
@@ -151,6 +239,8 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
       return {
         checked,
         indeterminate,
+        totalChildCount: list?.length,
+        checkedChildCount,
       }
     }
     treeForEach(props.treeData)
@@ -167,11 +257,7 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
   const [targetIndexes, setTargetIndexes] = createSignal<number[] | null>(null)
 
   return (
-    <div
-      style={{
-        '--ant-tree-node-hover-bg': 'rgba(0, 0, 0, 0.04)',
-      }}
-    >
+    <div>
       <SingleLevelTree
         {...props}
         treeData={props.treeData}
@@ -190,7 +276,6 @@ function Tree<T extends {} = TreeNode>(props: TreeProps<T>) {
         isTarget={isTarget}
         expandedKeys={expandedKeys}
         setExpandedKeys={setExpandedKeys}
-        checkedKeys={checkedKeys}
         setCheckedKeys={setCheckedKeys}
         getTitle={getTitle}
         getKey={getKey}

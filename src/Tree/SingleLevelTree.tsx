@@ -1,17 +1,24 @@
 /**
  * 单层级 tree
  */
-import { isEmpty, uniq } from 'lodash-es'
+import { isEmpty, last, uniq } from 'lodash-es'
 import { Show, For, createMemo, type Accessor, type Setter, type JSXElement } from 'solid-js'
 import cs from 'classnames'
-import Checkbox, { type CheckboxProps } from '../Checkbox'
-import { type TreeNode, type TreeProps } from '.'
+import Checkbox from '../Checkbox'
+import { type CheckNode, type TreeNode, type TreeProps } from '.'
 import { type Key } from '../types'
 
 interface SingleLevelTreeProps<T extends {} = TreeNode>
   extends Pick<
   TreeProps<T>,
-  'treeData' | 'draggable' | 'onDrop' | 'blockNode' | 'checkable' | 'multiple'
+  | 'treeData'
+  | 'draggable'
+  | 'onDrop'
+  | 'blockNode'
+  | 'checkable'
+  | 'multiple'
+  | 'checkStrategy'
+  | 'checkOnClick'
   > {
   indent: number
   parentIndexes?: number[]
@@ -29,9 +36,8 @@ interface SingleLevelTreeProps<T extends {} = TreeNode>
   isTarget: (key: T | null) => boolean
   expandedKeys: Accessor<Key[]>
   setExpandedKeys: Setter<Key[]>
-  checkedKeys: Accessor<Key[]>
   setCheckedKeys: Setter<Key[]>
-  checkedMap: Accessor<Map<Key, CheckboxProps>>
+  checkedMap: Accessor<Map<Key, CheckNode<T>>>
   getTitle: (
     node: T,
     info: {
@@ -50,6 +56,86 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
         const isExpanded = createMemo(() => props.expandedKeys().includes(props.getKey(item)))
         const children = createMemo(() => props.getChildren(item))
         const isEndNode = createMemo(() => isEmpty(children()))
+        const onCheck = () => {
+          const checked = !props.checkedMap().get(props.getKey(item))?.checked
+          const key = props.getKey(item)
+
+          /**
+           * 获取所有受影响的父节点
+           * @param node
+           * @param parentKeys
+           * @returns
+           */
+          const getAllParentKeys = (node: CheckNode<T>, parentKeys: Key[] = []): Key[] => {
+            if (node.parent) {
+              if (checked) {
+                node.parent.checkedChildCount!++
+              }
+              if (node.parent.checkedChildCount === node.parent.totalChildCount) {
+                parentKeys.push(node.parent.key)
+                return getAllParentKeys(node.parent, parentKeys)
+              }
+            }
+            return parentKeys
+          }
+          /**
+           * 获取所有受影响的子节点
+           * @param node
+           * @param parentKeys
+           * @returns
+           */
+          const getAllChildKeys = (list: T[] | undefined, onlyEndNode = false): Key[] => {
+            if (isEmpty(list)) return []
+
+            return list!.flatMap<Key>(v => {
+              const nextLevelChildren = props.getChildren(v)
+              if (!isEmpty(nextLevelChildren)) {
+                return [
+                  ...(onlyEndNode ? [] : [props.getKey(v)]),
+                  ...getAllChildKeys(nextLevelChildren!),
+                ]
+              }
+              return [props.getKey(v)]
+            })
+          }
+
+          if (props.checkStrategy === 'parent') {
+            const parentKeys: Key[] = getAllParentKeys(props.checkedMap().get(key)!, [key])
+            const root = props.checkedMap().get(last(parentKeys)!)!
+            const addKeys: Key[] = checked
+              ? [root.key]
+              : getAllChildKeys(props.getChildren(root.treeNode)).filter(
+                k => !parentKeys.includes(k),
+              )
+            const deleteKeys: Key[] = checked
+              ? getAllChildKeys(props.getChildren(root.treeNode))
+              : [key, root.key].concat(getAllChildKeys(children()))
+            const deleteChildDict = new Map(deleteKeys.map(k => [k, true]))
+            props.setCheckedKeys(keys => keys.concat(addKeys).filter(k => !deleteChildDict.has(k)))
+            return
+          }
+
+          let updateKeys: Key[] = []
+
+          if (props.checkStrategy === 'all') {
+            updateKeys = [key]
+              .concat(getAllChildKeys(children()!))
+              .concat(getAllParentKeys(props.checkedMap().get(key)!))
+          } else if (props.checkStrategy === 'child') {
+            if (isEndNode()) {
+              updateKeys = [key]
+            } else {
+              updateKeys = getAllChildKeys(children()!, true)
+            }
+          }
+
+          if (checked) {
+            props.setCheckedKeys(keys => uniq([...keys, ...updateKeys]))
+          } else {
+            const deleteChildDict = new Map(updateKeys.map(k => [k, true]))
+            props.setCheckedKeys(keys => keys.filter(k => !deleteChildDict.has(k)))
+          }
+        }
 
         return (
           <>
@@ -135,36 +221,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                   class="mr-8px mt-2px"
                   checked={props.checkedMap().get(props.getKey(item))?.checked}
                   indeterminate={props.checkedMap().get(props.getKey(item))?.indeterminate}
-                  onChange={e => {
-                    const key = props.getKey(item)
-
-                    if (isEndNode()) {
-                      if (e.target.checked) {
-                        props.setCheckedKeys(keys => [...keys, key])
-                      } else {
-                        props.setCheckedKeys(keys => keys.filter(k => k !== key))
-                      }
-                      return
-                    }
-
-                    const getAllChildrenKey = (list: T[]): Key[] => {
-                      return list.flatMap<Key>(v => {
-                        const nextLevelChildren = props.getChildren(v)
-                        if (!isEmpty(nextLevelChildren)) {
-                          return getAllChildrenKey(nextLevelChildren!)
-                        }
-                        return props.getKey(v)
-                      })
-                    }
-                    const allChildrenKey = getAllChildrenKey(children()!)
-
-                    if (e.target.checked) {
-                      props.setCheckedKeys(keys => uniq([...keys, ...allChildrenKey]))
-                    } else {
-                      const allChildrenDict = new Map(allChildrenKey.map(k => [k, true]))
-                      props.setCheckedKeys(keys => keys.filter(k => !allChildrenDict.get(k)))
-                    }
-                  }}
+                  onChange={onCheck}
                 />
               </Show>
               <div
@@ -186,7 +243,13 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                       return [...keys, key]
                     })
                   } else {
-                    props.setSelectedKeys([key])
+                    props.setSelectedKeys(keys => {
+                      return keys.includes(key) ? [] : [key]
+                    })
+                  }
+
+                  if (props.checkOnClick) {
+                    onCheck()
                   }
                 }}
               >
