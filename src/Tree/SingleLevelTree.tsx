@@ -102,16 +102,19 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
           if (props.checkStrategy === 'parent') {
             const parentKeys: Key[] = getAllParentKeys(props.checkedMap().get(key)!, [key])
             const root = props.checkedMap().get(last(parentKeys)!)!
-            const addKeys: Key[] = checked
+            const addKeys = checked
               ? [root.key]
-              : getAllChildKeys(props.getChildren(root.treeNode)).filter(
-                k => !parentKeys.includes(k),
-              )
-            const deleteKeys: Key[] = checked
+              : props
+                .getChildren(root.treeNode)
+                ?.map(node => props.getKey(node))
+                .filter(k => !parentKeys.includes(k))
+            const deleteKeys = checked
               ? getAllChildKeys(props.getChildren(root.treeNode))
               : [key, root.key].concat(getAllChildKeys(children()))
             const deleteChildDict = new Map(deleteKeys.map(k => [k, true]))
-            props.setCheckedKeys(keys => keys.concat(addKeys).filter(k => !deleteChildDict.has(k)))
+            props.setCheckedKeys(keys =>
+              keys.concat(addKeys ?? []).filter(k => !deleteChildDict.has(k)),
+            )
             return
           }
 
