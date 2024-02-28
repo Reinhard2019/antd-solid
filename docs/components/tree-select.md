@@ -14,9 +14,15 @@ outline: deep
 
 <Code path="tree-select/Base" />
 
+### 可勾选
+
+使用勾选框实现多选功能。
+
+<Code path="tree-select/Checkable" />
+
 ## API
 
-### Table
+### TreeSelect
 
 <div class="vp-table">
 

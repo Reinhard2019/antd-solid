@@ -1,7 +1,7 @@
 import { splitProps, type JSXElement, untrack, createMemo, Show } from 'solid-js'
+import { get, isEmpty, isNil } from 'lodash-es'
 import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
-import { get, isEmpty, isNil } from 'lodash-es'
 import Tree, { type TreeProps } from '../Tree'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
@@ -18,7 +18,7 @@ export interface TreeSelectProps<T extends {} = TreeSelectNode>
   SelectInputProps<Key>,
   'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
   >,
-  Pick<TreeProps<T>, 'treeData'> {
+  Pick<TreeProps<T>, 'treeData' | 'checkable' | 'checkStrategy'> {
   defaultValue?: Key | Key[] | undefined
   value?: Key | Key[] | undefined
   onChange?: (value: Key | Key[] | undefined) => void
@@ -42,6 +42,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     'placeholder',
     'status',
   ])
+  const [treeProps] = splitProps(props, ['treeData', 'checkable', 'checkStrategy'])
 
   const fieldNames = Object.assign(
     {
@@ -109,12 +110,6 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
         <Show when={!isEmpty(props.treeData)} fallback={<Empty.PRESENTED_IMAGE_SIMPLE />}>
           <div class="px-4px py-8px">
             <Tree
-              selectedKeys={valueArr()}
-              onSelect={selectedKeys => {
-                setValueArr(selectedKeys)
-                if (!props.multiple) close()
-              }}
-              treeData={props.treeData}
               multiple={props.multiple}
               blockNode
               fieldNames={{
@@ -122,6 +117,21 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
                 key: fieldNames.value,
                 children: fieldNames.children,
               }}
+              {...(props.checkable
+                ? {
+                  checkOnClick: true,
+                  onCheck: checkedKeys => {
+                    setValueArr(checkedKeys)
+                  },
+                }
+                : {
+                  selectedKeys: valueArr(),
+                  onSelect: selectedKeys => {
+                    setValueArr(selectedKeys)
+                    if (!props.multiple) close()
+                  },
+                })}
+              {...treeProps}
             />
           </div>
         </Show>

@@ -105,9 +105,8 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         <div
           ref={select!}
           class={cs(
-            'relative min-h-32px pr-25px rounded-inherit',
+            'relative min-h-32px pr-25px rounded-inherit py-1px',
             valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
-            props.multiple && 'py-1px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
             statusClassDict[props.status ?? 'default'](!!props.disabled),
@@ -125,7 +124,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             when={valueArr().length}
             fallback={
               <input
-                class="w-full h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                class="w-full h-28px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
                 readOnly
                 placeholder={props.placeholder}
               />
@@ -134,7 +133,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             <Show
               when={props.multiple}
               fallback={
-                <div class="h-30px ellipsis leading-30px">
+                <div class="h-28px ellipsis leading-30px">
                   {props.optionLabelRender(valueArr()[0])}
                 </div>
               }

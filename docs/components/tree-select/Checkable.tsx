@@ -46,7 +46,16 @@ const options = [
 ]
 
 const App: Component = () => {
-  return <TreeSelect placeholder="请选择" treeData={options} multiple allowClear />
+  return (
+    <TreeSelect
+      placeholder="请选择"
+      treeData={options}
+      multiple
+      allowClear
+      checkable
+      checkStrategy="parent"
+    />
+  )
 }
 
 export default App
