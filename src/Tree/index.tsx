@@ -54,8 +54,8 @@ export interface TreeProps<T extends {} = TreeNode> {
   /**
    * 默认选中复选框的树节点
    */
-  defaultCheckedKeys?: Key[]
-  checkedKeys?: Key[]
+  defaultCheckedKeys?: Key[] | undefined | null
+  checkedKeys?: Key[] | undefined | null
   onCheck?: (
     checkedKeys: Key[],
     e: {
@@ -145,15 +145,19 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
     }),
   )
 
-  const [checkedKeys, setCheckedKeys] = createControllableValue<Key[]>(props, {
+  const [_checkedKeys, setCheckedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultCheckedKeys',
     valuePropName: 'checkedKeys',
     trigger: 'onCheck',
     valueConvertor: v => (Array.isArray(v) ? v : []),
   })
+  // TODO
+  // 由于 treeForEach 中会对 checkedKeys 直接修改，未避免直接修改外部的传值，这里先拷贝一份
+  const checkedKeys = createMemo(() => [..._checkedKeys()])
   const checkedMap = createMemo(() => {
     const map = new Map<Key, CheckNode<T>>()
     const checkedKeyDict = new Map(checkedKeys()?.map(k => [k, true]))
+    console.log('checkedMap', map)
 
     const treeForEach = (
       list: T[] | undefined,
