@@ -73,6 +73,7 @@ export default defineConfig({
           --ant-button-border-color-disabled: #d9d9d9;
 
           --ant-radio-dot-color-disabled: rgba(0, 0, 0, 0.25);
+          --ant-radio-button-checked-bg-disabled: rgba(0, 0, 0, 0.15);
 
           --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);
           --ant-collapse-header-padding: 12px 16px;

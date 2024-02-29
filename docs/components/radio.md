@@ -14,11 +14,23 @@ outline: deep
 
 <Code path="radio/Base" />
 
+### 不可用
+
+Radio 不可用。
+
+<Code path="radio/Disabled" />
+
 ### 单选组合
 
 一组互斥的 Radio 配合使用。
 
 <Code path="radio/Group" />
+
+### 按钮样式
+
+按钮样式的单选组合。
+
+<Code path="radio/Button" />
 
 ## API
 
