@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="button/Base" />
 
+### 不可用状态
+
+添加 `disabled` 属性即可让按钮处于不可用状态，同时按钮样式也会改变。
+
+<Code path="button/Disabled" />
+
 ### 危险按钮
 
 在 4.0 之后，危险成为一种按钮属性而不是按钮类型。

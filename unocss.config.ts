@@ -69,6 +69,11 @@ export default defineConfig({
           --ant-border-radius: 6px;
           --ant-border-radius-lg: 8px;
 
+          --ant-button-default-color: rgba(0, 0, 0, 0.88);
+          --ant-button-border-color-disabled: #d9d9d9;
+
+          --ant-radio-dot-color-disabled: rgba(0, 0, 0, 0.25);
+
           --ant-collapse-header-bg: rgba(0, 0, 0, 0.02);
           --ant-collapse-header-padding: 12px 16px;
 

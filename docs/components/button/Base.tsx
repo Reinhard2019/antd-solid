@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { Button } from 'antd-solid'
 
-const Index: Component = () => {
+const App: Component = () => {
   return (
     <div
       style={{
@@ -18,4 +18,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App

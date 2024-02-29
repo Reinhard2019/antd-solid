@@ -9,17 +9,17 @@ const App: Component = () => {
         gap: '8px',
       }}
     >
-      <Button type="primary" danger>
+      <Button disabled type="primary">
         Primary Button
       </Button>
-      <Button danger>Default Button</Button>
-      <Button type="dashed" danger>
+      <Button disabled>Default Button</Button>
+      <Button disabled type="dashed">
         Dashed Button
       </Button>
-      <Button type="text" danger>
+      <Button disabled type="text">
         Text Button
       </Button>
-      <Button type="link" danger>
+      <Button disabled type="link">
         Link Button
       </Button>
     </div>
