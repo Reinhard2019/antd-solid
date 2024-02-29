@@ -85,6 +85,8 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
     }
   })
 
+  const isControlled = () => Object.keys(props).includes('value')
+
   const [_, controllableProps] = splitProps(props, ['onChange'])
   const [value, setValue] = createControllableValue(controllableProps)
   const showClearBtn = createMemo(() => props.allowClear && value())
@@ -135,8 +137,14 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       value={value() ?? ''}
       onInput={e => {
         setValue(e.target.value)
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        onChange?.(e as any)
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+          onChange?.(e as any)
+        } finally {
+          if (isControlled() && e.target.value !== props.value) {
+            e.target.value = props.value ?? ''
+          }
+        }
       }}
       onKeyDown={e => {
         if (e.key === 'Enter') {
