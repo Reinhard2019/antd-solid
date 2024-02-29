@@ -1,8 +1,9 @@
-import { type Component, type ParentProps, type JSX, untrack, Show } from 'solid-js'
+import { type Component, type ParentProps, type JSX, Show } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Button from './Button'
 import Group from './Group'
+import { buttonClickAnimation } from '../utils/animation'
 
 export interface RadioProps extends ParentProps {
   defaultChecked?: boolean
@@ -30,14 +31,10 @@ const Radio: Component<RadioProps> & {
       )}
     >
       <span
-        class={cs(
-          'w-16px h-16px rounded-50% [border:1px_solid_var(--ant-color-border)]',
-          checked() &&
-            (props.disabled
-              ? 'flex justify-center items-center before:content-empty before:block before:w-8px before:h-8px before:bg-[var(--ant-radio-dot-color-disabled)] before:rounded-50%'
-              : '[border:5px_solid_var(--ant-color-primary)]'),
-          props.disabled && 'bg-[var(--ant-color-bg-container-disabled)]',
-        )}
+        class={cs('relative w-16px h-16px rounded-50%')}
+        onClick={e => {
+          buttonClickAnimation(e.currentTarget, 'var(--ant-color-primary)')
+        }}
       >
         <input
           class="m-0 hidden"
@@ -46,8 +43,19 @@ const Radio: Component<RadioProps> & {
           disabled={props.disabled}
           onInput={e => {
             setChecked(e.target.checked)
-            untrack(() => props.onChange?.(e))
+            props.onChange?.(e)
           }}
+        />
+
+        <span
+          class={cs(
+            'absolute inset-0 rounded-inherit [border:1px_solid_var(--ant-color-border)] bg-white',
+            checked() &&
+              (props.disabled
+                ? 'flex justify-center items-center before:content-empty before:block before:w-8px before:h-8px before:bg-[var(--ant-radio-dot-color-disabled)] before:rounded-50%'
+                : '[border:5px_solid_var(--ant-color-primary)]'),
+            props.disabled && 'bg-[var(--ant-color-bg-container-disabled)]',
+          )}
         />
       </span>
 

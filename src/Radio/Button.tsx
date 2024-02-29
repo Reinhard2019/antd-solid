@@ -2,6 +2,7 @@ import { type Component } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { type RadioProps } from '.'
+import { buttonClickAnimation } from '../utils/animation'
 
 const Button: Component<RadioProps> = props => {
   const [checked, setChecked] = createControllableValue(props, {
@@ -14,7 +15,7 @@ const Button: Component<RadioProps> = props => {
   return (
     <label
       class={cs(
-        'px-15px [border:1px_solid_rgb(217,217,217)] first:rounded-l-6px last:rounded-r-6px h-32px inline-flex items-center cursor-pointer flex-grow justify-center not[:first-child]:-ml-1px',
+        'relative h-32px [border:1px_solid_rgb(217,217,217)] first:rounded-l-6px last:rounded-r-6px cursor-pointer flex-grow not[:first-child]:-ml-1px',
         checked() &&
           cs(
             props.disabled
@@ -27,7 +28,7 @@ const Button: Component<RadioProps> = props => {
       )}
     >
       <input
-        class="w-0 h-0"
+        class="hidden"
         checked={checked()}
         type="radio"
         disabled={props.disabled}
@@ -36,7 +37,14 @@ const Button: Component<RadioProps> = props => {
           props.onChange?.(e)
         }}
       />
-      {props.children}
+      <span
+        class="inline-flex items-center justify-center px-15px absolute inset-0 bg-white rounded-inherit"
+        onClick={e => {
+          buttonClickAnimation(e.currentTarget, 'var(--ant-color-primary)')
+        }}
+      >
+        {props.children}
+      </span>
     </label>
   )
 }

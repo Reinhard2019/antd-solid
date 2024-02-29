@@ -10,6 +10,7 @@ import {
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
+import { buttonClickAnimation } from '../utils/animation'
 
 export interface ButtonProps
   extends ParentProps,
@@ -124,22 +125,10 @@ const Button: Component<ButtonProps> = _props => {
         }
 
         if (props.type === 'default' || props.type === 'primary' || props.type === 'dashed') {
-          const div = document.createElement('div')
-          div.className = cs(
-            props.danger
-              ? '[--color:var(--ant-color-error-border-hover)]'
-              : '[--color:var(--ant-color-primary-hover)]',
-            props.type === 'primary' ? '[--bg-color:var(--color)]' : '[--bg-color:white]',
-            'absolute inset-0 rounded-inherit z--1',
-            'before:content-empty before:absolute before:inset-0 before:rounded-inherit before:[background:radial-gradient(var(--color),rgba(0,0,0,0))] before:keyframes-button-border[inset:0px][inset:-6px] before:[animation:button-border_ease-out_.3s]',
-            'after:content-empty after:absolute after:inset-0 after:rounded-inherit after:bg-[var(--bg-color)]',
+          buttonClickAnimation(
+            e.currentTarget,
+            props.danger ? 'var(--ant-color-error-border-hover)' : 'var(--ant-color-primary-hover)',
           )
-          const onAnimationEnd = () => {
-            div.remove()
-            div.removeEventListener('animationend', onAnimationEnd)
-          }
-          div.addEventListener('animationend', onAnimationEnd)
-          e.currentTarget.insertBefore(div, e.currentTarget.childNodes[0])
         }
       }}
     >

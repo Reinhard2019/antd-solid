@@ -181,23 +181,25 @@ export default defineConfig({
       () => {
         return `@keyframes spin {
           from {
-              transform: rotate(0deg);
+            transform: rotate(0deg);
           }
           to {
-              transform: rotate(360deg);
+            transform: rotate(360deg);
           }
         }`
       },
     ],
     [
-      /^keyframes-(.*)(\[.*\])(\[.*\])$/,
-      match => {
-        return `@keyframes ${match[1]} {
+      /^keyframes-button-click$/,
+      () => {
+        return `@keyframes button-click {
           from {
-            ${match[2].slice(1, -1)};
+            inset: 0px;
+            opacity: 0.4;
           }
           to {
-            ${match[3].slice(1, -1)};
+            inset: -6px;
+            opacity: 0.1;
           }
         }`
       },
