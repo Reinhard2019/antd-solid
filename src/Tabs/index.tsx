@@ -125,17 +125,18 @@ const Tabs: Component<TabsProps> = _props => {
         </Match>
       </Switch>
 
-      <div class={props.contentClass}>
-        <For each={props.items}>
-          {item => (
-            <DelayShow when={isSelectedItem(item.key)}>
-              <div style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}>
-                {unwrapStringOrJSXElement(item.children)}
-              </div>
-            </DelayShow>
-          )}
-        </For>
-      </div>
+      <For each={props.items}>
+        {item => (
+          <DelayShow when={isSelectedItem(item.key)}>
+            <div
+              class={props.contentClass}
+              style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}
+            >
+              {unwrapStringOrJSXElement(item.children)}
+            </div>
+          </DelayShow>
+        )}
+      </For>
     </div>
   )
 }
