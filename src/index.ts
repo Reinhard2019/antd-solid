@@ -1,6 +1,6 @@
 export { default as Button } from './Button'
 export { default as Input } from './Input'
-export type { InputProps } from './Input'
+export type { InputProps, TextAreaProps } from './Input'
 export { default as InputNumber } from './InputNumber'
 export type { InputNumberProps } from './InputNumber'
 export { default as Timeline } from './Timeline'
