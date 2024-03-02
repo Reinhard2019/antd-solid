@@ -41,6 +41,7 @@ const Group: Component<RadioGroupProps> = _props => {
             onChange={
               (e => {
                 setValue(option.value)
+                e.target.value = option.value
                 props.onChange?.(e)
               }) as JSX.ChangeEventHandler<HTMLInputElement, Event>
             }
