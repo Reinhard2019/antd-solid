@@ -11,6 +11,7 @@ export function buttonClickAnimation(parent: HTMLElement, color: string) {
   div.className = cs(
     'absolute inset-0 rounded-inherit z--1',
     'before:content-empty before:absolute before:inset-0 before:rounded-inherit before:bg-[currentColor] before:keyframes-button-click before:[animation:button-click_ease-out_.3s]',
+    'after:content-empty after:absolute after:inset-0 after:rounded-inherit after:bg-white',
   )
   const onAnimationEnd = () => {
     div.remove()
