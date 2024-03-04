@@ -1,4 +1,5 @@
-import { type JSXElement, For, Show } from 'solid-js'
+import { type JSXElement, For, Show, mergeProps } from 'solid-js'
+import cs from 'classnames'
 import Empty from '../Empty'
 
 export interface TableColumn<R extends {}> {
@@ -9,9 +10,26 @@ export interface TableColumn<R extends {}> {
 export interface TableProps<R extends {}> {
   columns: Array<TableColumn<R>>
   dataSource: R[]
+  /**
+   * 默认 'middle'
+   */
+  size?: 'large' | 'middle' | 'small'
 }
 
-const Table = <R extends {}>(props: TableProps<R>) => {
+const sizeClassDict = {
+  large: 'p-16px leading-22px',
+  middle: 'px-8px py-12px leading-22px',
+  small: 'p-8px leading-22px',
+}
+
+const Table = <R extends {}>(_props: TableProps<R>) => {
+  const props = mergeProps(
+    {
+      size: 'middle',
+    } as const,
+    _props,
+  )
+
   return (
     <div
       style={{
@@ -25,7 +43,12 @@ const Table = <R extends {}>(props: TableProps<R>) => {
           <tr>
             <For each={props.columns}>
               {item => (
-                <th class="p-16px bg-[var(--ant-table-header-bg)] font-bold [border-bottom:1px_solid_var(--ant-table-border-color)] text-left">
+                <th
+                  class={cs(
+                    sizeClassDict[props.size],
+                    'bg-[var(--ant-table-header-bg)] font-bold [border-bottom:1px_solid_var(--ant-table-border-color)] text-left',
+                  )}
+                >
                   {item.title}
                 </th>
               )}
@@ -38,7 +61,12 @@ const Table = <R extends {}>(props: TableProps<R>) => {
               <tr class="hover:bg-[var(--ant-table-row-hover-bg)]">
                 <For each={props.columns}>
                   {item => (
-                    <td class="p-16px [border-bottom:1px_solid_var(--ant-table-border-color)]">
+                    <td
+                      class={cs(
+                        sizeClassDict[props.size],
+                        '[border-bottom:1px_solid_var(--ant-table-border-color)]',
+                      )}
+                    >
                       {item.render(row)}
                     </td>
                   )}
