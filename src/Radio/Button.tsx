@@ -38,7 +38,7 @@ const Button: Component<RadioProps> = props => {
         }}
       />
       <span
-        class="inline-flex items-center justify-center px-15px absolute inset-0 bg-white rounded-inherit"
+        class="inline-flex items-center justify-center px-15px absolute inset-0 rounded-inherit"
         onClick={e => {
           wave(e.currentTarget, 'var(--ant-color-primary)')
         }}
