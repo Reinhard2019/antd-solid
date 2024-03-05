@@ -2,7 +2,7 @@
  * 延迟创建组件
  * 只有当 props.when 为 true 时才创建组件
  */
-import { type Component, type JSXElement, Show, onMount, untrack } from 'solid-js'
+import { type Component, type JSXElement, Show, untrack, createEffect } from 'solid-js'
 
 export interface DelayShowProps {
   when?: boolean
@@ -10,11 +10,14 @@ export interface DelayShowProps {
 }
 
 const DelayShow: Component<DelayShowProps> = props => {
-  let init = untrack(() => props.when ?? false)
-  onMount(() => {
-    init = true
+  // 是否显示过一次
+  let showed = untrack(() => props.when ?? false)
+  createEffect(() => {
+    if (props.when) {
+      showed = true
+    }
   })
-  return <Show when={init || props.when}>{props.children}</Show>
+  return <Show when={showed || props.when}>{props.children}</Show>
 }
 
 export default DelayShow
