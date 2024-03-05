@@ -3,7 +3,7 @@ import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Button from './Button'
 import Group from './Group'
-import { buttonClickAnimation } from '../utils/animation'
+import { wave } from '../utils/animation'
 
 export interface RadioProps extends ParentProps {
   defaultChecked?: boolean
@@ -33,7 +33,7 @@ const Radio: Component<RadioProps> & {
       <span
         class={cs('relative w-16px h-16px rounded-50%')}
         onClick={e => {
-          buttonClickAnimation(e.currentTarget, 'var(--ant-color-primary)')
+          wave(e.currentTarget, 'var(--ant-color-primary)')
         }}
       >
         <input

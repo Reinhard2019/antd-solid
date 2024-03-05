@@ -1,17 +1,15 @@
 import cs from 'classnames'
 
 /**
- * 按钮点击时的动画
+ * 水波动画
  * @param parent
  * @param color
  */
-export function buttonClickAnimation(parent: HTMLElement, color: string) {
+export function wave(parent: HTMLElement, color: string) {
   const div = document.createElement('div')
   div.style.color = color
   div.className = cs(
-    'absolute inset-0 rounded-inherit z--1',
-    'before:content-empty before:absolute before:inset-0 before:rounded-inherit before:bg-[currentColor] before:keyframes-button-click before:[animation:button-click_ease-out_.3s]',
-    'after:content-empty after:absolute after:inset-0 after:rounded-inherit after:bg-white',
+    'absolute inset-0 z--1 rounded-inherit border-solid border-[currentColor] keyframes-wave [animation:wave_ease-out_.3s]',
   )
   const onAnimationEnd = () => {
     div.remove()

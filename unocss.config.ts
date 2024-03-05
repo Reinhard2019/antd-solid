@@ -190,14 +190,16 @@ export default defineConfig({
       },
     ],
     [
-      /^keyframes-button-click$/,
+      /^keyframes-wave$/,
       () => {
-        return `@keyframes button-click {
+        return `@keyframes wave {
           from {
+            border-width: 0px;
             inset: 0px;
             opacity: 0.4;
           }
           to {
+            border-width: 6px;
             inset: -6px;
             opacity: 0.1;
           }

@@ -10,7 +10,7 @@ import {
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
-import { buttonClickAnimation } from '../utils/animation'
+import { wave } from '../utils/animation'
 
 export interface ButtonProps
   extends ParentProps,
@@ -125,7 +125,7 @@ const Button: Component<ButtonProps> = _props => {
         }
 
         if (props.type === 'default' || props.type === 'primary' || props.type === 'dashed') {
-          buttonClickAnimation(
+          wave(
             e.currentTarget,
             props.danger ? 'var(--ant-color-error-border-hover)' : 'var(--ant-color-primary-hover)',
           )

@@ -2,7 +2,7 @@ import { type Component } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { type RadioProps } from '.'
-import { buttonClickAnimation } from '../utils/animation'
+import { wave } from '../utils/animation'
 
 const Button: Component<RadioProps> = props => {
   const [checked, setChecked] = createControllableValue(props, {
@@ -40,7 +40,7 @@ const Button: Component<RadioProps> = props => {
       <span
         class="inline-flex items-center justify-center px-15px absolute inset-0 bg-white rounded-inherit"
         onClick={e => {
-          buttonClickAnimation(e.currentTarget, 'var(--ant-color-primary)')
+          wave(e.currentTarget, 'var(--ant-color-primary)')
         }}
       >
         {props.children}
