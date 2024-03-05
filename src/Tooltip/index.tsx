@@ -93,12 +93,14 @@ const Tooltip: Component<TooltipProps> = _props => {
   )
 
   const resolvedChildren = children(() => _props.children)
-  let content: HTMLDivElement | undefined
-  const [open, setOpen] = createControllableValue(_props, {
+  const content = createMemo(() => getContent(props.content, () => setOpen(false)))
+  let contentRef: HTMLDivElement | undefined
+  const [_open, setOpen] = createControllableValue(_props, {
     defaultValue: false,
     valuePropName: 'open',
     trigger: 'onOpenChange',
   })
+  const open = createMemo(() => _open() && !!content())
   const reverseOpen = () => setOpen(v => !v)
 
   createEffect(() => {
@@ -121,7 +123,7 @@ const Tooltip: Component<TooltipProps> = _props => {
 
           useClickAway(
             () => setOpen(false),
-            () => compact([content, _children]),
+            () => compact([contentRef, _children]),
           )
           break
         case 'focus':
@@ -139,88 +141,88 @@ const Tooltip: Component<TooltipProps> = _props => {
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
   const setTranslate = () => {
     untrack(() => {
-      if (!content) return
+      if (!contentRef) return
 
       const _children = resolvedChildren() as Element
       const childrenRect = _children.getBoundingClientRect()
       switch (props.placement) {
         case 'top':
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-x',
             `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
           )
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-y',
             `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
           )
           return
         case 'topLeft':
-          content.style.setProperty('--translate-x', `${childrenRect.left}px`)
-          content.style.setProperty(
+          contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
+          contentRef.style.setProperty(
             '--translate-y',
             `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
           )
           return
         case 'topRight':
-          content.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-          content.style.setProperty(
+          contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+          contentRef.style.setProperty(
             '--translate-y',
             `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
           )
           return
         case 'bottom':
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-x',
             `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
           )
-          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
           return
         case 'bottomLeft':
-          content.style.setProperty('--translate-x', `${childrenRect.left}px`)
-          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
+          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
           return
         case 'bottomRight':
-          content.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-          content.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+          contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
           return
         case 'left':
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-x',
             `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
           )
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-y',
             `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
           )
           return
         case 'leftTop':
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-x',
             `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
           )
-          content.style.setProperty('--translate-y', `${childrenRect.top}px`)
+          contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
           return
         case 'leftBottom':
-          content.style.setProperty(
+          contentRef.style.setProperty(
             '--translate-x',
             `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
           )
-          content.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+          contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
           return
         case 'right':
-          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          content.style.setProperty(
+          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          contentRef.style.setProperty(
             '--translate-y',
             `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
           )
           return
         case 'rightTop':
-          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          content.style.setProperty('--translate-y', `${childrenRect.top}px`)
+          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
           return
         case 'rightBottom':
-          content.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          content.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+          contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
       }
     })
   }
@@ -360,7 +362,7 @@ const Tooltip: Component<TooltipProps> = _props => {
         <Portal>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
-            ref={content}
+            ref={contentRef}
             class={cs('z-1000 fixed left-0 top-0', open() ? 'block' : 'hidden')}
             style={{
               transform:
@@ -377,7 +379,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               )}
               style={props.contentStyle}
             >
-              {getContent(props.content, () => setOpen(false))}
+              {content()}
             </div>
 
             <Show when={props.arrow}>
