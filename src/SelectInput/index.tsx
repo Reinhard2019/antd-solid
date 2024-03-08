@@ -127,7 +127,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             when={valueArr().length}
             fallback={
               <input
-                class="w-full h-28px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                class="w-full h-28px [outline:none] bg-transparent placeholder-text-[rgba(0,0,0,.25)]"
                 readOnly
                 placeholder={props.placeholder}
               />
