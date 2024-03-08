@@ -55,6 +55,12 @@ export interface TooltipProps {
    * 默认: true
    */
   arrow?: boolean | { pointAtCenter: boolean }
+  /**
+   * 菜单渲染父节点。默认渲染到 body 上，如果你遇到菜单滚动定位问题，试试修改为滚动的区域，并相对其定位。
+   * 默认 () => document.body
+   * @returns
+   */
+  getPopupContainer?: () => HTMLElement
 }
 
 /**
@@ -88,6 +94,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       placement: 'top',
       mode: 'dark',
       arrow: true,
+      getPopupContainer: () => document.body,
     },
     _props,
   )
@@ -359,7 +366,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       {resolvedChildren()}
 
       <DelayShow when={open()}>
-        <Portal>
+        <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <div
             ref={contentRef}

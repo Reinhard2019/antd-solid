@@ -9,7 +9,7 @@ import {
 import Button from '../Button'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 
-interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow'> {
+interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow' | 'getPopupContainer'> {
   title?: JSXElement
   content?: JSXElement
   children: JSXElement
@@ -29,7 +29,7 @@ interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow'> {
 
 const Popconfirm: Component<PopconfirmProps> = props => {
   const mergedProps = mergeProps({ okText: '确定', cancelText: '取消' }, props)
-  const [tooltipProps] = splitProps(props, ['placement', 'arrow'])
+  const [tooltipProps] = splitProps(props, ['placement', 'arrow', 'getPopupContainer'])
   const [open, setOpen] = createSignal(false)
 
   return (
