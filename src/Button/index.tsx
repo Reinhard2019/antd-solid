@@ -33,9 +33,9 @@ export interface ButtonProps
 }
 
 const sizeClassMap = {
-  large: 'px-15px py-6px h-40px rounded-[var(--ant-border-radius-lg)]',
-  middle: 'px-15px py-4px h-32px rounded-[var(--ant-border-radius)]',
-  small: 'px-7px h-24px rounded-[var(--ant-border-radius-sm)]',
+  large: 'px-15px py-7px h-40px leading-24px rounded-[var(--ant-border-radius-lg)]',
+  middle: 'px-15px py-4px h-32px leading-22px rounded-[var(--ant-border-radius)]',
+  small: 'px-7px h-24px leading-22px rounded-[var(--ant-border-radius-sm)]',
 } as const
 
 // 有边框按钮的 disabled 样式
@@ -135,7 +135,7 @@ const Button: Component<ButtonProps> = _props => {
       <Show when={loading()}>
         <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite] mr-8px" />
       </Show>
-      <span>{props.children}</span>
+      <span class="inline-block leading-inherit">{props.children}</span>
     </button>
   )
 }

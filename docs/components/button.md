@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="button/Base" />
 
+### 尺寸
+
+有 `small`、`medium` 和 `large` 尺寸。
+
+<Code path="button/Size" />
+
 ### 不可用状态
 
 添加 `disabled` 属性即可让按钮处于不可用状态，同时按钮样式也会改变。
