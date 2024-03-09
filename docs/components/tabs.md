@@ -32,6 +32,12 @@ outline: deep
 
 <Code path="tabs/Placement" />
 
+### 附加内容
+
+可以在页签两边添加附加操作。
+
+<Code path="tabs/Addon" />
+
 ## API
 
 ### Tabs
