@@ -24,7 +24,10 @@ export interface Tab {
 }
 
 export interface TabsProps {
-  type?: 'line' | 'segment'
+  /**
+   * 默认 'line'
+   */
+  type?: 'line' | 'card' | 'segment'
   class?: string
   navClass?: string
   navItemClass?: string
@@ -53,7 +56,7 @@ const Tabs: Component<TabsProps> = _props => {
   const updateSelectedBarStyle = () => {
     if (!nav) return
 
-    const el = nav.querySelector<HTMLElement>(':scope > .selected')
+    const el = nav.querySelector<HTMLElement>(':scope > [aria-label="selected"]')
     if (!el) return
 
     setSelectedBarStyle({
@@ -83,7 +86,7 @@ const Tabs: Component<TabsProps> = _props => {
           <div
             ref={nav!}
             class={cs(
-              'mb-16px flex gap-32px [border-bottom:solid_1px_rgba(5,5,5,0.1)] relative',
+              'mb-16px flex gap-32px [border-bottom:solid_1px_var(--ant-color-border-secondary)] relative',
               props.navClass,
             )}
           >
@@ -92,9 +95,11 @@ const Tabs: Component<TabsProps> = _props => {
                 <div
                   class={cs(
                     'py-12px cursor-pointer',
+                    'hover:text-[var(--ant-color-primary)]',
                     props.navItemClass,
-                    isSelectedItem(item.key) && 'text-[var(--ant-color-primary)] selected',
+                    isSelectedItem(item.key) && 'text-[var(--ant-color-primary)]',
                   )}
+                  aria-label={isSelectedItem(item.key) ? 'selected' : undefined}
                   onClick={() => {
                     setSelectedItem(item)
                     updateSelectedBarStyle()
@@ -106,8 +111,8 @@ const Tabs: Component<TabsProps> = _props => {
             </For>
 
             <div
-              role={'selected-bar' as any}
-              class="absolute bottom-0 bg-[var(--ant-color-primary)] h-2px transition-left"
+              aria-label="selected-bar"
+              class="absolute -bottom-1px bg-[var(--ant-color-primary)] h-2px transition-left"
               style={selectedBarStyle()}
             />
           </div>
@@ -122,6 +127,39 @@ const Tabs: Component<TabsProps> = _props => {
               onClick: () => setSelectedItem(item),
             }))}
           />
+        </Match>
+        <Match when={props.type === 'card'}>
+          <div
+            ref={nav!}
+            class={cs(
+              'mb-16px flex gap-2px [border-bottom:solid_1px_var(--ant-color-border-secondary)] relative',
+              props.navClass,
+            )}
+          >
+            <For each={props.items}>
+              {item => (
+                <div
+                  class={cs(
+                    'px-16px py-8px cursor-pointer [border:solid_1px_var(--ant-color-border-secondary)] border-b-0px rounded-t-[var(--ant-border-radius-lg)] relative',
+                    'hover:text-[var(--ant-color-primary)]',
+                    props.navItemClass,
+                    isSelectedItem(item.key)
+                      ? [
+                        'text-[var(--ant-color-primary)] bg-[var(--ant-color-bg-container)]',
+                        'after:content-empty after:block after:absolute after:bg-inherit after:left-0 after:right-0 after:bottom--1px after:h-1px',
+                      ]
+                      : 'bg-[var(--ant-tabs-card-bg)]',
+                  )}
+                  onClick={() => {
+                    setSelectedItem(item)
+                    updateSelectedBarStyle()
+                  }}
+                >
+                  {unwrapStringOrJSXElement(item.label)}
+                </div>
+              )}
+            </For>
+          </div>
         </Match>
       </Switch>
 

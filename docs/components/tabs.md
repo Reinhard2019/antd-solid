@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="tabs/Segment" />
 
+### 卡片式页签
+
+另一种样式的页签，不提供对应的垂直样式。
+
+<Code path="tabs/Card" />
+
 ## API
 
 ### Tabs

@@ -15,6 +15,8 @@ export default defineConfig({
           --ant-color-error: #ff4d4f;
           --ant-color-success: #52c41a;
           --ant-color-border: #d9d9d9;
+          --ant-color-border-secondary: #f0f0f0;
+          --ant-color-bg-container: #ffffff;
           --ant-color-bg-container-disabled: rgba(0, 0, 0, 0.04);
           --ant-color-bg-layout: #f5f5f5;
           --ant-color-split: rgba(5, 5, 5, 0.06);
@@ -83,6 +85,8 @@ export default defineConfig({
           
           --ant-tree-node-selected-bg: #e6f4ff;
           --ant-tree-node-hover-bg: rgba(0, 0, 0, 0.04);
+
+          --ant-tabs-card-bg: rgba(0, 0, 0, 0.02);
 
           --ant-color-split: rgba(5, 5, 5, 0.06);
         
