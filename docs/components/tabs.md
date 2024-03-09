@@ -26,6 +26,12 @@ outline: deep
 
 <Code path="tabs/Card" />
 
+### 位置
+
+有四个位置，`tabPosition="left|right|top|bottom"`。
+
+<Code path="tabs/Placement" />
+
 ## API
 
 ### Tabs

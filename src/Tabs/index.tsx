@@ -3,13 +3,14 @@ import {
   For,
   createSelector,
   createSignal,
-  onMount,
   untrack,
   type JSX,
   onCleanup,
   mergeProps,
   Switch,
   Match,
+  createEffect,
+  on,
 } from 'solid-js'
 import cs from 'classnames'
 import Segmented from '../Segmented'
@@ -28,7 +29,12 @@ export interface TabsProps {
    * 默认 'line'
    */
   type?: 'line' | 'card' | 'segment'
+  /**
+   * 默认 'top'
+   */
+  placement?: 'top' | 'bottom' | 'left' | 'right'
   class?: string
+  style?: JSX.CSSProperties
   navClass?: string
   navItemClass?: string
   contentClass?: string
@@ -39,7 +45,8 @@ const Tabs: Component<TabsProps> = _props => {
   const props = mergeProps(
     {
       type: 'line',
-    } as TabsProps,
+      placement: 'top',
+    } as const,
     _props,
   )
 
@@ -52,41 +59,66 @@ const Tabs: Component<TabsProps> = _props => {
     width: '0px',
   })
 
-  let nav: HTMLDivElement | undefined
+  let lineNav: HTMLDivElement | undefined
   const updateSelectedBarStyle = () => {
-    if (!nav) return
+    if (!lineNav) return
 
-    const el = nav.querySelector<HTMLElement>(':scope > [aria-label="selected"]')
+    const el = lineNav.querySelector<HTMLElement>(':scope > [aria-label="selected"]')
     if (!el) return
 
-    setSelectedBarStyle({
-      left: `${el.offsetLeft}px`,
-      width: `${el.clientWidth}px`,
-    })
+    if (props.placement === 'top' || props.placement === 'bottom') {
+      setSelectedBarStyle({
+        left: `${el.offsetLeft}px`,
+        width: `${el.clientWidth}px`,
+      })
+    } else {
+      setSelectedBarStyle({
+        top: `${el.offsetTop}px`,
+        height: `${el.clientHeight}px`,
+      })
+    }
   }
-  onMount(() => {
-    if (!nav) return
+  createEffect(
+    on([() => props.type, () => props.placement], () => {
+      if (!lineNav) return
 
-    updateSelectedBarStyle()
-
-    const resizeObserver = new ResizeObserver(() => {
       updateSelectedBarStyle()
-    })
 
-    resizeObserver.observe(nav)
-    onCleanup(() => {
-      resizeObserver.disconnect()
-    })
-  })
+      const resizeObserver = new ResizeObserver(() => {
+        updateSelectedBarStyle()
+      })
+
+      resizeObserver.observe(lineNav)
+      onCleanup(() => {
+        resizeObserver.disconnect()
+      })
+    }),
+  )
 
   return (
-    <div class={props.class}>
+    <div
+      class={cs(
+        props.class,
+        'flex',
+        props.placement === 'top' && 'flex-col',
+        props.placement === 'bottom' && 'flex-col-reverse',
+        props.placement === 'right' && 'flex-row-reverse',
+      )}
+      style={props.style}
+    >
       <Switch>
         <Match when={props.type === 'line'}>
           <div
-            ref={nav!}
+            ref={lineNav!}
             class={cs(
-              'mb-16px flex gap-32px [border-bottom:solid_1px_var(--ant-color-border-secondary)] relative',
+              'flex relative shrink-0',
+              'border-solid border-[var(--ant-color-border-secondary)] border-0',
+              props.placement === 'top' && '!border-b-1px mb-16px',
+              props.placement === 'bottom' && '!border-t-1px mt-16px',
+              props.placement === 'left' && '!border-r-1px mr-16px',
+              props.placement === 'right' && '!border-l-1px ml-16px',
+              (props.placement === 'top' || props.placement === 'bottom') && 'gap-32px',
+              (props.placement === 'left' || props.placement === 'right') && 'flex-col gap-16px',
               props.navClass,
             )}
           >
@@ -94,10 +126,12 @@ const Tabs: Component<TabsProps> = _props => {
               {item => (
                 <div
                   class={cs(
-                    'py-12px cursor-pointer',
+                    'cursor-pointer',
                     'hover:text-[var(--ant-color-primary)]',
                     props.navItemClass,
                     isSelectedItem(item.key) && 'text-[var(--ant-color-primary)]',
+                    (props.placement === 'top' || props.placement === 'bottom') && 'py-12px',
+                    (props.placement === 'left' || props.placement === 'right') && 'px-24px py-8px',
                   )}
                   aria-label={isSelectedItem(item.key) ? 'selected' : undefined}
                   onClick={() => {
@@ -112,7 +146,15 @@ const Tabs: Component<TabsProps> = _props => {
 
             <div
               aria-label="selected-bar"
-              class="absolute -bottom-1px bg-[var(--ant-color-primary)] h-2px transition-left"
+              class={cs(
+                'absolute bg-[var(--ant-color-primary)] transition-left,top',
+                props.placement === 'top' && '-bottom-1px',
+                props.placement === 'bottom' && '-top-1px',
+                props.placement === 'left' && '-right-1px',
+                props.placement === 'right' && '-left-1px',
+                (props.placement === 'top' || props.placement === 'bottom') && 'h-2px',
+                (props.placement === 'left' || props.placement === 'right') && 'w-2px',
+              )}
               style={selectedBarStyle()}
             />
           </div>
@@ -130,9 +172,14 @@ const Tabs: Component<TabsProps> = _props => {
         </Match>
         <Match when={props.type === 'card'}>
           <div
-            ref={nav!}
             class={cs(
-              'mb-16px flex gap-2px [border-bottom:solid_1px_var(--ant-color-border-secondary)] relative',
+              'flex gap-2px relative shrink-0',
+              'border-solid border-[var(--ant-color-border-secondary)] border-0',
+              props.placement === 'top' && '!border-b-1px mb-16px',
+              props.placement === 'bottom' && '!border-t-1px mt-16px',
+              props.placement === 'left' && '!border-r-1px mr-16px',
+              props.placement === 'right' && '!border-l-1px ml-16px',
+              (props.placement === 'left' || props.placement === 'right') && 'flex-col',
               props.navClass,
             )}
           >
@@ -140,13 +187,31 @@ const Tabs: Component<TabsProps> = _props => {
               {item => (
                 <div
                   class={cs(
-                    'px-16px py-8px cursor-pointer [border:solid_1px_var(--ant-color-border-secondary)] border-b-0px rounded-t-[var(--ant-border-radius-lg)] relative',
+                    'px-16px py-8px cursor-pointer border-solid border-[var(--ant-color-border-secondary)] border-1px relative',
                     'hover:text-[var(--ant-color-primary)]',
+                    props.placement === 'top' &&
+                      'rounded-t-[var(--ant-border-radius-lg)] !border-b-0px',
+                    props.placement === 'bottom' &&
+                      'rounded-b-[var(--ant-border-radius-lg)] !border-t-0px',
+                    props.placement === 'left' &&
+                      'rounded-l-[var(--ant-border-radius-lg)] !border-r-0px',
+                    props.placement === 'right' &&
+                      'rounded-r-[var(--ant-border-radius-lg)] !border-l-0px',
                     props.navItemClass,
                     isSelectedItem(item.key)
                       ? [
                         'text-[var(--ant-color-primary)] bg-[var(--ant-color-bg-container)]',
-                        'after:content-empty after:block after:absolute after:bg-inherit after:left-0 after:right-0 after:bottom--1px after:h-1px',
+                        [
+                          'after:content-empty after:block after:absolute after:bg-inherit',
+                          props.placement === 'top' && 'after:bottom--1px',
+                          props.placement === 'bottom' && 'after:top--1px',
+                          props.placement === 'left' && 'after:right--1px',
+                          props.placement === 'right' && 'after:left--1px',
+                          (props.placement === 'top' || props.placement === 'bottom') &&
+                              'after:left-0 after:right-0 after:h-1px',
+                          (props.placement === 'left' || props.placement === 'right') &&
+                              'after:top-0 after:bottom-0 after:w-1px',
+                        ],
                       ]
                       : 'bg-[var(--ant-tabs-card-bg)]',
                   )}
@@ -167,7 +232,7 @@ const Tabs: Component<TabsProps> = _props => {
         {item => (
           <DelayShow when={isSelectedItem(item.key)}>
             <div
-              class={props.contentClass}
+              class={cs(props.contentClass, 'grow')}
               style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}
             >
               {unwrapStringOrJSXElement(item.children)}
