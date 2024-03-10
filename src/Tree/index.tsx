@@ -68,14 +68,7 @@ export interface TreeProps<T extends {} = TreeNode> {
    * 默认 { title: 'title', key: 'key', children: 'children' }
    */
   fieldNames?: {
-    title?:
-    | string
-    | ((
-      node: T,
-      info: {
-        indexPath: number[]
-      },
-    ) => JSXElement)
+    title?: string | ((node: T) => JSXElement)
     key?: string | ((node: T) => Key)
     children?: string | ((node: T) => T[] | undefined)
   }
@@ -105,16 +98,9 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
     },
     untrack(() => props.fieldNames),
   )
-  const getTitle = (
-    node: T,
-    info: {
-      indexPath: number[]
-    },
-  ): JSXElement => {
+  const getTitle = (node: T): JSXElement => {
     const titleFieldName = fieldNames.title
-    return typeof titleFieldName === 'function'
-      ? titleFieldName(node, info)
-      : get(node, titleFieldName)
+    return typeof titleFieldName === 'function' ? titleFieldName(node) : get(node, titleFieldName)
   }
   const getKey = (node: T): Key => {
     const keyFieldName = fieldNames.key
