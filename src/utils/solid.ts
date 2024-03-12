@@ -59,3 +59,13 @@ export function setRef<T>(props: { ref?: Ref<T> }, value: T | null) {
     }
   })
 }
+
+export function isEmptyJSXElement(element: JSXElement): boolean {
+  return (
+    element === undefined ||
+    element === null ||
+    typeof element === 'boolean' ||
+    element === '' ||
+    (Array.isArray(element) && element.length === 0)
+  )
+}

@@ -17,6 +17,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
+import { isEmptyJSXElement } from '../utils/solid'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -107,7 +108,7 @@ const Tooltip: Component<TooltipProps> = _props => {
     valuePropName: 'open',
     trigger: 'onOpenChange',
   })
-  const open = createMemo(() => _open() && !!content())
+  const open = createMemo(() => _open() && !isEmptyJSXElement(content()))
   const reverseOpen = () => setOpen(v => !v)
 
   createEffect(() => {
