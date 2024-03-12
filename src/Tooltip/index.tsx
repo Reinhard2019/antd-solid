@@ -270,6 +270,20 @@ const Tooltip: Component<TooltipProps> = _props => {
       ro.disconnect()
     })
   })
+  // 监听 children 的 位置 变化
+  createEffect(() => {
+    const _children = resolvedChildren() as HTMLElement
+
+    const config = { attributes: true }
+    const ro = new MutationObserver(() => {
+      setTranslate()
+    })
+    ro.observe(_children, config)
+
+    onCleanup(() => {
+      ro.disconnect()
+    })
+  })
   const arrowStyle = createMemo(() => {
     switch (props.placement) {
       case 'top':
