@@ -110,17 +110,19 @@ const Tooltip: Component<TooltipProps> = _props => {
   })
   const open = createMemo(() => _open() && !isEmptyJSXElement(content()))
   const reverseOpen = () => setOpen(v => !v)
+  const show = () => setOpen(true)
+  const hide = () => setOpen(false)
 
   createEffect(() => {
     const _children = resolvedChildren() as Element
     toArray(props.trigger).forEach(trigger => {
       switch (trigger) {
         case 'hover':
-          _children.addEventListener('mouseenter', reverseOpen)
-          _children.addEventListener('mouseleave', reverseOpen)
+          _children.addEventListener('mouseenter', show)
+          _children.addEventListener('mouseleave', hide)
           onCleanup(() => {
-            _children.removeEventListener('mouseenter', reverseOpen)
-            _children.removeEventListener('mouseleave', reverseOpen)
+            _children.removeEventListener('mouseenter', show)
+            _children.removeEventListener('mouseleave', hide)
           })
           break
         case 'click':
@@ -135,11 +137,11 @@ const Tooltip: Component<TooltipProps> = _props => {
           )
           break
         case 'focus':
-          _children.addEventListener('focusin', reverseOpen)
-          _children.addEventListener('focusout', reverseOpen)
+          _children.addEventListener('focusin', show)
+          _children.addEventListener('focusout', hide)
           onCleanup(() => {
-            _children.removeEventListener('focusin', reverseOpen)
-            _children.removeEventListener('focusout', reverseOpen)
+            _children.removeEventListener('focusin', show)
+            _children.removeEventListener('focusout', hide)
           })
           break
       }
