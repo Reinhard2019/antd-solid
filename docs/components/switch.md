@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="switch/Base" />
 
+### 两种大小
+
+`size="small"` 表示小号开关。
+
+<Code path="switch/Size" />
+
 ## API
 
 ### Switch
