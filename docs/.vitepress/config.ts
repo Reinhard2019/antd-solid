@@ -47,6 +47,7 @@ export default defineConfig({
           { text: 'Form 表单', link: '/components/form' },
           { text: 'Select 选择器', link: '/components/select' },
           { text: 'RangeInput 范围输入框', link: '/components/range-input' },
+          { text: 'Slider 滑动输入条', link: '/components/slider' },
           { text: 'Switch 开关', link: '/components/switch' },
           { text: 'TreeSelect 树选择', link: '/components/tree-select' },
         ],

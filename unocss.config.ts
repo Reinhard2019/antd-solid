@@ -18,6 +18,7 @@ export default defineConfig({
           --ant-color-border-secondary: #f0f0f0;
           --ant-color-bg-container: #ffffff;
           --ant-color-bg-container-disabled: rgba(0, 0, 0, 0.04);
+          --ant-color-bg-elevated: #ffffff;
           --ant-color-bg-layout: #f5f5f5;
           --ant-color-split: rgba(5, 5, 5, 0.06);
           --ant-color-icon: rgba(0, 0, 0, 0.45);
@@ -50,7 +51,7 @@ export default defineConfig({
           --ant-font-size-lg: 16px;
 
           --ant-line-height-lg: 1.5;
-
+          --ant-line-width-bold: 2px;
           --ant-line-width: 1px;
           --ant-line-type: solid;
 
@@ -66,7 +67,7 @@ export default defineConfig({
 
           --ant-box-shadow-tertiary: 0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02);
 
-          --ant-line-width-bold: 2px;
+          --ant-border-radius-xs: 2px;
           --ant-border-radius-sm: 4px;
           --ant-border-radius: 6px;
           --ant-border-radius-lg: 8px;
@@ -88,7 +89,14 @@ export default defineConfig({
 
           --ant-tabs-card-bg: rgba(0, 0, 0, 0.02);
 
-          --ant-color-split: rgba(5, 5, 5, 0.06);
+          --ant-slider-rail-bg: rgba(0, 0, 0, 0.04);
+          --ant-slider-rail-hover-bg: rgba(0, 0, 0, 0.06);
+          --ant-slider-track-bg: #91caff;
+          --ant-slider-track-hover-bg: #69b1ff;
+          --ant-slider-handle-color: #91caff;
+          --ant-slider-handle-active-color: #1677ff;
+          --ant-slider-handle-color-disabled: #bfbfbf;
+          --ant-slider-track-bg-disabled: rgba(0, 0, 0, 0.04);
         
           font-size: 14px;
         }
