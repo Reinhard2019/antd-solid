@@ -141,7 +141,6 @@ const Slider: Component<SliderProps> = _props => {
             }
             window.addEventListener('mouseup', onMouseUp)
           }}
-          onMouseEnter={() => {}}
         />
       </Tooltip>
     </div>

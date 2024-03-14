@@ -49,6 +49,7 @@ export default defineConfig({
           { text: 'RangeInput 范围输入框', link: '/components/range-input' },
           { text: 'Slider 滑动输入条', link: '/components/slider' },
           { text: 'Switch 开关', link: '/components/switch' },
+          { text: 'Transformer 变形器', link: '/components/transformer' },
           { text: 'TreeSelect 树选择', link: '/components/tree-select' },
         ],
       },

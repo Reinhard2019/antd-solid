@@ -57,6 +57,8 @@ export { default as Divider } from './Divider'
 export type { DividerProps } from './Divider'
 export { default as Slider } from './Slider'
 export type { SliderProps } from './Slider'
+export { default as Transformer } from './Transformer'
+export type { TransformerProps, TransformValue } from './Transformer'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'

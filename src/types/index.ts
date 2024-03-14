@@ -1,5 +1,10 @@
-import { type JSXElement } from 'solid-js'
+import { type JSXElement, type JSX } from 'solid-js'
 
 export type Key = string | number
 
 export type StringOrJSXElement = string | number | undefined | null | (() => JSXElement)
+
+export interface StyleProps {
+  class?: string
+  style?: JSX.CSSProperties
+}
