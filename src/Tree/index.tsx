@@ -246,7 +246,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   const [targetIndexes, setTargetIndexes] = createSignal<number[] | null>(null)
 
   return (
-    <div>
+    <div class="text-[var(--ant-color-text)]">
       <SingleLevelTree
         {...props}
         treeData={props.treeData}

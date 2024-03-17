@@ -97,8 +97,6 @@ export default defineConfig({
           --ant-slider-handle-active-color: #1677ff;
           --ant-slider-handle-color-disabled: #bfbfbf;
           --ant-slider-track-bg-disabled: rgba(0, 0, 0, 0.04);
-        
-          font-size: 14px;
         }
       `,
     },

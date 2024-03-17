@@ -84,7 +84,7 @@ const typeClassMap = {
         'border-none bg-transparent',
         danger
           ? 'text-[var(--ant-color-error)] hover:bg-[var(--ant-color-error-bg)] active:bg-[var(--ant-color-error-bg)]'
-          : 'text-[var(--ant-button-default-color)] hover:bg-[var(--ant-color-bg-text-hover)] active:bg-[var(--ant-color-bg-text-active)]',
+          : 'text-[var(--ant-color-text)] hover:bg-[var(--ant-color-bg-text-hover)] active:bg-[var(--ant-color-bg-text-active)]',
       ),
   link: (danger: boolean, disabled: boolean) =>
     disabled
