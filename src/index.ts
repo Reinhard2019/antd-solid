@@ -65,5 +65,6 @@ export { default as useClickAway } from './hooks/useClickAway'
 export { default as useSize } from './hooks/useSize'
 export { default as useHover } from './hooks/useHover'
 export { default as useFocus } from './hooks/useFocus'
+export { default as useVirtualList } from './hooks/useVirtualList'
 
 export { message } from 'antd'

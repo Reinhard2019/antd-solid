@@ -77,6 +77,10 @@ export default defineConfig({
           { text: 'Progress 进度条', link: '/components/progress' },
         ],
       },
+      {
+        text: 'hooks',
+        items: [{ text: 'useVirtualList', link: '/components/use-virtual-list' }],
+      },
     ],
     socialLinks: [{ icon: 'github', link: 'https://github.com/Reinhard2019/antd-solid' }],
     footer: {
