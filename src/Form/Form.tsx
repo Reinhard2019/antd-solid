@@ -9,8 +9,9 @@ import {
 } from 'solid-js'
 import { createStore, produce } from 'solid-js/store'
 import { cloneDeep, get, max, set, unset } from 'lodash-es'
-import Context from './context'
 import { type Schema } from 'yup'
+import cs from 'classnames'
+import Context from './context'
 import { setRef } from '../utils/solid'
 
 export interface FormInstance<T extends {} = {}> {
@@ -88,6 +89,10 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
 
   return (
     <form
+      class={cs(
+        '[font-size:var(--ant-font-size)]',
+        props.layout === 'inline' ? 'inline-flex flex-wrap' : '',
+      )}
       onSubmit={e => {
         e.preventDefault()
       }}
@@ -99,6 +104,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
           setErrMsgDict,
           setItemWidthDict,
           maxItemWidth,
+          layout: () => props.layout,
         }}
       >
         {props.children}

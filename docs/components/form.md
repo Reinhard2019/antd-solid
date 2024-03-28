@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="form/Base" />
 
+### 表单布局
+
+表单有三种布局。
+
+<Code path="form/Layout" />
+
 ## API
 
 ### Form

@@ -48,6 +48,7 @@ export default defineConfig({
 
           --ant-font-weight-strong: 600;
 
+          --ant-font-size: 14px;
           --ant-font-size-lg: 16px;
 
           --ant-line-height-lg: 1.5;

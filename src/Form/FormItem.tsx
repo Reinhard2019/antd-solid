@@ -14,9 +14,9 @@ import { isNil } from 'lodash-es'
 import { nanoid } from 'nanoid'
 import cs from 'classnames'
 import { type Schema } from 'yup'
+import { Dynamic } from 'solid-js/web'
 import Context from './context'
 import { type FormInstance } from './Form'
-import { Dynamic } from 'solid-js/web'
 
 export interface FormItemComponentProps<T = any, F extends {} = {}> {
   value?: T | undefined
@@ -33,6 +33,9 @@ export interface FormItemProps<T extends {} = {}> {
   name?: string
   initialValue?: any
   rules?: Schema[]
+  /**
+   * @deprecated
+   */
   when?: boolean | ((formInstance: FormInstance<T>) => boolean)
   /**
    * 是否隐藏
@@ -43,7 +46,7 @@ export interface FormItemProps<T extends {} = {}> {
 }
 
 const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
-  const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth } =
+  const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth, layout } =
     useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
@@ -78,7 +81,7 @@ const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
   let label: HTMLLabelElement | undefined
   createEffect(
     on(
-      () => when() && !props.hidden,
+      () => when() && !props.hidden && layout() === 'horizontal',
       input => {
         if (!input) return
 
@@ -110,12 +113,23 @@ const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
 
   return (
     <Show when={when() && !props.hidden}>
-      <div class={cs(props.class, 'flex items-center mb-16px')} style={props.style}>
-        <div class="relative flex items-center" style={{ width: `${maxItemWidth() ?? 0}px` }}>
+      <div
+        class={cs(
+          props.class,
+          'mb-16px',
+          layout() === 'horizontal' && 'flex items-center',
+          layout() === 'inline' && 'inline-flex mr-16px',
+        )}
+        style={props.style}
+      >
+        <div
+          class="flex items-center"
+          style={{ width: layout() === 'horizontal' ? `${maxItemWidth() ?? 0}px` : undefined }}
+        >
           <label
             ref={label}
             class={cs(
-              'absolute shrink-0 h-32px leading-32px not[:empty]:pr-8px text-right [white-space:nowrap]',
+              'shrink-0 leading-32px not[:empty]:h-32px not[:empty]:pr-8px text-right [white-space:nowrap]',
             )}
           >
             <Show when={!isNil(props.label)}>
@@ -127,7 +141,12 @@ const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
           </label>
         </div>
 
-        <div class="flex flex-col" style={{ width: `calc(100% - ${maxItemWidth() ?? 0}px)` }}>
+        <div
+          class="flex flex-col"
+          style={{
+            width: layout() === 'horizontal' ? `calc(100% - ${maxItemWidth() ?? 0}px)` : undefined,
+          }}
+        >
           <Dynamic
             component={props.component}
             value={props.name ? formInstance.getFieldValue(props.name) : undefined}
