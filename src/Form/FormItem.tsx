@@ -6,7 +6,6 @@ import {
   createSignal,
   onCleanup,
   createEffect,
-  createMemo,
   on,
   type Component,
 } from 'solid-js'
@@ -25,7 +24,7 @@ export interface FormItemComponentProps<T = any, F extends {} = {}> {
   formInstance: FormInstance<F>
 }
 
-export interface FormItemProps<T extends {} = {}> {
+export interface FormItemProps {
   class?: string
   style?: JSX.CSSProperties
   required?: boolean
@@ -34,10 +33,6 @@ export interface FormItemProps<T extends {} = {}> {
   initialValue?: any
   rules?: Schema[]
   /**
-   * @deprecated
-   */
-  when?: boolean | ((formInstance: FormInstance<T>) => boolean)
-  /**
    * 是否隐藏
    * 和 when 的区别，只是不会显示，但值依然会存在
    */
@@ -45,43 +40,15 @@ export interface FormItemProps<T extends {} = {}> {
   component?: Component<FormItemComponentProps>
 }
 
-const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
-  const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth, layout } =
-    useContext(Context)
+const FormItem = (props: FormItemProps) => {
+  const { formInstance, setItemWidthDict, maxItemWidth, layout } = useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
-  const when = createMemo(() => {
-    if (typeof props.when === 'function') return props.when(formInstance as FormInstance<T>)
-    return props.when ?? true
-  })
-
-  createEffect(
-    on(when, input => {
-      if (isNil(props.name) || !input) return
-
-      if (!isNil(props.initialValue)) {
-        formInstance.setFieldValue(props.name, props.initialValue)
-      }
-
-      if (!isNil(props.rules)) {
-        rulesDict[props.name] = props.rules
-        setErrMsgDict[props.name] = setErrMsg
-      }
-
-      onCleanup(() => {
-        formInstance.removeFieldValue(props.name!)
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete rulesDict[props.name!]
-        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
-        delete setErrMsgDict[props.name!]
-      })
-    }),
-  )
 
   let label: HTMLLabelElement | undefined
   createEffect(
     on(
-      () => when() && !props.hidden && layout() === 'horizontal',
+      () => !props.hidden && layout() === 'horizontal',
       input => {
         if (!input) return
 
@@ -112,7 +79,7 @@ const FormItem = <T extends {} = {}>(props: FormItemProps<T>) => {
   )
 
   return (
-    <Show when={when() && !props.hidden}>
+    <Show when={!props.hidden}>
       <div
         class={cs(
           props.class,
