@@ -24,17 +24,16 @@ export interface ButtonProps
   size?: 'large' | 'middle' | 'small'
   class?: string
   style?: JSX.CSSProperties
-  loading?: boolean
+  /**
+   * 按钮加载中状态
+   * 'auto' 代表开启自动 loading，当按钮 click 事件返回 promise 对象时，会自动开启 loading 状态
+   */
+  loading?: boolean | 'auto'
   /**
    * 设置危险按钮
    */
   danger?: boolean
   disabled?: boolean
-  /**
-   * 是否开启自动 loading
-   * 当按钮 click 事件返回 promise 对象时，会自动开启 loading 状态
-   */
-  autoLoading?: boolean
 }
 
 const sizeClassMap = {
@@ -104,7 +103,7 @@ const Button: Component<ButtonProps> = _props => {
   )
   const [, buttonElementProps] = splitProps(props, ['type', 'size', 'loading', 'danger'])
   const [innerLoading, setLoading] = createSignal(false)
-  const loading = createMemo(() => props.loading ?? innerLoading())
+  const loading = createMemo(() => props.loading === true ?? innerLoading())
 
   return (
     <button
@@ -124,7 +123,7 @@ const Button: Component<ButtonProps> = _props => {
       disabled={props.disabled}
       onClick={e => {
         const res = props.onClick?.(e)
-        if (props.autoLoading && res instanceof Promise) {
+        if (props.loading === 'auto' && res instanceof Promise) {
           setLoading(true)
           res.finally(() => setLoading(false))
         }
