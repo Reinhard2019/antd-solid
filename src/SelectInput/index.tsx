@@ -1,4 +1,4 @@
-import { type JSXElement, For, createSignal, Show, createMemo } from 'solid-js'
+import { type JSXElement, type JSX, For, createSignal, Show, createMemo } from 'solid-js'
 import cs from 'classnames'
 import { compact } from 'lodash-es'
 import Tooltip from '../Tooltip'
@@ -16,6 +16,7 @@ export interface SelectInputProps<T> {
   allowClear?: boolean
   disabled?: boolean
   class?: string
+  style?: JSX.CSSProperties
   content: (close: () => void) => JSXElement
   /**
    * 设置校验状态
@@ -68,8 +69,10 @@ function SelectInput<T>(props: SelectInputProps<T>) {
 
   return (
     <div
+      ref={select!}
       class={cs(
-        'rounded-6px',
+        'p[.ant-input-addon]:my--1px p[.ant-input-addon]:mx--12px',
+        'rounded-6px [font-size:var(--ant-font-size)] cursor-pointer inline-block',
         [
           Compact.compactItemClass,
           Compact.compactItemRounded0Class,
@@ -83,6 +86,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
       style={{
         '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
         '--ant-select-multiple-item-height': '24px',
+        ...props.style,
       }}
     >
       <Tooltip
@@ -106,9 +110,9 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         }
       >
         <div
-          ref={select!}
           class={cs(
-            'relative min-h-32px pr-25px rounded-inherit py-1px',
+            'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
+            'relative h-32px pr-29px rounded-inherit py-1px flex',
             valueArr().length && props.multiple ? 'pl-4px' : 'pl-11px',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
@@ -126,29 +130,30 @@ function SelectInput<T>(props: SelectInputProps<T>) {
           <Show
             when={valueArr().length}
             fallback={
-              <input
-                class="w-full h-28px [outline:none] bg-transparent placeholder-text-[rgba(0,0,0,.25)]"
-                readOnly
-                placeholder={props.placeholder}
-              />
+              // <input
+              //   class="absolute w-full h-28px leading-28px [outline:none] bg-transparent placeholder-text-[rgba(0,0,0,.25)]"
+              //   readOnly
+              //   placeholder={props.placeholder}
+              // />
+              <span class="block w-full h-28px leading-28px text-[var(--ant-color-text-placeholder)]">
+                {props.placeholder}
+              </span>
             }
           >
             <Show
               when={props.multiple}
               fallback={
-                <div class="h-28px ellipsis leading-30px">{optionLabelRender(valueArr()[0])}</div>
+                <div class="h-28px leading-28px ellipsis">{optionLabelRender(valueArr()[0])}</div>
               }
             >
               <For each={valueArr()}>
                 {item => (
-                  <span class="inline-block">
-                    <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                      {optionLabelRender(item)}
-                      <span
-                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                        onClick={() => setValue(valueArr().filter(v => v !== item))}
-                      />
-                    </span>
+                  <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
+                    {optionLabelRender(item)}
+                    <span
+                      class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
+                      onClick={() => setValue(valueArr().filter(v => v !== item))}
+                    />
                   </span>
                 )}
               </For>

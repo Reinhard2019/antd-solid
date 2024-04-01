@@ -171,6 +171,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={props.addonBefore}>
         <div
           class={cs(
+            'ant-input-addon',
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px text-14px',
             Compact.compactItemRounded0Class,
             compactItemRoundedLeftClass,
@@ -209,6 +210,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       <Show when={props.addonAfter}>
         <div
           class={cs(
+            'ant-input-addon',
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px text-14px',
             Compact.compactItemRounded0Class,
             compactItemRoundedRightClass,

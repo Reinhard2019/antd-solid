@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="input-number/Base" />
 
+### 前置/后置标签
+
+用于配置一些固定组合。
+
+<Code path="input-number/PrefixAndSuffix" />
+
 ### 最小值 & 最大值
 
 你可以设定最小值和最大值。

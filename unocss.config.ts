@@ -29,6 +29,7 @@ export default defineConfig({
           --ant-color-text-quaternary: rgba(0, 0, 0, 0.25);
           --ant-color-text-disabled: rgba(0, 0, 0, 0.25);
           --ant-color-text-heading: rgba(0, 0, 0, 0.88);
+          --ant-color-text-placeholder: rgba(0, 0, 0, 0.25);
           --ant-color-bg-text-hover: rgba(0, 0, 0, 0.06);
           --ant-color-bg-text-active: rgba(0, 0, 0, 0.15);
           --ant-color-success-border: #b7eb8f;

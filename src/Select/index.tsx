@@ -23,7 +23,7 @@ interface SelectOption {
 export interface SelectProps
   extends Pick<
   SelectInputProps<Key>,
-  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status'
+  'multiple' | 'allowClear' | 'class' | 'style' | 'disabled' | 'placeholder' | 'status'
   > {
   defaultValue?: Key | Key[]
   value?: Key | Key[]
@@ -36,6 +36,7 @@ const Select: Component<SelectProps> = props => {
     'multiple',
     'allowClear',
     'class',
+    'style',
     'disabled',
     'placeholder',
     'status',
