@@ -52,6 +52,7 @@ export default defineConfig({
           --ant-font-size: 14px;
           --ant-font-size-lg: 16px;
 
+          --ant-line-height: 1.5714285714285714;
           --ant-line-height-lg: 1.5;
           --ant-line-width-bold: 2px;
           --ant-line-width: 1px;

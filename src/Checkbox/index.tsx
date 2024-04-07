@@ -24,7 +24,10 @@ const Checkbox: Component<CheckboxProps> & {
 
   return (
     <label
-      class={cs('inline-flex cursor-pointer inline-flex items-center', props.class)}
+      class={cs(
+        'inline-flex cursor-pointer inline-flex items-center [font-size:var(--ant-font-size)] leading-[var(--ant-line-height)]',
+        props.class,
+      )}
       style={props.style}
     >
       <span
