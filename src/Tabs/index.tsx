@@ -44,6 +44,10 @@ export interface TabsProps {
   items: Tab[]
   addonBefore?: JSX.Element
   addonAfter?: JSX.Element
+  /**
+   * 是否允许清空 activeKey
+   */
+  allowClear?: boolean
 }
 
 const Tabs: Component<TabsProps> = _props => {
@@ -51,33 +55,44 @@ const Tabs: Component<TabsProps> = _props => {
     {
       type: 'line',
       placement: 'top',
+      allowClear: false,
     } as const,
     _props,
   )
 
-  const [selectedItem, setSelectedItem] = createSignal<Tab | undefined>(
-    untrack(() => props.items[0]),
+  const [activeKey, setActiveKey] = createSignal<string | undefined>(
+    untrack(() => props.items[0]?.key),
   )
-  const isSelectedItem = createSelector(() => selectedItem()?.key)
-  const [selectedBarStyle, setSelectedBarStyle] = createSignal<JSX.CSSProperties>({
+  const [clear, setClear] = createSignal(false)
+  const isActiveKey = createSelector(activeKey)
+  const [activeBarStyle, setActiveBarStyle] = createSignal<JSX.CSSProperties>({
     left: '0px',
     width: '0px',
   })
+  const onTabClick = (item: Tab) => {
+    if (props.allowClear && isActiveKey(item.key)) {
+      setClear(v => !v)
+      return
+    }
+
+    setActiveKey(item.key)
+    setClear(false)
+  }
 
   let lineNav: HTMLDivElement | undefined
-  const updateSelectedBarStyle = () => {
+  const updateActiveBarStyle = () => {
     if (!lineNav) return
 
     const el = lineNav.querySelector<HTMLElement>(':scope > [aria-label="selected"]')
     if (!el) return
 
     if (props.placement === 'top' || props.placement === 'bottom') {
-      setSelectedBarStyle({
+      setActiveBarStyle({
         left: `${el.offsetLeft}px`,
         width: `${el.clientWidth}px`,
       })
     } else {
-      setSelectedBarStyle({
+      setActiveBarStyle({
         top: `${el.offsetTop}px`,
         height: `${el.clientHeight}px`,
       })
@@ -87,10 +102,10 @@ const Tabs: Component<TabsProps> = _props => {
     on([() => props.type, () => props.placement], () => {
       if (!lineNav) return
 
-      updateSelectedBarStyle()
+      updateActiveBarStyle()
 
       const resizeObserver = new ResizeObserver(() => {
-        updateSelectedBarStyle()
+        updateActiveBarStyle()
       })
 
       resizeObserver.observe(lineNav)
@@ -152,15 +167,15 @@ const Tabs: Component<TabsProps> = _props => {
                       'cursor-pointer',
                       'hover:text-[var(--ant-color-primary)]',
                       props.navItemClass,
-                      isSelectedItem(item.key) && 'text-[var(--ant-color-primary)]',
+                      isActiveKey(item.key) && !clear() && 'text-[var(--ant-color-primary)]',
                       (props.placement === 'top' || props.placement === 'bottom') && 'py-12px',
                       (props.placement === 'left' || props.placement === 'right') &&
                         'px-24px py-8px',
                     )}
-                    aria-label={isSelectedItem(item.key) ? 'selected' : undefined}
+                    aria-label={isActiveKey(item.key) && !clear() ? 'selected' : undefined}
                     onClick={() => {
-                      setSelectedItem(item)
-                      updateSelectedBarStyle()
+                      onTabClick(item)
+                      updateActiveBarStyle()
                     }}
                   >
                     {unwrapStringOrJSXElement(item.label)}
@@ -178,8 +193,9 @@ const Tabs: Component<TabsProps> = _props => {
                   props.placement === 'right' && '-left-1px',
                   (props.placement === 'top' || props.placement === 'bottom') && 'h-2px',
                   (props.placement === 'left' || props.placement === 'right') && 'w-2px',
+                  clear() && 'hidden',
                 )}
-                style={selectedBarStyle()}
+                style={activeBarStyle()}
               />
             </div>
           </Match>
@@ -190,7 +206,9 @@ const Tabs: Component<TabsProps> = _props => {
               options={props.items.map(item => ({
                 label: item.label,
                 value: item.key,
-                onClick: () => setSelectedItem(item),
+                onClick: () => {
+                  onTabClick(item)
+                },
               }))}
             />
           </Match>
@@ -217,7 +235,7 @@ const Tabs: Component<TabsProps> = _props => {
                       props.placement === 'right' &&
                         'rounded-r-[var(--ant-border-radius-lg)] !border-l-0px',
                       props.navItemClass,
-                      isSelectedItem(item.key)
+                      isActiveKey(item.key) && !clear()
                         ? [
                           'text-[var(--ant-color-primary)] bg-[var(--ant-color-bg-container)]',
                           [
@@ -235,8 +253,8 @@ const Tabs: Component<TabsProps> = _props => {
                         : 'bg-[var(--ant-tabs-card-bg)]',
                     )}
                     onClick={() => {
-                      setSelectedItem(item)
-                      updateSelectedBarStyle()
+                      onTabClick(item)
+                      updateActiveBarStyle()
                     }}
                   >
                     {unwrapStringOrJSXElement(item.label)}
@@ -253,16 +271,70 @@ const Tabs: Component<TabsProps> = _props => {
       </div>
 
       <For each={props.items}>
-        {item => (
-          <DelayShow when={isSelectedItem(item.key)}>
-            <div
-              class={cs(props.contentClass, 'grow')}
-              style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}
-            >
-              {unwrapStringOrJSXElement(item.children)}
-            </div>
-          </DelayShow>
-        )}
+        {item => {
+          let ref: HTMLDivElement | undefined
+          createEffect(
+            on([clear, () => isActiveKey(item.key)], (input, prevInput) => {
+              if (input[1] !== prevInput?.[1]) {
+                ref?.style.removeProperty('width')
+                ref?.style.removeProperty('height')
+              }
+
+              if (input[0] === prevInput?.[0] || !input[1] || !ref) return
+
+              if (props.placement === 'top' || props.placement === 'bottom') {
+                if (clear()) {
+                  ref.style.height = `${ref.scrollHeight}px`
+                  requestAnimationFrame(() => {
+                    ref!.style.height = '0px'
+                  })
+                } else {
+                  ref.style.height = '0px'
+                  requestAnimationFrame(() => {
+                    ref!.style.height = `${ref!.scrollHeight}px`
+                  })
+                  const onTransitionEnd = () => {
+                    ref!.style.removeProperty('height')
+                    ref!.removeEventListener('transitionend', onTransitionEnd)
+                  }
+                  ref.addEventListener('transitionend', onTransitionEnd)
+                }
+              } else {
+                if (clear()) {
+                  ref.style.width = `${ref.scrollWidth}px`
+                  requestAnimationFrame(() => {
+                    ref!.style.width = '0px'
+                  })
+                } else {
+                  ref.style.width = '0px'
+                  requestAnimationFrame(() => {
+                    ref!.style.width = `${ref!.scrollWidth}px`
+                  })
+                  const onTransitionEnd = () => {
+                    ref!.style.removeProperty('width')
+                    ref!.removeEventListener('transitionend', onTransitionEnd)
+                  }
+                  ref.addEventListener('transitionend', onTransitionEnd)
+                }
+              }
+            }),
+          )
+
+          return (
+            <DelayShow when={isActiveKey(item.key) && !clear()}>
+              <div
+                ref={ref}
+                class={cs(
+                  props.contentClass,
+                  'grow transition-height transition-300 overflow-hidden',
+                )}
+                style={{ display: isActiveKey(item.key) ? 'block' : 'none' }}
+              >
+                {unwrapStringOrJSXElement(item.children)}
+              </div>
+            </DelayShow>
+          )
+        }}
       </For>
     </div>
   )

@@ -38,6 +38,12 @@ outline: deep
 
 <Code path="tabs/Addon" />
 
+### 可清空
+
+允许通过重复点击同一个 Tab 标签来清除选中状态。
+
+<Code path="tabs/AllowClear" />
+
 ## API
 
 ### Tabs
