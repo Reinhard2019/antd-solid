@@ -133,6 +133,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         'w-full [outline:none] text-14px placeholder-text-[rgba(0,0,0,.25)]',
         !hasPrefixOrSuffix() && inputWrapClass(),
         inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
+        props.class,
       )}
       value={value() ?? ''}
       onInput={e => {
