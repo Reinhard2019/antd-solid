@@ -60,6 +60,8 @@ export type { SliderProps } from './Slider'
 export { default as Transformer } from './Transformer'
 export type { TransformerProps, TransformValue } from './Transformer'
 
+export { default as DelayShow } from './DelayShow'
+
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'
 export { default as useSize } from './hooks/useSize'
