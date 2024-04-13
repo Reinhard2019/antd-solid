@@ -77,6 +77,7 @@ export default defineConfig({
 
           --ant-button-default-color: rgba(0, 0, 0, 0.88);
           --ant-button-border-color-disabled: #d9d9d9;
+          --ant-button-default-bg: #fff;
 
           --ant-radio-dot-color-disabled: rgba(0, 0, 0, 0.25);
           --ant-radio-button-checked-bg-disabled: rgba(0, 0, 0, 0.15);

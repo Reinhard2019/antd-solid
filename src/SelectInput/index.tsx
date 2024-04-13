@@ -130,13 +130,13 @@ function SelectInput<T>(props: SelectInputProps<T>) {
           <Show
             when={valueArr().length}
             fallback={
-              // <input
-              //   class="absolute w-full h-28px leading-28px [outline:none] bg-transparent placeholder-text-[rgba(0,0,0,.25)]"
-              //   readOnly
-              //   placeholder={props.placeholder}
-              // />
               <span class="block w-full h-28px leading-28px text-[var(--ant-color-text-placeholder)]">
                 {props.placeholder}
+
+                {/* 防止为空的时候，与其它 inline 节点并排显示时不能对齐 */}
+                <Show when={!props.placeholder}>
+                  <span class="inline-block w-0"> </span>
+                </Show>
               </span>
             }
           >

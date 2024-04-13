@@ -130,7 +130,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         input = el
       }}
       class={cs(
-        'w-full [outline:none] text-14px placeholder-text-[rgba(0,0,0,.25)]',
+        'w-full [outline:none] text-14px placeholder-text-[rgba(0,0,0,.25)] bg-transparent',
         !hasPrefixOrSuffix() && inputWrapClass(),
         inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
         props.class,

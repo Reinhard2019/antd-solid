@@ -53,7 +53,7 @@ const typeClassMap = {
     disabled
       ? disabledWithBorderClass
       : cs(
-        'bg-white',
+        'bg-[var(--ant-button-default-bg)]',
         danger
           ? '[border:1px_solid_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-color-error-border-hover)] hover:text-[var(--ant-color-error-border-hover)] active:[border-color:var(--ant-color-error-active)] active:text-[var(--ant-color-error-active)]'
           : '[border:1px_solid_var(--ant-color-border)] text-[var(--ant-button-default-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
@@ -71,7 +71,7 @@ const typeClassMap = {
     disabled
       ? disabledWithBorderClass
       : cs(
-        ' bg-white',
+        ' bg-[var(--ant-button-default-bg)]',
         danger
           ? '[border:1px_dashed_var(--ant-color-error)] text-[var(--ant-color-error)] hover:[border-color:var(--ant-color-error-border-hover)] hover:text-[var(--ant-color-error-border-hover)] active:[border-color:var(--ant-color-error-active)] active:text-[var(--ant-color-error-active)]'
           : '[border:1px_dashed_var(--ant-color-border)] text-[var(--ant-button-default-color)] hover:[border-color:var(--ant-color-primary-hover)] hover:text-[var(--ant-color-primary-hover)] active:[border-color:var(--ant-color-primary-active)] active:text-[var(--ant-color-primary-active)]',
