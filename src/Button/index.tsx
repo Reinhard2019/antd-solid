@@ -7,8 +7,10 @@ import {
   createSignal,
   createMemo,
   splitProps,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
+import ConfigProviderContext from '../ConfigProvider/context'
 import './index.scss'
 import { wave } from '../utils/animation'
 
@@ -97,6 +99,7 @@ const typeClassMap = {
 } as const
 
 const Button: Component<ButtonProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     { type: 'default', size: 'middle', danger: false, disabled: false } as const,
     _props,
@@ -119,7 +122,10 @@ const Button: Component<ButtonProps> = _props => {
         typeClassMap[props.type!](props.danger, props.disabled),
         loading() && 'opacity-65',
       )}
-      style={props.style}
+      style={{
+        ...cssVariables(),
+        ...props.style,
+      }}
       disabled={props.disabled}
       onClick={e => {
         const res = props.onClick?.(e)

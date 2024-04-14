@@ -5,12 +5,14 @@ import {
   createMemo,
   type JSXElement,
   mergeProps,
+  useContext,
 } from 'solid-js'
 import { get, isEmpty, pull } from 'lodash-es'
 import createControllableValue from '../hooks/createControllableValue'
 import { type Key } from '../types'
 import SingleLevelTree from './SingleLevelTree'
 import { type CheckboxProps } from '../Checkbox'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface CheckNode<T extends {} = TreeNode> extends CheckboxProps {
   key: Key
@@ -84,6 +86,7 @@ export interface TreeProps<T extends {} = TreeNode> {
 }
 
 function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       checkStrategy: 'all' as const,
@@ -246,7 +249,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   const [targetIndexes, setTargetIndexes] = createSignal<number[] | null>(null)
 
   return (
-    <div class="text-[var(--ant-color-text)]">
+    <div class="text-[var(--ant-color-text)]" style={cssVariables()}>
       <SingleLevelTree
         {...props}
         treeData={props.treeData}

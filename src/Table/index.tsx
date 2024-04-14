@@ -1,6 +1,7 @@
-import { type JSXElement, For, Show, mergeProps } from 'solid-js'
+import { type JSXElement, For, Show, mergeProps, useContext } from 'solid-js'
 import cs from 'classnames'
 import Empty from '../Empty'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement
@@ -23,6 +24,7 @@ const sizeClassDict = {
 }
 
 const Table = <R extends {}>(_props: TableProps<R>) => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       size: 'middle',
@@ -31,13 +33,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
   )
 
   return (
-    <div
-      style={{
-        '--ant-table-header-bg': '#fafafa',
-        '--ant-table-row-hover-bg': '#fafafa',
-        '--ant-table-border-color': '#f0f0f0',
-      }}
-    >
+    <div style={cssVariables()}>
       <table class="w-full">
         <thead>
           <tr>

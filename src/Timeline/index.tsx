@@ -1,5 +1,6 @@
-import { type Accessor, type Component, For, type JSXElement } from 'solid-js'
+import { type Accessor, type Component, For, type JSXElement, useContext } from 'solid-js'
 import { type TimelineItemProps as TimelineItemAntdProps } from 'antd'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 interface TimelineItemProps extends Omit<TimelineItemAntdProps, 'children' | 'dot' | 'label'> {
   dot?: JSXElement
@@ -13,8 +14,10 @@ interface TimelineProps {
 }
 
 const Timeline: Component<TimelineProps> = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
+
   return (
-    <div class="flex flex-col gap-[16px]">
+    <div class="flex flex-col gap-[16px]" style={cssVariables()}>
       <For each={props.items}>
         {(item, i) => (
           <div class="flex relative">

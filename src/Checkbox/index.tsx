@@ -1,5 +1,6 @@
-import { type ParentProps, type Component, type JSX, Show } from 'solid-js'
+import { type ParentProps, type Component, type JSX, Show, useContext } from 'solid-js'
 import cs from 'classnames'
+import ConfigProviderContext from '../ConfigProvider/context'
 import createControllableValue from '../hooks/createControllableValue'
 import Group from './Group'
 
@@ -15,6 +16,7 @@ export interface CheckboxProps extends ParentProps {
 const Checkbox: Component<CheckboxProps> & {
   Group: typeof Group
 } = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const [checked, setChecked] = createControllableValue(props, {
     defaultValue: false,
     defaultValuePropName: 'defaultChecked',
@@ -28,7 +30,7 @@ const Checkbox: Component<CheckboxProps> & {
         'inline-flex cursor-pointer inline-flex items-center [font-size:var(--ant-font-size)] leading-[var(--ant-line-height)]',
         props.class,
       )}
-      style={props.style}
+      style={{ ...cssVariables(), ...props.style }}
     >
       <span
         class={cs(

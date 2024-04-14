@@ -1,10 +1,11 @@
-import { type Component, type JSX, For, mergeProps, createSelector } from 'solid-js'
+import { type Component, type JSX, For, mergeProps, createSelector, useContext } from 'solid-js'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
 import { type StringOrJSXElement } from '../types'
 import Radio from '.'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface RadioGroupProps {
   defaultValue?: string
@@ -17,6 +18,7 @@ export interface RadioGroupProps {
 }
 
 const Group: Component<RadioGroupProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       optionType: 'default',
@@ -31,6 +33,7 @@ const Group: Component<RadioGroupProps> = _props => {
   return (
     <div
       class={cs(props.block ? 'flex' : 'inline-flex', props.optionType === 'default' && 'gap-8px')}
+      style={cssVariables()}
     >
       <For each={props.options}>
         {option => (

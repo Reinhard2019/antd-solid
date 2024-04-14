@@ -11,10 +11,11 @@ import {
   onCleanup,
 } from 'solid-js'
 import { Dynamic, Portal, render } from 'solid-js/web'
-import Button from '../Button'
 import cs from 'classnames'
+import Button from '../Button'
 import createControllableValue from '../hooks/createControllableValue'
 import DelayShow from '../DelayShow'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface ModalProps {
   title?: JSXElement
@@ -216,6 +217,7 @@ const Modal: Component<ModalProps> & {
   useModalProps: typeof useModalProps
   createModal: typeof createModal
 } = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     { footer: true, keyboard: true, maskClosable: true, closeIcon: true },
     _props,
@@ -259,6 +261,7 @@ const Modal: Component<ModalProps> & {
               props.onCancel?.()
             }
           }}
+          style={cssVariables()}
         >
           <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
             <div

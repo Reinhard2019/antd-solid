@@ -1,6 +1,7 @@
-import { For } from 'solid-js'
+import { For, useContext } from 'solid-js'
 import type { Component, JSX } from 'solid-js'
 import cs from 'classnames'
+import ConfigProviderContext from '../ConfigProvider/context'
 import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import Checkbox from '.'
@@ -26,12 +27,16 @@ const getOptionValue = (option: string | number | CheckboxOption) =>
   typeof option === 'object' ? option.value : option
 
 const Group: Component<CheckboxGroupProps> = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const [value, setValue] = createControllableValue<Key[]>(props, {
     defaultValue: [],
   })
 
   return (
-    <div class={cs(props.block ? 'flex' : 'inline-flex', props.class)} style={props.style}>
+    <div
+      class={cs(props.block ? 'flex' : 'inline-flex', props.class)}
+      style={{ ...cssVariables(), ...props.style }}
+    >
       <For each={props.options}>
         {option => (
           <Checkbox

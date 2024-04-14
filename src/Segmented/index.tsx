@@ -1,8 +1,9 @@
-import { type Component, For, createSelector, type JSX, Show } from 'solid-js'
+import { type Component, For, createSelector, type JSX, Show, useContext } from 'solid-js'
 import cs from 'classnames'
 import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface SegmentedProps {
   block?: boolean
@@ -32,6 +33,7 @@ const unWarpValue = (value: SegmentedProps['options'][0]) =>
   typeof value === 'object' ? value.value : value
 
 const Segmented: Component<SegmentedProps> = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const [value, setValue] = createControllableValue<Key>(props, {
     defaultValue: unWarpValue(props.options[0]),
   })
@@ -50,9 +52,7 @@ const Segmented: Component<SegmentedProps> = props => {
         props.class,
       )}
       style={{
-        '--ant-segmented-item-color': 'rgba(0, 0, 0, 0.65)',
-        '--ant-segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
-        '--ant-segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
+        ...cssVariables(),
         ...props.style,
       }}
     >

@@ -1,8 +1,8 @@
 import { Image as ImageAntd } from 'antd'
-import { configProvider, reactToSolidComponent, replaceClassName } from '../utils/component'
-import { solidToReact } from '../utils/solid'
 import { type JSXElement, createMemo } from 'solid-js'
 import { mapValues } from 'lodash-es'
+import { configProvider, reactToSolidComponent, replaceClassName } from '../utils/component'
+import { solidToReact } from '../utils/solid'
 
 const _Image = replaceClassName(
   reactToSolidComponent(configProvider(ImageAntd), () => (<div class="inline-flex" />) as any),

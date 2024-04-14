@@ -10,6 +10,7 @@ import {
   onCleanup,
   createMemo,
   untrack,
+  useContext,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
@@ -18,6 +19,7 @@ import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -89,6 +91,7 @@ export const getContent = (content: TooltipProps['content'], close: () => void) 
 }
 
 const Tooltip: Component<TooltipProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       trigger: 'hover',
@@ -392,6 +395,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               open() ? 'block' : 'hidden',
             )}
             style={{
+              ...cssVariables(),
               transform:
                 'translate(clamp(0px, var(--translate-x), calc(100vw - 100%)), clamp(0px, var(--translate-y), calc(100vh - 100%)))',
             }}

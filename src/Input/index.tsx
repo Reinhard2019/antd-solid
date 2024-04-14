@@ -1,11 +1,12 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
+import { Show, createMemo, mergeProps, onMount, splitProps, useContext } from 'solid-js'
 import type { JSX, JSXElement, Component } from 'solid-js'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
 import Compact from '../Compact'
 import { setRef } from '../utils/solid'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {
@@ -33,6 +34,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
     size?: 'small' | 'default' | 'large'
     autoFocus?: boolean
     allowClear?: boolean
+    style?: JSX.CSSProperties
     onChange?: JSX.InputEventHandler<T, InputEvent>
     onPressEnter?: JSX.EventHandler<T, KeyboardEvent>
     onKeyDown?: JSX.EventHandler<T, KeyboardEvent>
@@ -61,8 +63,9 @@ const statusClassDict = {
 
 export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
   _props: CommonInputProps<T> &
-  Omit<JSX.InputHTMLAttributes<T>, 'onChange' | 'onInput' | 'onKeyDown'>,
+  Omit<JSX.InputHTMLAttributes<T>, 'style' | 'onChange' | 'onInput' | 'onKeyDown'>,
 ) {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ size: 'default' as const }, _props)
   const [{ style, onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
@@ -167,7 +170,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
-      style={style}
+      style={{ ...cssVariables(), ...style }}
     >
       <Show when={props.addonBefore}>
         <div

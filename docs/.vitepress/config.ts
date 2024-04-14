@@ -78,6 +78,10 @@ export default defineConfig({
         ],
       },
       {
+        text: '其他',
+        items: [{ text: 'ConfigProvider 全局化配置', link: '/components/config-provider' }],
+      },
+      {
         text: 'hooks',
         items: [{ text: 'useVirtualList', link: '/components/use-virtual-list' }],
       },

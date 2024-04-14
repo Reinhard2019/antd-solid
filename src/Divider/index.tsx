@@ -1,6 +1,14 @@
-import { type ParentProps, type Component, Show, mergeProps, createMemo } from 'solid-js'
+import {
+  type ParentProps,
+  type Component,
+  Show,
+  mergeProps,
+  createMemo,
+  useContext,
+} from 'solid-js'
 import cs from 'classnames'
 import { useSize } from '../hooks'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface DividerProps extends ParentProps {
   dashed?: boolean
@@ -12,6 +20,7 @@ export interface DividerProps extends ParentProps {
 }
 
 const Divider: Component<DividerProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       orientation: 'center',
@@ -47,6 +56,7 @@ const Divider: Component<DividerProps> = _props => {
             'my-[var(--ant-margin-lg)] border-width-[1px_0_0] border-[var(--ant-color-split)]',
             props.dashed ? 'border-dashed' : 'border-solid',
           )}
+          style={cssVariables()}
         />
       }
     >
@@ -64,6 +74,7 @@ const Divider: Component<DividerProps> = _props => {
           ],
         )}
         style={{
+          ...cssVariables(),
           '--ant-divider-text-padding-inline': '1em',
           '--ant-divider-children-start': `${childrenStart()}px`,
           '--ant-divider-children-end': `${childrenStart() + childrenWidth()}px`,

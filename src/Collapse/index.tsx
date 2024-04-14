@@ -1,6 +1,7 @@
-import { type JSX, type Component, For, Show } from 'solid-js'
+import { type JSX, type Component, For, Show, useContext } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
+import ConfigProviderContext from '../ConfigProvider/context'
 import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
@@ -30,6 +31,7 @@ export interface CollapseProps {
 }
 
 const Collapse: Component<CollapseProps> = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
@@ -43,7 +45,7 @@ const Collapse: Component<CollapseProps> = props => {
         props.class,
       )}
       style={{
-        '--ant-collapse-content-padding': '16px',
+        ...cssVariables(),
         ...props.style,
       }}
     >

@@ -16,6 +16,7 @@ import { type Schema } from 'yup'
 import { Dynamic } from 'solid-js/web'
 import Context from './context'
 import { type FormInstance } from './Form'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface FormItemComponentProps<T = any, F extends {} = {}> {
   value?: T | undefined
@@ -41,6 +42,7 @@ export interface FormItemProps {
 }
 
 const FormItem = (props: FormItemProps) => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const { formInstance, setItemWidthDict, maxItemWidth, layout } = useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
@@ -87,7 +89,7 @@ const FormItem = (props: FormItemProps) => {
           layout() === 'horizontal' && 'flex items-center',
           layout() === 'inline' && 'inline-flex mr-16px',
         )}
-        style={props.style}
+        style={{ ...cssVariables(), ...props.style }}
       >
         <div
           class="flex items-center"

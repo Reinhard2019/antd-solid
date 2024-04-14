@@ -7,14 +7,16 @@ import {
   createSignal,
   untrack,
   createMemo,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
-import Button from '../Button'
-import { setRef } from '../utils/solid'
 import { Portal } from 'solid-js/web'
 import { Transition } from 'solid-transition-group'
+import Button from '../Button'
+import { setRef } from '../utils/solid'
 import './index.scss'
 import createTransition from '../hooks/createTransition'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface DrawerInstance {
   open: () => void
@@ -59,6 +61,7 @@ export interface DrawerProps {
 }
 
 const Drawer: Component<DrawerProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       width: '378px',
@@ -151,6 +154,7 @@ const Drawer: Component<DrawerProps> = _props => {
               instance.close()
             }
           }}
+          style={cssVariables()}
         >
           <div
             class={cs(

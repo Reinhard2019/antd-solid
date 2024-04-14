@@ -6,6 +6,7 @@ import {
   createSignal,
   createMemo,
   untrack,
+  useContext,
 } from 'solid-js'
 import { createStore, produce } from 'solid-js/store'
 import { cloneDeep, get, max, set, unset } from 'lodash-es'
@@ -13,6 +14,7 @@ import { type Schema } from 'yup'
 import cs from 'classnames'
 import Context from './context'
 import { setRef } from '../utils/solid'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
@@ -33,6 +35,7 @@ export interface FormProps<T extends {} = {}> {
 }
 
 function Form<T extends {} = {}>(_props: FormProps<T>) {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ layout: 'horizontal' } as FormProps, _props)
   const rulesDict: Record<string, Schema[]> = {}
   const setErrMsgDict: Record<string, Setter<string>> = {}
@@ -96,6 +99,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
       onSubmit={e => {
         e.preventDefault()
       }}
+      style={cssVariables()}
     >
       <Context.Provider
         value={{

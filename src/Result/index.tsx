@@ -1,5 +1,6 @@
-import { type JSXElement, type Component, type ParentProps } from 'solid-js'
+import { type JSXElement, type Component, type ParentProps, useContext } from 'solid-js'
 import cs from 'classnames'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 type ResultStatusType = 'success' | 'error' | 'info' | 'warning'
 
@@ -18,8 +19,10 @@ const statusIconMap = {
 }
 
 const Result: Component<ResultProps> = props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
+
   return (
-    <div class="text-center px-32px py-48px">
+    <div class="text-center px-32px py-48px" style={cssVariables()}>
       <div class="mb-24px">
         <span class={cs(statusIconMap[props.status!], 'text-72px')} />
       </div>

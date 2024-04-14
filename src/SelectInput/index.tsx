@@ -1,10 +1,19 @@
-import { type JSXElement, type JSX, For, createSignal, Show, createMemo } from 'solid-js'
+import {
+  type JSXElement,
+  type JSX,
+  For,
+  createSignal,
+  Show,
+  createMemo,
+  useContext,
+} from 'solid-js'
 import cs from 'classnames'
 import { compact } from 'lodash-es'
 import Tooltip from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Compact from '../Compact'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface SelectInputProps<T> {
   multiple?: boolean
@@ -46,6 +55,8 @@ const statusClassDict = {
 }
 
 function SelectInput<T>(props: SelectInputProps<T>) {
+  const { cssVariables } = useContext(ConfigProviderContext)
+
   let select: HTMLDivElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
@@ -84,8 +95,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         props.disabled && 'cursor-not-allowed',
       )}
       style={{
-        '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
-        '--ant-select-multiple-item-height': '24px',
+        ...cssVariables(),
         ...props.style,
       }}
     >

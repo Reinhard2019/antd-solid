@@ -5,6 +5,7 @@ import {
   createMemo,
   createEffect,
   onCleanup,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import { clamp } from 'lodash-es'
@@ -13,6 +14,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import Tooltip from '../Tooltip'
 import useHover from '../hooks/useHover'
 import useFocus from '../hooks/useFocus'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface SliderProps {
   defaultValue?: number
@@ -37,6 +39,8 @@ export interface SliderProps {
 }
 
 const Slider: Component<SliderProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
+
   let container: HTMLDivElement | undefined
   let handle: HTMLDivElement | undefined
 
@@ -86,6 +90,7 @@ const Slider: Component<SliderProps> = _props => {
     <div
       ref={container}
       class={cs('py-4px mx-5px my-11px relative', props.disabled && 'cursor-not-allowed')}
+      style={cssVariables()}
     >
       <div
         class={cs(

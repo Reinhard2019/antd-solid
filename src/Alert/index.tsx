@@ -1,5 +1,6 @@
-import { type ParentProps, type Component, mergeProps } from 'solid-js'
+import { type ParentProps, type Component, mergeProps, useContext } from 'solid-js'
 import cs from 'classnames'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface AlertProps extends ParentProps {
   /**
@@ -20,16 +21,16 @@ const TypeClassDict = {
 } as const
 
 const Alert: Component<AlertProps> = _props => {
+  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ type: 'info' } as Required<AlertProps>, _props)
+
   return (
     <div
       class={cs(
         'p-[var(--ant-alert-default-padding)] rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)]',
         TypeClassDict[props.type],
       )}
-      style={{
-        '--ant-alert-default-padding': '8px 12px',
-      }}
+      style={cssVariables()}
     >
       {props.children}
     </div>

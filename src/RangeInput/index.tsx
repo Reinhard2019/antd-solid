@@ -162,10 +162,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
-      style={{
-        '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
-        '--ant-select-multiple-item-height': '24px',
-      }}
+      style={{}}
     >
       <Tooltip
         mode="light"

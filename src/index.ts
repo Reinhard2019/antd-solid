@@ -59,6 +59,7 @@ export { default as Slider } from './Slider'
 export type { SliderProps } from './Slider'
 export { default as Transformer } from './Transformer'
 export type { TransformerProps, TransformValue } from './Transformer'
+export { default as ConfigProvider } from './ConfigProvider'
 
 export { default as DelayShow } from './DelayShow'
 
