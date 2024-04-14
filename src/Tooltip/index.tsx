@@ -65,6 +65,10 @@ export interface TooltipProps {
    * @returns
    */
   getPopupContainer?: () => HTMLElement
+  /**
+   * x、y 轴的偏移量
+   */
+  offset?: [number, number]
 }
 
 /**
@@ -100,6 +104,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       mode: 'dark',
       arrow: true,
       getPopupContainer: () => document.body,
+      offset: [0, 0],
     },
     _props,
   )
@@ -154,102 +159,103 @@ const Tooltip: Component<TooltipProps> = _props => {
 
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
   const setTranslate = () => {
-    untrack(() => {
-      if (!contentRef) return
+    if (!contentRef) return
 
-      const _children = resolvedChildren() as HTMLElement
-      if (isHide(_children)) {
-        setOpen(false)
+    const _children = resolvedChildren() as HTMLElement
+    if (isHide(_children)) {
+      setOpen(false)
+      return
+    }
+
+    const childrenRect = _children.getBoundingClientRect()
+    switch (props.placement) {
+      case 'top':
+        contentRef.style.setProperty(
+          '--translate-x',
+          `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
+        )
+        contentRef.style.setProperty(
+          '--translate-y',
+          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+        )
         return
-      }
-
-      const childrenRect = _children.getBoundingClientRect()
-      switch (props.placement) {
-        case 'top':
-          contentRef.style.setProperty(
-            '--translate-x',
-            `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
-          )
-          contentRef.style.setProperty(
-            '--translate-y',
-            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-          )
-          return
-        case 'topLeft':
-          contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
-          contentRef.style.setProperty(
-            '--translate-y',
-            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-          )
-          return
-        case 'topRight':
-          contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-          contentRef.style.setProperty(
-            '--translate-y',
-            `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-          )
-          return
-        case 'bottom':
-          contentRef.style.setProperty(
-            '--translate-x',
-            `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
-          )
-          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-          return
-        case 'bottomLeft':
-          contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
-          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-          return
-        case 'bottomRight':
-          contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-          contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-          return
-        case 'left':
-          contentRef.style.setProperty(
-            '--translate-x',
-            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-          )
-          contentRef.style.setProperty(
-            '--translate-y',
-            `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
-          )
-          return
-        case 'leftTop':
-          contentRef.style.setProperty(
-            '--translate-x',
-            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-          )
-          contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
-          return
-        case 'leftBottom':
-          contentRef.style.setProperty(
-            '--translate-x',
-            `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-          )
-          contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
-          return
-        case 'right':
-          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          contentRef.style.setProperty(
-            '--translate-y',
-            `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
-          )
-          return
-        case 'rightTop':
-          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
-          return
-        case 'rightBottom':
-          contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-          contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
-      }
-    })
+      case 'topLeft':
+        contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
+        contentRef.style.setProperty(
+          '--translate-y',
+          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+        )
+        return
+      case 'topRight':
+        contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+        contentRef.style.setProperty(
+          '--translate-y',
+          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
+        )
+        return
+      case 'bottom':
+        contentRef.style.setProperty(
+          '--translate-x',
+          `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
+        )
+        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+        return
+      case 'bottomLeft':
+        contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
+        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+        return
+      case 'bottomRight':
+        contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
+        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
+        return
+      case 'left':
+        contentRef.style.setProperty(
+          '--translate-x',
+          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+        )
+        contentRef.style.setProperty(
+          '--translate-y',
+          `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
+        )
+        return
+      case 'leftTop':
+        contentRef.style.setProperty(
+          '--translate-x',
+          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+        )
+        contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
+        return
+      case 'leftBottom':
+        contentRef.style.setProperty(
+          '--translate-x',
+          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
+        )
+        contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+        return
+      case 'right':
+        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+        contentRef.style.setProperty(
+          '--translate-y',
+          `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
+        )
+        return
+      case 'rightTop':
+        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+        contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
+        return
+      case 'rightBottom':
+        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
+        contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+    }
   }
-  // 监听滚动
   createEffect(() => {
     if (!open()) return
 
     setTranslate()
+  })
+  // 监听滚动
+  createEffect(() => {
+    if (!open()) return
 
     const cleanupFnList: Array<() => void> = []
 
@@ -257,7 +263,7 @@ const Tooltip: Component<TooltipProps> = _props => {
     const scrollList = collectScroll(_children)
     scrollList.forEach(scroll => {
       const onScroll = () => {
-        setTranslate()
+        untrack(setTranslate)
       }
       scroll.addEventListener('scroll', onScroll)
       cleanupFnList.push(() => {
@@ -402,8 +408,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             )}
             style={{
               ...cssVariables(),
-              transform:
-                'translate(clamp(0px, var(--translate-x), calc(100vw - 100%)), clamp(0px, var(--translate-y), calc(100vh - 100%)))',
+              transform: `translate(clamp(0px, calc(var(--translate-x) + ${props.offset?.[0] ?? 0}px), calc(100vw - 100%)), clamp(0px, calc(var(--translate-y) + ${props.offset?.[1] ?? 0}px), calc(100vh - 100%)))`,
             }}
             onClick={e => {
               e.stopPropagation()
