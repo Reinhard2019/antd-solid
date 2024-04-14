@@ -20,6 +20,7 @@ import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
 import ConfigProviderContext from '../ConfigProvider/context'
+import { isHide } from '../utils/dom'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -156,7 +157,12 @@ const Tooltip: Component<TooltipProps> = _props => {
     untrack(() => {
       if (!contentRef) return
 
-      const _children = resolvedChildren() as Element
+      const _children = resolvedChildren() as HTMLElement
+      if (isHide(_children)) {
+        setOpen(false)
+        return
+      }
+
       const childrenRect = _children.getBoundingClientRect()
       switch (props.placement) {
         case 'top':
@@ -276,7 +282,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       ro.disconnect()
     })
   })
-  // 监听 children 的 位置 变化
+  // 监听 children 的位置变化
   createEffect(() => {
     const _children = resolvedChildren() as HTMLElement
 
