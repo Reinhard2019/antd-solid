@@ -37,7 +37,10 @@ export default defineConfig({
       },
       {
         text: '导航',
-        items: [{ text: 'Menu 导航菜单', link: '/components/menu' }],
+        items: [
+          { text: 'Dropdown 下拉菜单', link: '/components/dropdown' },
+          { text: 'Menu 导航菜单', link: '/components/menu' },
+        ],
       },
       {
         text: '数据录入',
