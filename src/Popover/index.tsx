@@ -1,7 +1,7 @@
 import { type Component, type JSXElement, Show } from 'solid-js'
 import Tooltip, { getContent, type TooltipProps } from '../Tooltip'
 
-interface PopoverProps extends TooltipProps {
+export interface PopoverProps extends TooltipProps {
   title?: JSXElement
 }
 

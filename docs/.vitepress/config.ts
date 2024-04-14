@@ -36,6 +36,10 @@ export default defineConfig({
         ],
       },
       {
+        text: '导航',
+        items: [{ text: 'Menu 导航菜单', link: '/components/menu' }],
+      },
+      {
         text: '数据录入',
         items: [
           { text: 'Checkbox 多选框', link: '/components/checkbox' },

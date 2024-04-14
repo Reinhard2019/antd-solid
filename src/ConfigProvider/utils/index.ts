@@ -21,6 +21,9 @@ export function createCssVariables(
     colorSplit: getAlphaColor(mapToken.colorBorderSecondary, mapToken.colorBgContainer),
     colorIcon: mapToken.colorTextTertiary,
     colorIconHover: mapToken.colorText,
+
+    controlItemBgActive: mapToken.colorPrimaryBg,
+    controlOutline: getAlphaColor(mapToken.colorPrimaryBg, mapToken.colorBgContainer),
   }
 
   return {
@@ -66,7 +69,8 @@ export function createCssVariables(
     '--ant-color-bg-elevated': mapToken.colorBgElevated,
     '--ant-color-bg-layout': mapToken.colorBgLayout,
 
-    '--ant-control-outline': 'rgba(5, 145, 255, 0.1)',
+    '--ant-control-outline': aliasToken.controlOutline,
+    '--ant-control-item-bg-active': aliasToken.controlItemBgActive,
 
     '--ant-font-weight-strong': '600',
 

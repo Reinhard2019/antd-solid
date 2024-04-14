@@ -9,7 +9,8 @@ import {
 import Button from '../Button'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 
-interface PopconfirmProps extends Pick<TooltipProps, 'placement' | 'arrow' | 'getPopupContainer'> {
+export interface PopconfirmProps
+  extends Pick<TooltipProps, 'placement' | 'arrow' | 'getPopupContainer'> {
   title?: JSXElement
   content?: JSXElement
   children: JSXElement
