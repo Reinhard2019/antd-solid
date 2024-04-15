@@ -21,6 +21,7 @@ import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
 import ConfigProviderContext from '../ConfigProvider/context'
 import { isHide } from '../utils/dom'
+import useHover from '../hooks/useHover'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -69,6 +70,11 @@ export interface TooltipProps {
    * x、y 轴的偏移量
    */
   offset?: [number, number]
+  /**
+   * 鼠标移出后延时多少才隐藏 Tooltip，单位：秒
+   * 默认 0.1
+   */
+  mouseLeaveDelay?: number
 }
 
 /**
@@ -105,6 +111,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       arrow: true,
       getPopupContainer: () => document.body,
       offset: [0, 0],
+      mouseLeaveDelay: 0.1,
     },
     _props,
   )
@@ -122,18 +129,28 @@ const Tooltip: Component<TooltipProps> = _props => {
   const show = () => setOpen(true)
   const hide = () => setOpen(false)
 
+  const contentHovering = useHover(() => (open() ? contentRef : undefined))
+  const childrenHovering = useHover(() =>
+    toArray(props.trigger).includes('hover') ? (resolvedChildren() as HTMLElement) : undefined,
+  )
+  createEffect(() => {
+    if (toArray(props.trigger).includes('hover')) {
+      if (contentHovering() || childrenHovering()) {
+        show()
+      } else {
+        setTimeout(() => {
+          if (!contentHovering() && !childrenHovering()) {
+            hide()
+          }
+        }, props.mouseLeaveDelay * 1000)
+      }
+    }
+  })
+
   createEffect(() => {
     const _children = resolvedChildren() as Element
     toArray(props.trigger).forEach(trigger => {
       switch (trigger) {
-        case 'hover':
-          _children.addEventListener('mouseenter', show)
-          _children.addEventListener('mouseleave', hide)
-          onCleanup(() => {
-            _children.removeEventListener('mouseenter', show)
-            _children.removeEventListener('mouseleave', hide)
-          })
-          break
         case 'click':
           _children.addEventListener('click', reverseOpen)
           onCleanup(() => {
