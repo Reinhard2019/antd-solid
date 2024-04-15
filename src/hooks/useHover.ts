@@ -5,7 +5,10 @@ export default function useHover(target: Accessor<HTMLElement | undefined>) {
 
   createEffect(() => {
     const _target = target()
-    if (!_target) return
+    if (!_target) {
+      setHover(false)
+      return
+    }
 
     const onMouseEnter = () => {
       setHover(true)
