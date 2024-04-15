@@ -44,14 +44,13 @@ const Progress: Component<ProgressProps> & {
   })
 
   return (
-    <div class="flex items-center" style={{}}>
+    <div class="flex items-center" style={cssVariables()}>
       <div
         class={cs(
           'w-full bg-[var(--ant-progress-remaining-color)]',
           'before:content-empty before:block before:bg-[var(--color)] before:w-[var(--percent)] before:h-full before:rounded-inherit',
         )}
         style={{
-          ...cssVariables(),
           height: `${props.height}px`,
           'border-radius': `${props.height / 2}px`,
           '--percent': `${props.percent}%`,
