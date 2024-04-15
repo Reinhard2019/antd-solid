@@ -83,6 +83,7 @@ export function createCssVariables(
     '--ant-line-width': '1px',
     '--ant-line-type': 'solid',
 
+    '--ant-margin-xxs': '4px',
     '--ant-margin-xs': '8px',
     '--ant-margin-sm': '12px',
     '--ant-margin': '16px',

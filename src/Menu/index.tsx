@@ -8,10 +8,20 @@ import Fragment from '../Fragment'
 import Popover, { type PopoverProps } from '../Popover'
 import DropdownContext from '../Dropdown/context'
 
-export interface MenuItem {
-  key: string
+export interface MenuItemType {
+  key: any
   label: JSX.Element
   children?: MenuItem[]
+}
+
+export interface MenuDividerType {
+  type: 'divider'
+}
+
+export type MenuItem = MenuItemType | MenuDividerType
+
+function isMenuDividerType(value: MenuItem): value is MenuDividerType {
+  return (value as MenuDividerType).type === 'divider'
 }
 
 export interface MenuProps extends StyleProps {
@@ -31,11 +41,11 @@ export interface MenuProps extends StyleProps {
   /**
    * 点击 MenuItem 调用此函数
    */
-  onClick?: (info: { key: string; keyPath: string[] }) => void
+  onClick?: (info: { key: any; keyPath: any[] }) => void
 }
 
 interface InternalMenuProps extends MenuProps {
-  parents?: MenuItem[]
+  parents?: MenuItemType[]
 }
 
 const InternalMenu: Component<InternalMenuProps> = props => {
@@ -44,6 +54,9 @@ const InternalMenu: Component<InternalMenuProps> = props => {
   return (
     <For each={props.items}>
       {item => {
+        if (isMenuDividerType(item))
+          return <div class="h-1px bg-[var(--ant-color-split)] my-[var(--ant-margin-xxs)]" />
+
         const parents = createMemo(() => [...(props.parents ?? []), item])
         return (
           <Dynamic<Component<PopoverProps>>
@@ -63,15 +76,15 @@ const InternalMenu: Component<InternalMenuProps> = props => {
               />
             )}
             contentStyle={{
-              padding: 0,
+              padding: inDropdown ? '4px' : 0,
             }}
             offset={[8, 0]}
           >
             <div
               class={cs(
-                'relative m-4px rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
+                'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
                 'hover:bg-[var(--ant-color-bg-text-hover)]',
-                inDropdown ? 'leading-32px' : 'leading-40px',
+                inDropdown ? 'leading-32px' : 'leading-40px m-4px',
                 isEmpty(item.children)
                   ? [
                     'px-[var(--ant-padding)]',
