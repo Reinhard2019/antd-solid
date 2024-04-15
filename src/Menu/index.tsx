@@ -6,6 +6,7 @@ import ConfigProviderContext from '../ConfigProvider/context'
 import { type StyleProps } from '../types'
 import Fragment from '../Fragment'
 import Popover, { type PopoverProps } from '../Popover'
+import DropdownContext from '../Dropdown/context'
 
 export interface MenuItem {
   key: string
@@ -38,6 +39,8 @@ interface InternalMenuProps extends MenuProps {
 }
 
 const InternalMenu: Component<InternalMenuProps> = props => {
+  const { inDropdown } = useContext(DropdownContext)
+
   return (
     <For each={props.items}>
       {item => {
@@ -66,8 +69,9 @@ const InternalMenu: Component<InternalMenuProps> = props => {
           >
             <div
               class={cs(
-                'relative m-4px leading-40px rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
+                'relative m-4px rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
                 'hover:bg-[var(--ant-color-bg-text-hover)]',
+                inDropdown ? 'leading-32px' : 'leading-40px',
                 isEmpty(item.children)
                   ? [
                     'px-[var(--ant-padding)]',
