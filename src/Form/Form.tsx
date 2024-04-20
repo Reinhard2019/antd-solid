@@ -93,7 +93,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   return (
     <form
       class={cs(
-        '[font-size:var(--ant-font-size)]',
+        'text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]',
         props.layout === 'inline' ? 'inline-flex flex-wrap' : '',
       )}
       onSubmit={e => {

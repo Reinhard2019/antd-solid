@@ -33,7 +33,10 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
   )
 
   return (
-    <div style={cssVariables()}>
+    <div
+      class="text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]"
+      style={cssVariables()}
+    >
       <table class="w-full">
         <thead>
           <tr>
