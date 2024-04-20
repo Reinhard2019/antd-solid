@@ -38,6 +38,9 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ layout: 'horizontal' } as FormProps, _props)
   const rulesDict: Record<string, Schema[]> = {}
+  /**
+   * 用于设置错误消息方法的字典
+   */
   const setErrMsgDict: Record<string, Setter<string>> = {}
 
   const [values, setValues] = createStore(

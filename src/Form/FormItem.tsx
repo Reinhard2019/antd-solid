@@ -8,8 +8,9 @@ import {
   createEffect,
   on,
   type Component,
+  onMount,
 } from 'solid-js'
-import { isNil } from 'lodash-es'
+import { isNil, set, unset } from 'lodash-es'
 import { nanoid } from 'nanoid'
 import cs from 'classnames'
 import { type Schema } from 'yup'
@@ -43,9 +44,22 @@ export interface FormItemProps {
 
 const FormItem = (props: FormItemProps) => {
   const { cssVariables } = useContext(ConfigProviderContext)
-  const { formInstance, setItemWidthDict, maxItemWidth, layout } = useContext(Context)
+  const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth, layout } =
+    useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
+
+  onMount(() => {
+    if (props.name && props.rules) {
+      set(rulesDict, props.name, props.rules)
+      set(setErrMsgDict, props.name, setErrMsg)
+
+      onCleanup(() => {
+        unset(rulesDict, props.name!)
+        unset(setErrMsgDict, props.name!)
+      })
+    }
+  })
 
   let label: HTMLLabelElement | undefined
   createEffect(
