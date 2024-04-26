@@ -2,12 +2,12 @@ import { type Component, type JSX, For, mergeProps, createSelector, useContext }
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
-import { type StringOrJSXElement } from '../types'
+import { type StyleProps, type StringOrJSXElement } from '../types'
 import Radio from '.'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import ConfigProviderContext from '../ConfigProvider/context'
 
-export interface RadioGroupProps {
+export interface RadioGroupProps extends StyleProps {
   defaultValue?: string
   value?: string
   onChange?: JSX.ChangeEventHandler<HTMLInputElement, Event>
@@ -32,8 +32,15 @@ const Group: Component<RadioGroupProps> = _props => {
 
   return (
     <div
-      class={cs(props.block ? 'flex' : 'inline-flex', props.optionType === 'default' && 'gap-8px')}
-      style={cssVariables()}
+      class={cs(
+        props.class,
+        props.block ? 'flex' : 'inline-flex',
+        props.optionType === 'default' && 'gap-8px',
+      )}
+      style={{
+        ...cssVariables(),
+        ...props.style,
+      }}
     >
       <For each={props.options}>
         {option => (

@@ -25,9 +25,9 @@ export interface SelectProps
   SelectInputProps<Key>,
   'multiple' | 'allowClear' | 'class' | 'style' | 'disabled' | 'placeholder' | 'status'
   > {
-  defaultValue?: Key | Key[]
-  value?: Key | Key[]
-  onChange?: (value: Key | Key[]) => void
+  defaultValue?: Key | Key[] | null
+  value?: Key | Key[] | null
+  onChange?: (value: Key | Key[] | undefined) => void
   options?: SelectOption[]
 }
 
