@@ -1,11 +1,11 @@
-import { type JSXElement, For, Show, mergeProps, useContext } from 'solid-js'
+import { type JSXElement, For, Show, mergeProps, useContext, type Accessor } from 'solid-js'
 import cs from 'classnames'
 import Empty from '../Empty'
 import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement
-  render: (row: R) => JSXElement
+  render: (row: R, index: Accessor<number>) => JSXElement
 }
 
 export interface TableProps<R extends {}> {
@@ -56,7 +56,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
         </thead>
         <tbody>
           <For each={props.dataSource}>
-            {row => (
+            {(row, i) => (
               <tr class="hover:bg-[var(--ant-table-row-hover-bg)]">
                 <For each={props.columns}>
                   {item => (
@@ -66,7 +66,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
                         '[border-bottom:1px_solid_var(--ant-table-border-color)]',
                       )}
                     >
-                      {item.render(row)}
+                      {item.render(row, i)}
                     </td>
                   )}
                 </For>
