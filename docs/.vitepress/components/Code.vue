@@ -146,10 +146,8 @@ onMounted(() => {
       window[appRef] = app.value
 
       let _code = `
-    // import { render } from 'solid-js/web';
     ${code.value}
-    const App = exports["default"];
-    window.SolidJsWeb.render(() => <App />, window['${appRef}']);
+    window.SolidJsWeb.render(exports["default"], window['${appRef}']);
   `
 
       // @ts-ignore
