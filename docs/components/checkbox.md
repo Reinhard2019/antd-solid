@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="checkbox/Base" />
 
+### 不可用
+
+checkbox 不可用。
+
+<Code path="checkbox/Disabled" />
+
 ### 全选
 
 在实现全选效果时，你可能会用到 `indeterminate` 属性。

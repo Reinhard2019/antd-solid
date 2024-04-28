@@ -21,6 +21,7 @@ export interface CheckboxGroupProps {
   block?: boolean
   class?: string
   style?: JSX.CSSProperties
+  disabled?: boolean
 }
 
 const getOptionValue = (option: string | number | CheckboxOption) =>
@@ -48,6 +49,7 @@ const Group: Component<CheckboxGroupProps> = props => {
                 setValue(l => l.filter(v => getOptionValue(v) !== getOptionValue(option)))
               }
             }}
+            disabled={props.disabled}
           >
             {typeof option === 'object' ? unwrapStringOrJSXElement(option.label) : option}{' '}
           </Checkbox>
