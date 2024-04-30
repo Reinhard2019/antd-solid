@@ -8,14 +8,15 @@ import {
   useContext,
 } from 'solid-js'
 import { get, isEmpty, pull } from 'lodash-es'
+import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
-import { type Key } from '../types'
+import { type StyleProps, type Key } from '../types'
 import SingleLevelTree from './SingleLevelTree'
 import { type CheckboxProps } from '../Checkbox'
 import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface CheckNode<T extends {} = TreeNode> extends CheckboxProps {
-  key: Key
+  key: any
   parent?: CheckNode<T>
   treeNode: T
   checkedChildCount?: number
@@ -23,20 +24,23 @@ export interface CheckNode<T extends {} = TreeNode> extends CheckboxProps {
 }
 
 export interface TreeNode {
-  key: Key
+  key: any
   title: JSXElement
   children?: TreeNode[] | undefined
 }
 
-export interface TreeProps<T extends {} = TreeNode> {
+export interface TreeProps<T extends {} = TreeNode> extends StyleProps {
   /**
    * 支持点选多个节点（节点本身）
    */
   multiple?: boolean
-  defaultSelectedKeys?: Key[] | undefined | null
-  selectedKeys?: Key[] | undefined | null
-  onSelect?: (selectedKeys: Key[]) => void
   treeData?: T[]
+  defaultSelectedKeys?: any[] | undefined | null
+  selectedKeys?: any[] | undefined | null
+  onSelect?: (selectedKeys: any[]) => void
+  defaultExpandedKeys?: any[] | undefined | null
+  expandedKeys?: any[] | undefined | null
+  onExpand?: (expandedKeys: any[]) => void
   /**
    * 是否节点占据一行
    */
@@ -47,22 +51,17 @@ export interface TreeProps<T extends {} = TreeNode> {
    * 设置节点可拖拽
    */
   draggable?: boolean
-  onDrop?: (info: {
-    dragNode: T
-    targetNode: T
-    dragIndexes: number[]
-    targetIndexes: number[]
-  }) => void
+  onDrop?: (info: { dragNode: T; dragIndexes: number[]; targetIndexes: number[] }) => void
   /**
    * 默认选中复选框的树节点
    */
-  defaultCheckedKeys?: Key[] | undefined | null
-  checkedKeys?: Key[] | undefined | null
+  defaultCheckedKeys?: any[] | undefined | null
+  checkedKeys?: any[] | undefined | null
   onCheck?: (
-    checkedKeys: Key[],
+    checkedKeys: any[],
     e: {
       checked: boolean
-      halfCheckedKeys: Key[]
+      halfCheckedKeys: any[]
     },
   ) => void
   /**
@@ -71,7 +70,7 @@ export interface TreeProps<T extends {} = TreeNode> {
    */
   fieldNames?: {
     title?: string | ((node: T) => JSXElement)
-    key?: string | ((node: T) => Key)
+    key?: string | ((node: T) => any)
     children?: string | ((node: T) => T[] | undefined)
   }
   /**
@@ -83,6 +82,11 @@ export interface TreeProps<T extends {} = TreeNode> {
    * 是否允许点击节点进行勾选，仅在 checkable 为 true 时生效
    */
   checkOnClick?: boolean
+  /**
+   * 缩进宽度
+   * 默认 24
+   */
+  indentSize?: number
 }
 
 function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
@@ -90,6 +94,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   const props = mergeProps(
     {
       checkStrategy: 'all' as const,
+      indentSize: 24,
     },
     _props,
   )
@@ -123,8 +128,12 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
     valueConvertor: v => (Array.isArray(v) ? v : []),
   })
 
-  const [expandedKeys, setExpandedKeys] = createSignal<Key[]>(
-    untrack(() => {
+  const [expandedKeys, setExpandedKeys] = createControllableValue<Key[]>(props, {
+    defaultValuePropName: 'defaultExpandedKeys',
+    valuePropName: 'expandedKeys',
+    trigger: 'onExpand',
+    valueConvertor: v => (Array.isArray(v) ? v : []),
+    defaultValue: untrack(() => {
       if (!props.defaultExpandAll) return []
       const collectKeys = (list: T[] | undefined): Key[] => {
         if (!list) return []
@@ -132,7 +141,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
       }
       return collectKeys(props.treeData)
     }),
-  )
+  })
 
   const [_checkedKeys, setCheckedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultCheckedKeys',
@@ -141,7 +150,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
     valueConvertor: v => (Array.isArray(v) ? v : []),
   })
   // TODO
-  // 由于 treeForEach 中会对 checkedKeys 直接修改，未避免直接修改外部的传值，这里先拷贝一份
+  // 由于 treeForEach 中会对 checkedKeys 直接修改，为避免直接修改外部的传值，这里先拷贝一份
   const checkedKeys = createMemo(() => [..._checkedKeys()])
   const checkedMap = createMemo(() => {
     const map = new Map<Key, CheckNode<T>>()
@@ -244,12 +253,20 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   const isDraggable = createSelector<T | null, T | null>(draggableNode)
   const [draggableIndexes, setDraggableIndexes] = createSignal<number[] | null>(null)
 
-  const [targetNode, setTargetNode] = createSignal<T | null>(null)
-  const isTarget = createSelector<T | null, T | null>(targetNode)
-  const [targetIndexes, setTargetIndexes] = createSignal<number[] | null>(null)
+  const getNodeByIndexes = (indexes: number[], treeData: T[] | undefined | null): T | undefined => {
+    if (indexes.length === 0 || !treeData) return
+    if (indexes.length === 1) return treeData[indexes[0]]
+    return getNodeByIndexes(indexes.slice(1), getChildren(treeData[indexes[0]]))
+  }
 
   return (
-    <div class="text-[var(--ant-color-text)]" style={cssVariables()}>
+    <div
+      class={cs(props.class, 'text-[var(--ant-color-text)]')}
+      style={{
+        ...cssVariables(),
+        ...props.style,
+      }}
+    >
       <SingleLevelTree
         {...props}
         treeData={props.treeData}
@@ -261,11 +278,6 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
         draggableIndexes={draggableIndexes}
         setDraggableIndexes={setDraggableIndexes}
         isDraggable={isDraggable}
-        targetNode={targetNode}
-        setTargetNode={setTargetNode}
-        targetIndexes={targetIndexes}
-        setTargetIndexes={setTargetIndexes}
-        isTarget={isTarget}
         expandedKeys={expandedKeys}
         setExpandedKeys={setExpandedKeys}
         setCheckedKeys={setCheckedKeys}
@@ -273,6 +285,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
         getKey={getKey}
         getChildren={getChildren}
         checkedMap={checkedMap}
+        getNodeByIndexes={indexes => getNodeByIndexes(indexes, props.treeData)}
       />
     </div>
   )

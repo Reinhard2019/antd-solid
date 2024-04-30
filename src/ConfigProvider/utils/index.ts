@@ -22,7 +22,11 @@ export function createCssVariables(
     colorIcon: mapToken.colorTextTertiary,
     colorIconHover: mapToken.colorText,
 
+    controlItemBgHover: mapToken.colorFillTertiary,
     controlItemBgActive: mapToken.colorPrimaryBg,
+    controlItemBgActiveHover: mapToken.colorPrimaryBgHover,
+    controlItemBgActiveDisabled: mapToken.colorFill,
+    controlTmpOutline: mapToken.colorFillQuaternary,
     controlOutline: getAlphaColor(mapToken.colorPrimaryBg, mapToken.colorBgContainer),
   }
 
@@ -90,9 +94,12 @@ export function createCssVariables(
     '--ant-margin-lg': '24px',
     '--ant-margin-xl': '32px',
 
+    '--ant-padding-xxs': '4px',
+    '--ant-padding-xs': '8px',
     '--ant-padding-sm': '12px',
     '--ant-padding': '16px',
     '--ant-padding-lg': '24px',
+    '--ant-padding-xl': '32px',
 
     '--ant-box-shadow-tertiary':
       '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
@@ -118,8 +125,10 @@ export function createCssVariables(
     '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
     '--ant-select-multiple-item-height': '24px',
 
-    '--ant-tree-node-selected-bg': '#e6f4ff',
-    '--ant-tree-node-hover-bg': 'rgba(0, 0, 0, 0.04)',
+    '--ant-tree-expand-icon-width': '24px',
+    '--ant-tree-node-wrapper-padding': '2px 0',
+    '--ant-tree-node-selected-bg': aliasToken.controlItemBgActive,
+    '--ant-tree-node-hover-bg': aliasToken.controlItemBgHover,
 
     '--ant-alert-default-padding': '8px 12px',
 

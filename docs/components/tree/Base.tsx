@@ -47,7 +47,7 @@ const treeData = [
   },
 ]
 
-const Index: Component = () => {
+const App: Component = () => {
   const [checkedKeys, setCheckedKeys] = createSignal<Key[]>(['0-0-0'])
 
   return (
@@ -65,4 +65,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App
