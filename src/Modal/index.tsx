@@ -9,13 +9,18 @@ import {
   useContext,
   createEffect,
   onCleanup,
+  on,
+  createRenderEffect,
 } from 'solid-js'
 import { Dynamic, Portal, render } from 'solid-js/web'
 import cs from 'classnames'
+import { Transition } from 'solid-transition-group'
 import Button from '../Button'
 import createControllableValue from '../hooks/createControllableValue'
 import DelayShow from '../DelayShow'
 import ConfigProviderContext from '../ConfigProvider/context'
+import './index.scss'
+import createTransition from '../hooks/createTransition'
 
 export interface ModalProps {
   title?: JSXElement
@@ -135,7 +140,7 @@ function createModal<P extends {} = {}, T = void>(
   contextHolder: true,
 ): {
   show: (props?: P) => Promise<T>
-  getContextHolder: () => JSXElement
+  getContextHolder: (destroyOnClose?: boolean) => JSXElement
 }
 function createModal<P extends {} = {}, T = void>(
   component: Component<P>,
@@ -146,7 +151,7 @@ function createModal<P extends {} = {}, T = void>(
   }
   | {
     show: (props?: P) => Promise<T>
-    getContextHolder: () => JSXElement
+    getContextHolder: (destroyOnClose?: boolean) => JSXElement
   } {
   const [open, setOpen] = createSignal(false)
   const [props, setProps] = createSignal<P>({} as P)
@@ -167,8 +172,8 @@ function createModal<P extends {} = {}, T = void>(
     // eslint-disable-next-line prefer-promise-reject-errors
     reject()
   }
-  const getContextHolder = () => (
-    <Show when={open()}>
+  const getContextHolder = (destroyOnClose = false) => (
+    <Dynamic component={destroyOnClose ? Show : DelayShow} when={open()}>
       <ModalContext.Provider
         value={{
           open,
@@ -179,7 +184,7 @@ function createModal<P extends {} = {}, T = void>(
       >
         <Dynamic component={component} {...props()!} />
       </ModalContext.Provider>
-    </Show>
+    </Dynamic>
   )
 
   if (contextHolder) {
@@ -212,6 +217,9 @@ function createModal<P extends {} = {}, T = void>(
   }
 }
 
+// 单位 s
+const transitionDuration = 0.3
+
 const Modal: Component<ModalProps> & {
   warning: typeof warning
   useModalProps: typeof useModalProps
@@ -219,7 +227,7 @@ const Modal: Component<ModalProps> & {
 } = _props => {
   const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
-    { footer: true, keyboard: true, maskClosable: true, closeIcon: true },
+    { footer: true, keyboard: true, maskClosable: true, closeIcon: true, destroyOnClose: false },
     _props,
   )
   const [open] = createControllableValue(props, {
@@ -247,85 +255,135 @@ const Modal: Component<ModalProps> & {
     })
   })
 
+  const [activeElementCenter, setActiveElementCenter] = createSignal({
+    x: 0,
+    y: 0,
+  })
+  createRenderEffect(
+    on(open, input => {
+      if (input) {
+        const rect = document.activeElement?.getBoundingClientRect()
+        setActiveElementCenter({
+          x: rect ? rect.x + rect.width / 2 : 0,
+          y: rect ? rect.y + rect.height / 2 : 0,
+        })
+      }
+    }),
+  )
+
+  let modalRootRef: HTMLDivElement | undefined
+  createTransition(() => modalRootRef, open, 'ant-modal-fade')
+
   return (
-    <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
-      <Portal>
-        <div
-          class={cs(
-            open() ? 'flex' : 'hidden',
-            'fixed justify-center inset-0 bg-[rgba(0,0,0,.45)] z-1000',
-            props.centered && 'items-center',
-          )}
-          onClick={() => {
-            if (props.maskClosable) {
-              props.onCancel?.()
-            }
-          }}
-          style={cssVariables()}
-        >
-          <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
+    <Portal>
+      <Transition
+        name="ant-modal-fade"
+        appear
+        onEnter={(el, done) => {
+          el.animate([], {
+            duration: transitionDuration * 1000,
+          }).finished.finally(done)
+        }}
+        onExit={(el, done) => {
+          el.animate([], {
+            duration: transitionDuration * 1000,
+          }).finished.finally(done)
+        }}
+      >
+        <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
+          <div
+            ref={modalRootRef}
+            class={cs('text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]')}
+            style={{
+              ...cssVariables(),
+              '--transition-duration': `${transitionDuration}s`,
+            }}
+          >
             <div
-              class={cs(
-                'absolute px-24px py-20px rounded-8px overflow-hidden bg-white flex flex-col',
-                // '![animation-duration:.5s]',
-                !props.centered && 'top-100px',
-              )}
-              onClick={e => {
-                e.stopPropagation()
+              class={cs('ant-modal-mask', 'fixed inset-0 bg-[var(--ant-color-bg-mask)] z-1000')}
+              aria-label="mask"
+              onClick={() => {
+                if (props.maskClosable) {
+                  props.onCancel?.()
+                }
               }}
+            />
+
+            <div
+              class="ant-modal-wrap z-1000 fixed transform-origin-center"
               style={{
-                width: props.width ?? '520px',
-                height: props.height,
+                '--top': props.centered ? '50%' : '100px',
+                '--translate-y': props.centered ? '-50%' : '0%',
+                '--active-element-center-x': `${activeElementCenter().x}px`,
+                '--active-element-center-y': `${activeElementCenter().y}px`,
               }}
             >
-              {/* 关闭按钮 */}
-              <Show when={props.closeIcon}>
-                <Button
-                  type="text"
+              <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
+                <div
                   class={cs(
-                    'rm-size-btn !w-22px !h-22px !flex !justify-center !items-center text-center text-18px !absolute !top-16px !right-16px z-1000 text-[rgba(0,0,0,.45)] hover:!text-[rgba(0,0,0,.88)]',
+                    'ant-modal',
+                    'px-24px py-20px rounded-8px overflow-hidden bg-[var(--ant-modal-content-bg)] flex flex-col',
                   )}
-                  onClick={() => {
-                    props.onCancel?.()
+                  style={{
+                    width: props.width ?? '520px',
+                    height: props.height,
+                  }}
+                  onClick={e => {
+                    e.stopPropagation()
                   }}
                 >
-                  <span class="i-ant-design:close-outlined" />
-                </Button>
-              </Show>
+                  {/* 关闭按钮 */}
+                  <Show when={props.closeIcon}>
+                    <Button
+                      type="text"
+                      class={cs(
+                        '!w-22px !h-22px !flex !justify-center !items-center text-center text-18px !absolute !top-16px !right-16px z-1000 !text-[var(--ant-color-icon)] hover:!text-[var(--ant-color-icon-hover)]',
+                      )}
+                      onClick={() => {
+                        props.onCancel?.()
+                      }}
+                    >
+                      <span class="i-ant-design:close-outlined" />
+                    </Button>
+                  </Show>
 
-              <div class="text-[rgba(0,0,0,.88)] text-16px font-600 mb-8px">{props.title}</div>
-              <div class="grow">{props.children}</div>
+                  <div class="text-[var(--ant-modal-title-color)] text-16px font-600 mb-8px">
+                    {props.title}
+                  </div>
+                  <div class="grow">{props.children}</div>
 
-              <Show when={props.footer}>
-                <div class="mt-12px">
-                  <Show
-                    when={typeof props.footer !== 'function'}
-                    fallback={typeof props.footer === 'function' && props.footer()}
-                  >
-                    <div class="flex gap-8px justify-end">
-                      <Button
-                        onClick={() => {
-                          props.onCancel?.()
-                        }}
+                  <Show when={props.footer}>
+                    <div class="mt-12px">
+                      <Show
+                        when={typeof props.footer !== 'function'}
+                        fallback={typeof props.footer === 'function' && props.footer()}
                       >
-                        取消
-                      </Button>
-                      <Button
-                        type="primary"
-                        // eslint-disable-next-line solid/reactivity
-                        onClick={async () => await props.onOk?.()}
-                      >
-                        确定
-                      </Button>
+                        <div class="flex gap-8px justify-end">
+                          <Button
+                            onClick={() => {
+                              props.onCancel?.()
+                            }}
+                          >
+                            取消
+                          </Button>
+                          <Button
+                            type="primary"
+                            // eslint-disable-next-line solid/reactivity
+                            onClick={async () => await props.onOk?.()}
+                          >
+                            确定
+                          </Button>
+                        </div>
+                      </Show>
                     </div>
                   </Show>
                 </div>
               </Show>
             </div>
-          </Show>
-        </div>
-      </Portal>
-    </Dynamic>
+          </div>
+        </Dynamic>
+      </Transition>
+    </Portal>
   )
 }
 

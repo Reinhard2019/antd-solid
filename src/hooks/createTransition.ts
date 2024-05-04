@@ -18,12 +18,9 @@ export default function createTransition(
 
       if (input) {
         targetValue.style.display = ''
-        targetValue.classList.add(
-          `${className}-enter-active`,
-          `${className}-enter`,
-          `${className}-enter-to`,
-        )
+        targetValue.classList.add(`${className}-enter-active`, `${className}-enter`)
         requestAnimationFrame(() => {
+          targetValue.classList.add(`${className}-enter-to`)
           targetValue!.classList.remove(`${className}-enter`)
         })
         const onTransitionEnd = () => {
@@ -32,12 +29,9 @@ export default function createTransition(
         }
         targetValue.addEventListener('transitionend', onTransitionEnd)
       } else {
-        targetValue.classList.add(
-          `${className}-exit-active`,
-          `${className}-exit`,
-          `${className}-exit-to`,
-        )
+        targetValue.classList.add(`${className}-exit-active`, `${className}-exit`)
         requestAnimationFrame(() => {
+          targetValue!.classList.add(`${className}-exit-to`)
           targetValue!.classList.remove(`${className}-exit`)
         })
         const onTransitionEnd = () => {

@@ -1,0 +1,42 @@
+.ant-modal-wrap {
+  --scale: 1;
+  transform: translate(-50%, var(--translate-y)) scale(var(--scale));
+  left: 50%;
+  top: var(--top);
+}
+
+.ant-modal-fade-enter-active,
+.ant-modal-fade-exit-active {
+  .ant-modal-mask {
+    transition: opacity var(--transition-duration);
+  }
+
+  .ant-modal-wrap {
+    transition:
+      transform var(--transition-duration),
+      left var(--transition-duration),
+      top var(--transition-duration);
+  }
+}
+
+.ant-modal-fade-enter,
+.ant-modal-fade-exit-to {
+  .ant-modal-mask {
+    opacity: 0;
+  }
+
+  .ant-modal-wrap {
+    --scale: 0;
+    --translate-y: -50% !important;
+    left: var(--active-element-center-x);
+    top: var(--active-element-center-y);
+  }
+}
+
+.ant-modal-fade-enter-to,
+.ant-modal-fade-exit {
+  .ant-modal-wrap {
+    left: 50%;
+    top: var(--top);
+  }
+}

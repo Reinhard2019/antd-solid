@@ -73,6 +73,9 @@ export function createCssVariables(
     '--ant-color-bg-elevated': mapToken.colorBgElevated,
     '--ant-color-bg-layout': mapToken.colorBgLayout,
 
+    '--ant-color-white': mapToken.colorWhite,
+    '--ant-color-bg-mask': mapToken.colorBgMask,
+
     '--ant-control-outline': aliasToken.controlOutline,
     '--ant-control-item-bg-active': aliasToken.controlItemBgActive,
 
@@ -101,6 +104,16 @@ export function createCssVariables(
     '--ant-padding-lg': '24px',
     '--ant-padding-xl': '32px',
 
+    '--ant-box-shadow': `
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05)
+    `,
+    '--ant-box-shadow-secondary': `
+      0 6px 16px 0 rgba(0, 0, 0, 0.08),
+      0 3px 6px -4px rgba(0, 0, 0, 0.12),
+      0 9px 28px 8px rgba(0, 0, 0, 0.05)
+    `,
     '--ant-box-shadow-tertiary':
       '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
 
@@ -152,5 +165,8 @@ export function createCssVariables(
     '--ant-slider-handle-active-color': '#1677ff',
     '--ant-slider-handle-color-disabled': '#bfbfbf',
     '--ant-slider-track-bg-disabled': 'rgba(0, 0, 0, 0.04)',
+
+    '--ant-modal-content-bg': mapToken.colorBgElevated,
+    '--ant-modal-title-color': aliasToken.colorTextHeading,
   }
 }
