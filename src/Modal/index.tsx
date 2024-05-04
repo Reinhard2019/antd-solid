@@ -51,8 +51,14 @@ export interface ModalProps {
   keyboard?: boolean
   /**
    * 关闭时销毁 Modal 里的子元素
+   * 默认 false
    */
   destroyOnClose?: boolean
+  /**
+   * 是否在摁下 Esc 键的时候关闭 Modal
+   * 默认 true
+   */
+  closeOnEsc?: boolean
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -227,7 +233,14 @@ const Modal: Component<ModalProps> & {
 } = _props => {
   const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
-    { footer: true, keyboard: true, maskClosable: true, closeIcon: true, destroyOnClose: false },
+    {
+      footer: true,
+      keyboard: true,
+      maskClosable: true,
+      closeIcon: true,
+      destroyOnClose: false,
+      closeOnEsc: true,
+    },
     _props,
   )
   const [open] = createControllableValue(props, {
@@ -241,6 +254,8 @@ const Modal: Component<ModalProps> & {
 
     const originOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+
+    if (!props.closeOnEsc) return
 
     const onKeyup = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
