@@ -66,9 +66,9 @@ export interface ModalProps {
   onOk?: () => Promise<unknown> | void
   onCancel?: () => void
   /**
-   * 自定义渲染对话框
+   * Modal 打开动画结束事件
    */
-  modalRender?: () => JSXElement
+  onAfterEnter?: () => void
 }
 
 export interface MethodProps extends Pick<ModalProps, 'title' | 'children' | 'onOk' | 'onCancel'> {}
@@ -146,7 +146,7 @@ function createModal<P extends {} = {}, T = void>(
   contextHolder: true,
 ): {
   show: (props?: P) => Promise<T>
-  getContextHolder: (destroyOnClose?: boolean) => JSXElement
+  getContextHolder: () => JSXElement
 }
 function createModal<P extends {} = {}, T = void>(
   component: Component<P>,
@@ -157,7 +157,7 @@ function createModal<P extends {} = {}, T = void>(
   }
   | {
     show: (props?: P) => Promise<T>
-    getContextHolder: (destroyOnClose?: boolean) => JSXElement
+    getContextHolder: () => JSXElement
   } {
   const [open, setOpen] = createSignal(false)
   const [props, setProps] = createSignal<P>({} as P)
@@ -178,19 +178,17 @@ function createModal<P extends {} = {}, T = void>(
     // eslint-disable-next-line prefer-promise-reject-errors
     reject()
   }
-  const getContextHolder = (destroyOnClose = false) => (
-    <Dynamic component={destroyOnClose ? Show : DelayShow} when={open()}>
-      <ModalContext.Provider
-        value={{
-          open,
-          // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-          onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
-          onCancel,
-        }}
-      >
-        <Dynamic component={component} {...props()!} />
-      </ModalContext.Provider>
-    </Dynamic>
+  const getContextHolder = () => (
+    <ModalContext.Provider
+      value={{
+        open,
+        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
+        onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
+        onCancel,
+      }}
+    >
+      <Dynamic component={component} {...props()!} />
+    </ModalContext.Provider>
   )
 
   if (contextHolder) {
@@ -234,6 +232,7 @@ const Modal: Component<ModalProps> & {
   const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
+      width: '520px',
       footer: true,
       keyboard: true,
       maskClosable: true,
@@ -290,57 +289,55 @@ const Modal: Component<ModalProps> & {
   createTransition(() => modalRootRef, open, 'ant-modal-fade')
 
   return (
-    <Portal>
-      <Transition
-        name="ant-modal-fade"
-        appear
-        onEnter={(el, done) => {
-          el.animate([], {
-            duration: transitionDuration * 1000,
-          }).finished.finally(done)
-        }}
-        onExit={(el, done) => {
-          el.animate([], {
-            duration: transitionDuration * 1000,
-          }).finished.finally(done)
-        }}
-      >
-        <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
-          <div
-            ref={modalRootRef}
-            class={cs('text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]')}
-            style={{
-              ...cssVariables(),
-              '--transition-duration': `${transitionDuration}s`,
-            }}
-          >
+    <DelayShow when={open()}>
+      <Portal>
+        <Transition
+          name="ant-modal-fade"
+          appear
+          onEnter={(el, done) => {
+            el.animate([], {
+              duration: transitionDuration * 1000,
+            }).finished.finally(done)
+          }}
+          onAfterEnter={() => {
+            props.onAfterEnter?.()
+          }}
+          onExit={(el, done) => {
+            el.animate([], {
+              duration: transitionDuration * 1000,
+            }).finished.finally(done)
+          }}
+        >
+          <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
             <div
-              class={cs('ant-modal-mask', 'fixed inset-0 bg-[var(--ant-color-bg-mask)] z-1000')}
-              aria-label="mask"
-              onClick={() => {
-                if (props.maskClosable) {
-                  props.onCancel?.()
-                }
-              }}
-            />
-
-            <div
-              class="ant-modal-wrap z-1000 fixed transform-origin-center"
+              ref={modalRootRef}
+              class={cs('text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]')}
               style={{
-                '--top': props.centered ? '50%' : '100px',
-                '--translate-y': props.centered ? '-50%' : '0%',
-                '--active-element-center-x': `${activeElementCenter().x}px`,
-                '--active-element-center-y': `${activeElementCenter().y}px`,
+                ...cssVariables(),
+                '--transition-duration': `${transitionDuration}s`,
               }}
             >
-              <Show when={typeof props.modalRender !== 'function'} fallback={props.modalRender!()}>
+              <div
+                class={cs('ant-modal-mask', 'fixed inset-0 bg-[var(--ant-color-bg-mask)] z-1000')}
+                aria-label="mask"
+                onClick={() => {
+                  if (props.maskClosable) {
+                    props.onCancel?.()
+                  }
+                }}
+              />
+
+              <div class="ant-modal-wrap z-1000 fixed inset-0 overflow-auto pointer-events-none">
                 <div
                   class={cs(
                     'ant-modal',
-                    'px-24px py-20px rounded-8px overflow-hidden bg-[var(--ant-modal-content-bg)] flex flex-col',
+                    'px-24px py-20px rounded-8px overflow-hidden bg-[var(--ant-modal-content-bg)] flex flex-col max-w-[calc(100vw-calc(var(--ant-margin)*2))] transform-origin-center pointer-events-initial',
                   )}
                   style={{
-                    width: props.width ?? '520px',
+                    '--translate-y': props.centered ? 'max(calc(50vh - 50%), 0px)' : '100px',
+                    '--active-element-center-x': `${activeElementCenter().x}px`,
+                    '--active-element-center-y': `${activeElementCenter().y}px`,
+                    width: props.width,
                     height: props.height,
                   }}
                   onClick={e => {
@@ -368,12 +365,12 @@ const Modal: Component<ModalProps> & {
                   <div class="grow">{props.children}</div>
 
                   <Show when={props.footer}>
-                    <div class="mt-12px">
+                    <div class="mt-12px text-right">
                       <Show
                         when={typeof props.footer !== 'function'}
                         fallback={typeof props.footer === 'function' && props.footer()}
                       >
-                        <div class="flex gap-8px justify-end">
+                        <div class="inline-flex gap-8px">
                           <Button
                             onClick={() => {
                               props.onCancel?.()
@@ -393,12 +390,12 @@ const Modal: Component<ModalProps> & {
                     </div>
                   </Show>
                 </div>
-              </Show>
+              </div>
             </div>
-          </div>
-        </Dynamic>
-      </Transition>
-    </Portal>
+          </Dynamic>
+        </Transition>
+      </Portal>
+    </DelayShow>
   )
 }
 
