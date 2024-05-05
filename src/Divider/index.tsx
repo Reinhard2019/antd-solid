@@ -1,14 +1,7 @@
-import {
-  type ParentProps,
-  type Component,
-  Show,
-  mergeProps,
-  createMemo,
-  useContext,
-} from 'solid-js'
+import { type ParentProps, type Component, Show, mergeProps, createMemo } from 'solid-js'
 import cs from 'classnames'
 import { useSize } from '../hooks'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface DividerProps extends ParentProps {
   dashed?: boolean
@@ -20,7 +13,6 @@ export interface DividerProps extends ParentProps {
 }
 
 const Divider: Component<DividerProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       orientation: 'center',
@@ -51,16 +43,15 @@ const Divider: Component<DividerProps> = _props => {
     <Show
       when={props.children}
       fallback={
-        <div
+        <Element
           class={cs(
             'my-[var(--ant-margin-lg)] border-width-[1px_0_0] border-[var(--ant-color-split)]',
             props.dashed ? 'border-dashed' : 'border-solid',
           )}
-          style={cssVariables()}
         />
       }
     >
-      <div
+      <Element
         ref={container}
         class={cs(
           'my-[var(--ant-margin)] flex items-center relative',
@@ -74,7 +65,6 @@ const Divider: Component<DividerProps> = _props => {
           ],
         )}
         style={{
-          ...cssVariables(),
           '--ant-divider-text-padding-inline': '1em',
           '--ant-divider-children-start': `${childrenStart()}px`,
           '--ant-divider-children-end': `${childrenStart() + childrenWidth()}px`,
@@ -89,7 +79,7 @@ const Divider: Component<DividerProps> = _props => {
         >
           {props.children}
         </span>
-      </div>
+      </Element>
     </Show>
   )
 }

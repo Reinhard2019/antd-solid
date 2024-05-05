@@ -7,7 +7,6 @@ import {
   createSignal,
   untrack,
   createMemo,
-  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import { Portal } from 'solid-js/web'
@@ -16,7 +15,7 @@ import Button from '../Button'
 import { setRef } from '../utils/solid'
 import './index.scss'
 import createTransition from '../hooks/createTransition'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface DrawerInstance {
   open: () => void
@@ -61,7 +60,6 @@ export interface DrawerProps {
 }
 
 const Drawer: Component<DrawerProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       width: '378px',
@@ -146,7 +144,7 @@ const Drawer: Component<DrawerProps> = _props => {
   const children = (
     <Transition name="ant-drawer-fade">
       <Show when={open()}>
-        <div
+        <Element
           ref={drawer}
           class={cs('inset-0 bg-[rgba(0,0,0,.45)] z-1000', isBody() ? 'fixed' : 'absolute')}
           onClick={() => {
@@ -154,7 +152,6 @@ const Drawer: Component<DrawerProps> = _props => {
               instance.close()
             }
           }}
-          style={cssVariables()}
         >
           <div
             class={cs(
@@ -197,7 +194,7 @@ const Drawer: Component<DrawerProps> = _props => {
             </div>
             <div class="p-[var(--ant-padding-lg)] overflow-auto">{props.children}</div>
           </div>
-        </div>
+        </Element>
       </Show>
     </Transition>
   )

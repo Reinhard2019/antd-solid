@@ -1,4 +1,5 @@
 import {
+  type JSX,
   type JSXElement,
   type Ref,
   mergeProps,
@@ -6,7 +7,6 @@ import {
   createSignal,
   createMemo,
   untrack,
-  useContext,
 } from 'solid-js'
 import { createStore, produce } from 'solid-js/store'
 import { cloneDeep, get, max, set, unset } from 'lodash-es'
@@ -14,7 +14,7 @@ import { type Schema } from 'yup'
 import cs from 'classnames'
 import Context from './context'
 import { setRef } from '../utils/solid'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
@@ -35,7 +35,6 @@ export interface FormProps<T extends {} = {}> {
 }
 
 function Form<T extends {} = {}>(_props: FormProps<T>) {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ layout: 'horizontal' } as FormProps, _props)
   const rulesDict: Record<string, Schema[]> = {}
   /**
@@ -94,7 +93,8 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
   const maxItemWidth = createMemo(() => max(Object.values(itemWidthDict())))
 
   return (
-    <form
+    <Element<JSX.FormHTMLAttributes<HTMLFormElement>>
+      tag="form"
       class={cs(
         'text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]',
         props.layout === 'inline' ? 'inline-flex flex-wrap' : '',
@@ -102,7 +102,6 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
       onSubmit={e => {
         e.preventDefault()
       }}
-      style={cssVariables()}
     >
       <Context.Provider
         value={{
@@ -116,7 +115,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
       >
         {props.children}
       </Context.Provider>
-    </form>
+    </Element>
   )
 }
 

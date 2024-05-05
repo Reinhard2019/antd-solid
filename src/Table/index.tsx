@@ -1,7 +1,7 @@
-import { type JSXElement, For, Show, mergeProps, useContext, type Accessor } from 'solid-js'
+import { type JSXElement, For, Show, mergeProps, type Accessor } from 'solid-js'
 import cs from 'classnames'
 import Empty from '../Empty'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement
@@ -24,7 +24,6 @@ const sizeClassDict = {
 }
 
 const Table = <R extends {}>(_props: TableProps<R>) => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       size: 'middle',
@@ -33,10 +32,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
   )
 
   return (
-    <div
-      class="text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]"
-      style={cssVariables()}
-    >
+    <Element class="text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]">
       <table class="w-full">
         <thead>
           <tr>
@@ -79,7 +75,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
       <Show when={!props.dataSource.length}>
         <Empty.PRESENTED_IMAGE_SIMPLE />
       </Show>
-    </div>
+    </Element>
   )
 }
 

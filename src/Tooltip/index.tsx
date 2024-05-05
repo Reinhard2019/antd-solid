@@ -10,7 +10,6 @@ import {
   onCleanup,
   createMemo,
   untrack,
-  useContext,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
@@ -19,9 +18,9 @@ import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
-import ConfigProviderContext from '../ConfigProvider/context'
 import { isHide } from '../utils/dom'
 import useHover from '../hooks/useHover'
+import Element from '../Element'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -102,7 +101,6 @@ export const getContent = (content: TooltipProps['content'], close: () => void) 
 }
 
 const Tooltip: Component<TooltipProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       trigger: 'hover',
@@ -417,14 +415,13 @@ const Tooltip: Component<TooltipProps> = _props => {
       <DelayShow when={open()}>
         <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
-          <div
+          <Element
             ref={contentRef}
             class={cs(
               'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)]',
               open() ? 'block' : 'hidden',
             )}
             style={{
-              ...cssVariables(),
               transform: `translate(clamp(0px, calc(var(--translate-x) + ${props.offset?.[0] ?? 0}px), calc(100vw - 100%)), clamp(0px, calc(var(--translate-y) + ${props.offset?.[1] ?? 0}px), calc(100vh - 100%)))`,
             }}
             onClick={e => {
@@ -450,7 +447,7 @@ const Tooltip: Component<TooltipProps> = _props => {
                 }}
               />
             </Show>
-          </div>
+          </Element>
         </Portal>
       </DelayShow>
     </>

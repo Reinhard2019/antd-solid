@@ -1,7 +1,7 @@
-import { mergeProps, type Component, Switch, Match, Show, createMemo, useContext } from 'solid-js'
+import { mergeProps, type Component, Switch, Match, Show, createMemo } from 'solid-js'
 import { type ProgressProps } from '.'
 import { useSize } from '../hooks'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface CircleProps extends Omit<ProgressProps, 'type' | 'height'> {
   /**
@@ -17,7 +17,6 @@ export interface CircleProps extends Omit<ProgressProps, 'type' | 'height'> {
 }
 
 const Circle: Component<CircleProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   let ref: HTMLDivElement | undefined
   const props = mergeProps(
     {
@@ -40,11 +39,10 @@ const Circle: Component<CircleProps> = _props => {
   const size = useSize(() => ref)
 
   return (
-    <div
+    <Element
       ref={ref}
       class="flex items-center relative"
       style={{
-        ...cssVariables(),
         height: props.height,
         width: typeof size()?.height === 'number' ? `${size()!.height}px` : undefined,
         'font-size': typeof size()?.height === 'number' ? `${size()!.height / 5}px` : undefined,
@@ -104,7 +102,7 @@ const Circle: Component<CircleProps> = _props => {
           </Switch>
         </span>
       </Show>
-    </div>
+    </Element>
   )
 }
 

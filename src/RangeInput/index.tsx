@@ -14,6 +14,7 @@ import Tooltip from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Compact from '../Compact'
+import Element from '../Element'
 
 export interface RangeInputProps<T> {
   multiple?: boolean
@@ -149,7 +150,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     props.optionLabelRender ? props.optionLabelRender(v) : String(v)
 
   return (
-    <div
+    <Element
       class={cs(
         'rounded-6px',
         [
@@ -162,7 +163,6 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
-      style={{}}
     >
       <Tooltip
         mode="light"
@@ -265,7 +265,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
           </div>
         </div>
       </Tooltip>
-    </div>
+    </Element>
   )
 }
 

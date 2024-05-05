@@ -17,7 +17,7 @@ import { type Schema } from 'yup'
 import { Dynamic } from 'solid-js/web'
 import Context from './context'
 import { type FormInstance } from './Form'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface FormItemComponentProps<T = any, F extends {} = {}> {
   value?: T | undefined
@@ -43,7 +43,6 @@ export interface FormItemProps {
 }
 
 const FormItem = (props: FormItemProps) => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth, layout } =
     useContext(Context)
   const [errMsg, setErrMsg] = createSignal('')
@@ -96,14 +95,14 @@ const FormItem = (props: FormItemProps) => {
 
   return (
     <Show when={!props.hidden}>
-      <div
+      <Element
         class={cs(
           props.class,
           'mb-16px',
           layout() === 'horizontal' && 'flex items-center',
           layout() === 'inline' && 'inline-flex mr-16px',
         )}
-        style={{ ...cssVariables(), ...props.style }}
+        style={props.style}
       >
         <div
           class="flex items-center"
@@ -155,7 +154,7 @@ const FormItem = (props: FormItemProps) => {
             <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
           </Show>
         </div>
-      </div>
+      </Element>
     </Show>
   )
 }

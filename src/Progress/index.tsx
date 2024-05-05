@@ -1,7 +1,7 @@
-import { type Component, Switch, Match, mergeProps, Show, createMemo, useContext } from 'solid-js'
+import { type Component, Switch, Match, mergeProps, Show, createMemo } from 'solid-js'
 import cs from 'classnames'
 import Circle from './Circle'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface ProgressProps {
   /**
@@ -28,7 +28,6 @@ export interface ProgressProps {
 const Progress: Component<ProgressProps> & {
   Circle: typeof Circle
 } = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       percent: 0,
@@ -44,7 +43,7 @@ const Progress: Component<ProgressProps> & {
   })
 
   return (
-    <div class="flex items-center" style={cssVariables()}>
+    <Element class="flex items-center">
       <div
         class={cs(
           'w-full bg-[var(--ant-progress-remaining-color)]',
@@ -74,7 +73,7 @@ const Progress: Component<ProgressProps> & {
           </Switch>
         </span>
       </Show>
-    </div>
+    </Element>
   )
 }
 

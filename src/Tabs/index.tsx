@@ -13,14 +13,13 @@ import {
   on,
   children,
   Show,
-  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import Segmented from '../Segmented'
 import { type StringOrJSXElement } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import DelayShow from '../DelayShow'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface Tab {
   key: string
@@ -49,7 +48,6 @@ export interface TabsProps {
 }
 
 const Tabs: Component<TabsProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       type: 'line',
@@ -107,7 +105,7 @@ const Tabs: Component<TabsProps> = _props => {
   const resolvedAddonAfter = children(() => props.addonAfter)
 
   return (
-    <div
+    <Element
       class={cs(
         props.class,
         'flex',
@@ -115,7 +113,7 @@ const Tabs: Component<TabsProps> = _props => {
         props.placement === 'bottom' && 'flex-col-reverse',
         props.placement === 'right' && 'flex-row-reverse',
       )}
-      style={{ ...cssVariables(), ...props.style }}
+      style={props.style}
     >
       <div
         class={cs(
@@ -267,7 +265,7 @@ const Tabs: Component<TabsProps> = _props => {
           </DelayShow>
         )}
       </For>
-    </div>
+    </Element>
   )
 }
 

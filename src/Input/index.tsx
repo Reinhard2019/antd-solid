@@ -1,12 +1,12 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, mergeProps, onMount, splitProps, useContext } from 'solid-js'
+import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
 import type { JSX, JSXElement, Component } from 'solid-js'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
 import Compact from '../Compact'
 import { setRef } from '../utils/solid'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {
@@ -65,7 +65,6 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   _props: CommonInputProps<T> &
   Omit<JSX.InputHTMLAttributes<T>, 'style' | 'onChange' | 'onInput' | 'onKeyDown'>,
 ) {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ size: 'default' as const }, _props)
   const [{ style, onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
@@ -163,14 +162,14 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   )
 
   return (
-    <div
+    <Element
       class={cs(
         'flex w-full relative',
         Compact.compactItemClass,
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
-      style={{ ...cssVariables(), ...style }}
+      style={style}
     >
       <Show when={props.addonBefore}>
         <div
@@ -238,7 +237,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           }}
         />
       </Show>
-    </div>
+    </Element>
   )
 }
 

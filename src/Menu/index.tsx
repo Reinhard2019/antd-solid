@@ -2,11 +2,11 @@ import { For, Show, createMemo, mergeProps, useContext, type Component, type JSX
 import { isEmpty, omit } from 'lodash-es'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
-import ConfigProviderContext from '../ConfigProvider/context'
 import { type StyleProps } from '../types'
 import Fragment from '../Fragment'
 import Popover, { type PopoverProps } from '../Popover'
 import DropdownContext from '../Dropdown/context'
+import Element from '../Element'
 
 export interface MenuItemType {
   key: any
@@ -115,7 +115,6 @@ const InternalMenu: Component<InternalMenuProps> = props => {
 }
 
 const Menu: Component<MenuProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       mode: 'vertical',
@@ -125,15 +124,9 @@ const Menu: Component<MenuProps> = _props => {
   )
 
   return (
-    <div
-      class={props.class}
-      style={{
-        ...cssVariables(),
-        ...props.style,
-      }}
-    >
+    <Element class={props.class} style={props.style}>
       <InternalMenu {...omit(props, ['parents'])} />
-    </div>
+    </Element>
   )
 }
 

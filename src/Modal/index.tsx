@@ -18,9 +18,9 @@ import { Transition } from 'solid-transition-group'
 import Button from '../Button'
 import createControllableValue from '../hooks/createControllableValue'
 import DelayShow from '../DelayShow'
-import ConfigProviderContext from '../ConfigProvider/context'
 import './index.scss'
 import createTransition from '../hooks/createTransition'
+import Element from '../Element'
 
 export interface ModalProps {
   title?: JSXElement
@@ -229,7 +229,6 @@ const Modal: Component<ModalProps> & {
   useModalProps: typeof useModalProps
   createModal: typeof createModal
 } = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       width: '520px',
@@ -309,11 +308,10 @@ const Modal: Component<ModalProps> & {
           }}
         >
           <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
-            <div
+            <Element
               ref={modalRootRef}
               class={cs('text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]')}
               style={{
-                ...cssVariables(),
                 '--transition-duration': `${transitionDuration}s`,
               }}
             >
@@ -391,7 +389,7 @@ const Modal: Component<ModalProps> & {
                   </Show>
                 </div>
               </div>
-            </div>
+            </Element>
           </Dynamic>
         </Transition>
       </Portal>

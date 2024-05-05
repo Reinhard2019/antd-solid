@@ -5,7 +5,6 @@ import {
   createMemo,
   type JSXElement,
   mergeProps,
-  useContext,
 } from 'solid-js'
 import { get, isEmpty, pull } from 'lodash-es'
 import cs from 'classnames'
@@ -13,7 +12,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import { type StyleProps, type Key } from '../types'
 import SingleLevelTree from './SingleLevelTree'
 import { type CheckboxProps } from '../Checkbox'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface CheckNode<T extends {} = TreeNode> extends CheckboxProps {
   key: any
@@ -90,7 +89,6 @@ export interface TreeProps<T extends {} = TreeNode> extends StyleProps {
 }
 
 function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       checkStrategy: 'all' as const,
@@ -260,13 +258,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   }
 
   return (
-    <div
-      class={cs(props.class, 'text-[var(--ant-color-text)]')}
-      style={{
-        ...cssVariables(),
-        ...props.style,
-      }}
-    >
+    <Element class={cs(props.class, 'text-[var(--ant-color-text)]')} style={props.style}>
       <SingleLevelTree
         {...props}
         treeData={props.treeData}
@@ -287,7 +279,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
         checkedMap={checkedMap}
         getNodeByIndexes={indexes => getNodeByIndexes(indexes, props.treeData)}
       />
-    </div>
+    </Element>
   )
 }
 

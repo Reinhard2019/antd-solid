@@ -7,12 +7,11 @@ import {
   createSignal,
   createMemo,
   splitProps,
-  useContext,
 } from 'solid-js'
 import cs from 'classnames'
-import ConfigProviderContext from '../ConfigProvider/context'
 import './index.scss'
 import { wave } from '../utils/animation'
+import Element from '../Element'
 
 export interface ButtonProps
   extends ParentProps,
@@ -99,7 +98,6 @@ const typeClassMap = {
 } as const
 
 const Button: Component<ButtonProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     { type: 'default', size: 'middle', danger: false, disabled: false } as const,
     _props,
@@ -109,7 +107,8 @@ const Button: Component<ButtonProps> = _props => {
   const loading = createMemo(() => props.loading === true ?? innerLoading())
 
   return (
-    <button
+    <Element<JSX.ButtonHTMLAttributes<HTMLButtonElement>>
+      tag="button"
       {...buttonElementProps}
       ref={props.ref}
       class={cs(
@@ -123,7 +122,6 @@ const Button: Component<ButtonProps> = _props => {
         loading() && 'opacity-65',
       )}
       style={{
-        ...cssVariables(),
         ...props.style,
       }}
       disabled={props.disabled}
@@ -146,7 +144,7 @@ const Button: Component<ButtonProps> = _props => {
         <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite] mr-8px" />
       </Show>
       <span class="inline-block leading-inherit">{props.children}</span>
-    </button>
+    </Element>
   )
 }
 

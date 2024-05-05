@@ -1,8 +1,8 @@
-import { mergeProps, useContext, type Component } from 'solid-js'
+import { mergeProps, type Component } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import RotateSvg from '../assets/svg/Rotate'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface TransformValue {
   x: number
@@ -19,7 +19,6 @@ export interface TransformerProps {
 }
 
 const Transformer: Component<TransformerProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       transformOrigin: ['center', 'center'],
@@ -168,11 +167,10 @@ const Transformer: Component<TransformerProps> = _props => {
   const borderWidth = 1
 
   return (
-    <div
+    <Element
       ref={container}
       class={cs('border-solid border-white relative box-content')}
       style={{
-        ...cssVariables(),
         width: `${value().width}px`,
         height: `${value().height}px`,
         'border-width': `${borderWidth}px`,
@@ -237,7 +235,7 @@ const Transformer: Component<TransformerProps> = _props => {
       >
         <RotateSvg style={{ width: '24px', height: '24px' }} />
       </div>
-    </div>
+    </Element>
   )
 }
 

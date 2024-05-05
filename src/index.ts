@@ -66,6 +66,8 @@ export { default as Menu } from './Menu'
 export type { MenuProps, MenuItem } from './Menu'
 export { default as Dropdown } from './Dropdown'
 export type { DropdownProps } from './Dropdown'
+export { default as Element } from './Element'
+export type { ElementProps } from './Element'
 
 export { default as ConfigProvider } from './ConfigProvider'
 export { default as Fragment } from './Fragment'

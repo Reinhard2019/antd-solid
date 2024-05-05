@@ -1,10 +1,10 @@
-import { type JSX, type Component, For, Show, useContext } from 'solid-js'
+import { type JSX, type Component, For, Show } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
-import ConfigProviderContext from '../ConfigProvider/context'
 import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import Element from '../Element'
 
 export interface CollapseItem {
   key: Key
@@ -31,7 +31,6 @@ export interface CollapseProps {
 }
 
 const Collapse: Component<CollapseProps> = props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
@@ -39,15 +38,12 @@ const Collapse: Component<CollapseProps> = props => {
   })
 
   return (
-    <div
+    <Element
       class={cs(
         'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] border-b-0',
         props.class,
       )}
-      style={{
-        ...cssVariables(),
-        ...props.style,
-      }}
+      style={props.style}
     >
       <For each={props.items}>
         {item => (
@@ -101,7 +97,7 @@ const Collapse: Component<CollapseProps> = props => {
           </div>
         )}
       </For>
-    </div>
+    </Element>
   )
 }
 

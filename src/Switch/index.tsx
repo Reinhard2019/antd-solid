@@ -1,7 +1,7 @@
-import { mergeProps, useContext, type Component } from 'solid-js'
+import { mergeProps, type Component, type JSX } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface SwitchProps {
   defaultChecked?: boolean
@@ -15,7 +15,6 @@ export interface SwitchProps {
 }
 
 const Switch: Component<SwitchProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps({ size: 'default' } as const, _props)
   const [checked, setChecked] = createControllableValue<boolean>(props, {
     defaultValuePropName: 'defaultChecked',
@@ -23,7 +22,8 @@ const Switch: Component<SwitchProps> = _props => {
   })
 
   return (
-    <button
+    <Element<JSX.ButtonHTMLAttributes<HTMLButtonElement>>
+      tag="button"
       class={cs(
         'rounded-100px relative vertical-middle',
         {
@@ -33,7 +33,6 @@ const Switch: Component<SwitchProps> = _props => {
         checked() ? 'bg-[var(--ant-color-primary)]' : 'bg-[rgba(0,0,0,0.45)]',
       )}
       onClick={() => setChecked(c => !c)}
-      style={cssVariables()}
     >
       <div
         class={cs(
@@ -45,7 +44,7 @@ const Switch: Component<SwitchProps> = _props => {
           checked() ? 'right-2px' : 'left-2px',
         )}
       />
-    </button>
+    </Element>
   )
 }
 

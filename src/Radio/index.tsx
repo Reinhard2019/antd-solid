@@ -1,10 +1,10 @@
-import { type Component, type ParentProps, type JSX, Show, useContext } from 'solid-js'
+import { type Component, type ParentProps, type JSX, Show } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Button from './Button'
 import Group from './Group'
 import { wave } from '../utils/animation'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 export interface RadioProps extends ParentProps {
   defaultChecked?: boolean
@@ -17,7 +17,6 @@ const Radio: Component<RadioProps> & {
   Group: typeof Group
   Button: typeof Button
 } = props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const [checked, setChecked] = createControllableValue(props, {
     defaultValue: false,
     defaultValuePropName: 'defaultChecked',
@@ -26,12 +25,12 @@ const Radio: Component<RadioProps> & {
   })
 
   return (
-    <label
+    <Element<JSX.LabelHTMLAttributes<HTMLLabelElement>>
+      tag="label"
       class={cs(
         'inline-flex cursor-pointer inline-flex items-center',
         props.disabled && 'text-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
-      style={cssVariables()}
     >
       <span
         class={cs('relative w-16px h-16px rounded-50%')}
@@ -65,7 +64,7 @@ const Radio: Component<RadioProps> & {
       <Show when={props.children}>
         <span class="px-8px">{props.children}</span>
       </Show>
-    </label>
+    </Element>
   )
 }
 

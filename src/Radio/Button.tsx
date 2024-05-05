@@ -1,13 +1,11 @@
-import { useContext, type Component } from 'solid-js'
+import { type Component, type JSX } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { type RadioProps } from '.'
 import { wave } from '../utils/animation'
-import ConfigProviderContext from '../ConfigProvider/context'
+import Element from '../Element'
 
 const Button: Component<RadioProps> = props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
-
   let input: HTMLInputElement | undefined
 
   const [checked, setChecked] = createControllableValue(props, {
@@ -18,7 +16,8 @@ const Button: Component<RadioProps> = props => {
   })
 
   return (
-    <label
+    <Element<JSX.LabelHTMLAttributes<HTMLLabelElement>>
+      tag="label"
       class={cs(
         'relative px-15px h-32px [border:1px_solid_rgb(217,217,217)] first:rounded-l-6px last:rounded-r-6px cursor-pointer flex-grow not[:first-child]:-ml-1px flex justify-center items-center',
         checked() &&
@@ -35,7 +34,6 @@ const Button: Component<RadioProps> = props => {
         if (e.target === input) return
         wave(e.currentTarget, 'var(--ant-color-primary)')
       }}
-      style={cssVariables()}
     >
       <input
         ref={input}
@@ -50,7 +48,7 @@ const Button: Component<RadioProps> = props => {
       />
 
       <span>{props.children}</span>
-    </label>
+    </Element>
   )
 }
 

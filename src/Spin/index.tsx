@@ -1,5 +1,5 @@
-import { Show, type Component, type ParentProps, mergeProps, useContext } from 'solid-js'
-import ConfigProviderContext from '../ConfigProvider/context'
+import { Show, type Component, type ParentProps, mergeProps } from 'solid-js'
+import Element from '../Element'
 
 interface SpinProps extends ParentProps {
   /**
@@ -10,7 +10,6 @@ interface SpinProps extends ParentProps {
 }
 
 const Spin: Component<SpinProps> = _props => {
-  const { cssVariables } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       size: 20,
@@ -19,7 +18,7 @@ const Spin: Component<SpinProps> = _props => {
   )
 
   return (
-    <div style={cssVariables()}>
+    <Element>
       {props.children}
       <Show when={props.spinning}>
         <div class="flex items-center justify-center bg-[rgba(255,255,255,.5)]">
@@ -29,7 +28,7 @@ const Spin: Component<SpinProps> = _props => {
           />
         </div>
       </Show>
-    </div>
+    </Element>
   )
 }
 
