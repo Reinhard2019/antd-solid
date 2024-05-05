@@ -1,3 +1,4 @@
+import { nanoid } from 'nanoid'
 import { type SeedToken, type CssVariables } from '../types'
 import genDarkColorMapToken from '../dark'
 import genLightColorMapToken from '../light'
@@ -169,4 +170,8 @@ export function createCssVariables(
     '--ant-modal-content-bg': mapToken.colorBgElevated,
     '--ant-modal-title-color': aliasToken.colorTextHeading,
   }
+}
+
+export function getCssVariablesClass() {
+  return `css-var-${nanoid(12)}`
 }

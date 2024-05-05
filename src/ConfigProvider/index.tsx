@@ -1,8 +1,7 @@
-import { type ParentProps, type Component, createMemo, mergeProps, Show } from 'solid-js'
-import { Dynamic } from 'solid-js/web'
+import { type ParentProps, type Component, createMemo, mergeProps } from 'solid-js'
 import Context from './context'
 import { type SeedToken } from './types'
-import { createCssVariables } from './utils'
+import { createCssVariables, getCssVariablesClass } from './utils'
 import { darkSeedToken, lightSeedToken } from './seed'
 
 interface ConfigProviderProps extends ParentProps {
@@ -12,11 +11,6 @@ interface ConfigProviderProps extends ParentProps {
    */
   theme?: 'light' | 'dark'
   token?: SeedToken
-  /**
-   * 被渲染成的元素，例如 'div'
-   * 默认为空
-   */
-  tag?: string
 }
 
 const ConfigProvider: Component<ConfigProviderProps> = _props => {
@@ -33,12 +27,8 @@ const ConfigProvider: Component<ConfigProviderProps> = _props => {
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
 
   return (
-    <Context.Provider value={{ cssVariables }}>
-      <Show when={props.tag} fallback={props.children}>
-        <Dynamic component={props.tag} style={cssVariables()}>
-          {props.children}
-        </Dynamic>
-      </Show>
+    <Context.Provider value={{ cssVariablesClass: getCssVariablesClass(), cssVariables }}>
+      {props.children}
     </Context.Provider>
   )
 }
