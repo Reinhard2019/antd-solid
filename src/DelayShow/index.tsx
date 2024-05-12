@@ -25,18 +25,13 @@ const DelayShow: Component<DelayShowProps> = props => {
   // 是否显示过一次
   const [showed, setShowed] = createSignal(untrack(() => props.when ?? false))
   createRenderEffect(() => {
-    if (props.when) {
-      setShowed(true)
-    }
-  })
-  createRenderEffect(() => {
     if (typeof props.time === 'number') {
       setTimeout(() => {
         setShowed(true)
       }, props.time)
     }
   })
-  return <Show when={showed()}>{props.children}</Show>
+  return <Show when={showed() || props.when}>{props.children}</Show>
 }
 
 export default DelayShow
