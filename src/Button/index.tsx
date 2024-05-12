@@ -104,7 +104,9 @@ const Button: Component<ButtonProps> = _props => {
   )
   const [, buttonElementProps] = splitProps(props, ['type', 'size', 'loading', 'danger'])
   const [innerLoading, setLoading] = createSignal(false)
-  const loading = createMemo(() => props.loading === true ?? innerLoading())
+  const loading = createMemo(() =>
+    typeof props.loading === 'boolean' ? props.loading : innerLoading(),
+  )
 
   return (
     <Element<JSX.ButtonHTMLAttributes<HTMLButtonElement>>
