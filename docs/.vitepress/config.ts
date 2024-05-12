@@ -16,7 +16,6 @@ export default defineConfig({
       },
     ],
   ],
-  appearance: false,
   themeConfig: {
     logo: 'https://gw.alipayobjects.com/zos/rmsportal/rlpTLlbMzTNYuZGGCVYM.png',
     nav: [

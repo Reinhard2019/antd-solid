@@ -27,7 +27,10 @@
 
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
+import { useData } from 'vitepress'
 import Prism from 'prismjs'
+// @ts-ignore
+import { ConfigProvider } from 'antd-solid'
 // @ts-ignore
 import antdCss from 'antd-solid-css/index.css?raw'
 // @ts-ignore
@@ -51,6 +54,8 @@ let app = ref<HTMLDivElement>()
 // @ts-ignore
 const codeModules = import.meta.glob('../../components/*/**.tsx', { as: 'raw' })
 
+const { isDark } = useData()
+
 onMounted(() => {
   codeModules[`../../components/${props.path}.tsx`]().then(value => {
     codeHtml.value = Prism.highlight(value, Prism.languages.typescript, 'typescript')
@@ -65,7 +70,10 @@ onMounted(() => {
       modules[`../../components/${props.path}.tsx`]().then(module => {
         const App = module.default
         import('solid-js/web').then(({ render, createComponent }) => {
-          render(() => createComponent(App, {}), app.value!)
+          render(() => createComponent(ConfigProvider, {
+            theme: isDark.value ? 'dark' : 'light',
+            children: () => createComponent(App, {})
+          }), app.value!)
         })
       })
       return
@@ -146,8 +154,14 @@ onMounted(() => {
       window[appRef] = app.value
 
       let _code = `
+      import { ConfigProvider } from 'antd-solid'
     ${code.value}
-    window.SolidJsWeb.render(exports["default"], window['${appRef}']);
+    const Component = exports["default"];
+    window.SolidJsWeb.render(() => (
+      <ConfigProvider theme="${isDark.value ? 'dark' : 'light'}">
+        <Component />
+      </ConfigProvider>
+    ), window['${appRef}']);
   `
 
       // @ts-ignore
