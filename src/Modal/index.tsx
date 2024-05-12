@@ -310,7 +310,7 @@ const Modal: Component<ModalProps> & {
           <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
             <Element
               ref={modalRootRef}
-              class={cs('text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]')}
+              class="[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]"
               style={{
                 '--transition-duration': `${transitionDuration}s`,
               }}

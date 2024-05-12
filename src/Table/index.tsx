@@ -32,7 +32,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
   )
 
   return (
-    <Element class="text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]">
+    <Element class="[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]">
       <table class="w-full">
         <thead>
           <tr>

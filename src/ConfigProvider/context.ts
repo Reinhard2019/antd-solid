@@ -5,12 +5,10 @@ import { lightSeedToken } from './seed'
 
 const defaultCssVariables = createCssVariables(lightSeedToken)
 
-const Context = createContext<{
-  cssVariablesClass: string
-  cssVariables: Accessor<CssVariables>
-}>({
+const Context = createContext({
+  theme: (() => 'light') as Accessor<'light' | 'dark'>,
   cssVariablesClass: getCssVariablesClass(),
-  cssVariables: () => defaultCssVariables,
+  cssVariables: (() => defaultCssVariables) as Accessor<CssVariables>,
 })
 
 export default Context

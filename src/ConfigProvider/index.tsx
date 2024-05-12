@@ -27,7 +27,9 @@ const ConfigProvider: Component<ConfigProviderProps> = _props => {
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
 
   return (
-    <Context.Provider value={{ cssVariablesClass: getCssVariablesClass(), cssVariables }}>
+    <Context.Provider
+      value={{ theme: () => props.theme, cssVariablesClass: getCssVariablesClass(), cssVariables }}
+    >
       {props.children}
     </Context.Provider>
   )

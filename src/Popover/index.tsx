@@ -8,17 +8,17 @@ export interface PopoverProps extends TooltipProps {
 const Popover: Component<PopoverProps> = props => {
   return (
     <Tooltip
-      mode="light"
+      plain
       {...props}
       content={close => (
         <div>
           <Show when={props.title}>
             <div class="mb-8px flex items-center">
-              <span class="text-[rgba(0,0,0,0.88)] font-600">{props.title}</span>
+              <span class="font-600">{props.title}</span>
             </div>
           </Show>
 
-          <div class="text-[rgba(0,0,0,0.88)]">{getContent(props.content, close)}</div>
+          <div>{getContent(props.content, close)}</div>
         </div>
       )}
     />

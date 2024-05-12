@@ -73,7 +73,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
       ref={select!}
       class={cs(
         'p[.ant-input-addon]:my--1px p[.ant-input-addon]:mx--12px',
-        'rounded-6px [font-size:var(--ant-font-size)] cursor-pointer inline-block',
+        'rounded-6px cursor-pointer inline-block [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         [
           Compact.compactItemClass,
           Compact.compactItemRounded0Class,
@@ -87,7 +87,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
       style={props.style}
     >
       <Tooltip
-        mode="light"
+        plain
         open={open()}
         onOpenChange={setOpen}
         trigger={[]}

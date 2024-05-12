@@ -14,6 +14,7 @@ export function createCssVariables(
     colorTextPlaceholder: mapToken.colorTextQuaternary,
     colorTextDisabled: mapToken.colorTextQuaternary,
     colorTextHeading: mapToken.colorText,
+    colorTextLightSolid: mapToken.colorWhite,
 
     colorBgTextHover: mapToken.colorFillSecondary,
     colorBgTextActive: mapToken.colorFill,
@@ -67,11 +68,14 @@ export function createCssVariables(
     '--ant-color-text-disabled': aliasToken.colorTextDisabled,
     '--ant-color-text-heading': aliasToken.colorTextHeading,
     '--ant-color-text-placeholder': aliasToken.colorTextPlaceholder,
+    '--ant-color-text-light-solid': aliasToken.colorTextLightSolid,
+
     '--ant-color-bg-text-hover': aliasToken.colorBgTextHover,
     '--ant-color-bg-text-active': aliasToken.colorBgTextActive,
     '--ant-color-bg-container': mapToken.colorBgContainer,
     '--ant-color-bg-container-disabled': aliasToken.colorBgContainerDisabled,
     '--ant-color-bg-elevated': mapToken.colorBgElevated,
+    '--ant-color-bg-spotlight': mapToken.colorBgSpotlight,
     '--ant-color-bg-layout': mapToken.colorBgLayout,
 
     '--ant-color-white': mapToken.colorWhite,

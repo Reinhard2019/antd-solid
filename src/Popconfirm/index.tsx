@@ -35,7 +35,7 @@ const Popconfirm: Component<PopconfirmProps> = props => {
 
   return (
     <Tooltip
-      mode="light"
+      plain
       trigger="click"
       open={open()}
       onOpenChange={setOpen}
@@ -43,10 +43,10 @@ const Popconfirm: Component<PopconfirmProps> = props => {
         <div>
           <div class="mb-8px flex items-center">
             <span class="i-ant-design:exclamation-circle-fill text-#faad14" />
-            <span class="ml-8px text-[rgba(0,0,0,0.88)] font-600">{mergedProps.title}</span>
+            <span class="ml-8px font-600">{mergedProps.title}</span>
           </div>
 
-          <div class="ml-22px mb-8px text-[rgba(0,0,0,0.88)]">{mergedProps.content}</div>
+          <div class="ml-22px mb-8px">{mergedProps.content}</div>
 
           <div class="text-right">
             <Button

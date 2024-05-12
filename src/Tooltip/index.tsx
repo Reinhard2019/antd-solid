@@ -52,9 +52,11 @@ export interface TooltipProps {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   /**
-   * 默认: dark
+   * 简单样式
+   * 如果为 true，则背景色和文字颜色会跟随主题
+   * 默认 false
    */
-  mode?: 'dark' | 'light'
+  plain?: boolean
   /**
    * 默认: true
    */
@@ -110,6 +112,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       getPopupContainer: () => document.body,
       offset: [0, 0],
       mouseLeaveDelay: 0.1,
+      plain: false,
     },
     _props,
   )
@@ -418,7 +421,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           <Element
             ref={contentRef}
             class={cs(
-              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)]',
+              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
               open() ? 'block' : 'hidden',
             )}
             style={{
@@ -430,8 +433,10 @@ const Tooltip: Component<TooltipProps> = _props => {
           >
             <div
               class={cs(
-                'px-8px py-6px box-content [box-shadow:0_6px_16px_0_rgba(0,0,0,0.08),0_3px_6px_-4px_rgba(0,0,0,0.12),0_9px_28px_8px_rgba(0,0,0,0.05)] rounded-[var(--ant-border-radius-lg)] overflow-hidden',
-                props.mode === 'dark' ? 'bg-[rgba(0,0,0,0.85)] text-white' : 'bg-white',
+                'px-8px py-6px box-content [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-hidden',
+                props.plain
+                  ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-elevated)]'
+                  : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
               )}
               style={props.contentStyle}
             >
@@ -442,7 +447,9 @@ const Tooltip: Component<TooltipProps> = _props => {
               <div
                 class={cs('w-8px h-8px absolute border-solid border-4px border-transparent')}
                 style={{
-                  '--color': props.mode === 'dark' ? 'rgba(0,0,0,0.85)' : 'white',
+                  '--color': props.plain
+                    ? 'var(--ant-color-bg-elevated)'
+                    : 'var(--ant-color-bg-spotlight)',
                   ...arrowStyle(),
                 }}
               />

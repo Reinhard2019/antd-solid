@@ -165,7 +165,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
       )}
     >
       <Tooltip
-        mode="light"
+        plain
         open={open()}
         onOpenChange={setOpen}
         trigger={[]}

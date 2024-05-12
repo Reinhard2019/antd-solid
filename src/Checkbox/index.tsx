@@ -28,7 +28,7 @@ const Checkbox: Component<CheckboxProps> & {
     <Element<JSX.LabelHTMLAttributes<HTMLLabelElement>>
       tag="label"
       class={cs(
-        'inline-flex cursor-pointer inline-flex items-center [font-size:var(--ant-font-size)] leading-[var(--ant-line-height)]',
+        'inline-flex cursor-pointer inline-flex items-center [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}

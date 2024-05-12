@@ -96,7 +96,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
     <Element<JSX.FormHTMLAttributes<HTMLFormElement>>
       tag="form"
       class={cs(
-        'text-[var(--ant-color-text)] [font-size:var(--ant-font-size)]',
+        '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.layout === 'inline' ? 'inline-flex flex-wrap' : '',
       )}
       onSubmit={e => {
