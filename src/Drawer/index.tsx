@@ -146,7 +146,10 @@ const Drawer: Component<DrawerProps> = _props => {
       <Show when={open()}>
         <Element
           ref={drawer}
-          class={cs('inset-0 bg-[rgba(0,0,0,.45)] z-1000', isBody() ? 'fixed' : 'absolute')}
+          class={cs(
+            'inset-0 bg-[var(--ant-color-bg-mask)] z-1000',
+            isBody() ? 'fixed' : 'absolute',
+          )}
           onClick={() => {
             if (props.maskClosable) {
               instance.close()
@@ -162,7 +165,7 @@ const Drawer: Component<DrawerProps> = _props => {
                 top: 'ant-drawer-content-top',
                 bottom: 'ant-drawer-content-bottom',
               }[props.placement],
-              'absolute bg-white grid [grid-template-rows:auto_1fr]',
+              'absolute bg-[var(--ant-color-bg-elevated)] grid [grid-template-rows:auto_1fr]',
             )}
             style={{
               width: direction() === 'horizontal' ? props.width : undefined,

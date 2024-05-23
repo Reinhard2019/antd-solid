@@ -46,7 +46,7 @@ const Segmented: Component<SegmentedProps> = props => {
   return (
     <Element
       class={cs(
-        'bg-[var(--ant-color-bg-layout)] rounded-[var(--ant-border-radius)] p-2px',
+        'bg-[var(--ant-color-bg-layout)] rounded-[var(--ant-border-radius)] p-2px [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.block ? 'flex' : 'inline-flex',
         props.class,
       )}
@@ -62,8 +62,10 @@ const Segmented: Component<SegmentedProps> = props => {
           >
             <div
               class={cs(
-                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] where:cursor-pointer leading-28px where:hover:bg-[var(--ant-segmented-item-hover-bg)] where:active:bg-[var(--ant-segmented-item-active-bg)]',
-                isSelected(unWarpValue(item)) && 'bg-white shadow-[var(--ant-box-shadow-tertiary)]',
+                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] cursor-pointer leading-28px',
+                isSelected(unWarpValue(item))
+                  ? 'bg-[var(--ant-segmented-item-selected-bg)] shadow-[var(--ant-box-shadow-tertiary)] text-[var(--ant-segmented-item-selected-color)]'
+                  : 'text-[var(--ant-segmented-item-color)] hover:text-[var(--ant-segmented-item-hover-color)] hover:bg-[var(--ant-segmented-item-hover-bg)] active:bg-[var(--ant-segmented-item-active-bg)]',
                 props.block && 'flex justify-center',
                 isDisabledValue(item) &&
                   '[pointer-events:none] text-[var(--ant-color-text-disabled)]',

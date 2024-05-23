@@ -99,7 +99,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
         content={
           <div
             ref={tooltipContent}
-            class="bg-white w-200px max-h-400px overflow-auto"
+            class="w-200px max-h-400px overflow-auto"
             style={{ width: `${width()}px` }}
           >
             {props.content(() => setOpen(false))}

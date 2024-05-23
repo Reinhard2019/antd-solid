@@ -26,7 +26,7 @@ const Alert: Component<AlertProps> = _props => {
   return (
     <Element
       class={cs(
-        'p-[var(--ant-alert-default-padding)] rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)]',
+        'p-[var(--ant-alert-default-padding)] rounded-[var(--ant-border-radius-lg)] [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         TypeClassDict[props.type],
       )}
     >

@@ -19,7 +19,7 @@ const Button: Component<RadioProps> = props => {
     <Element<JSX.LabelHTMLAttributes<HTMLLabelElement>>
       tag="label"
       class={cs(
-        'relative px-15px h-32px [border:1px_solid_rgb(217,217,217)] first:rounded-l-6px last:rounded-r-6px cursor-pointer flex-grow not[:first-child]:-ml-1px flex justify-center items-center',
+        'relative px-15px h-32px [border:1px_solid_var(--ant-color-border)] first:rounded-l-6px last:rounded-r-6px cursor-pointer flex-grow not[:first-child]:-ml-1px flex justify-center items-center',
         checked() &&
           cs(
             props.disabled

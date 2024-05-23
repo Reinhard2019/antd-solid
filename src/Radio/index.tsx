@@ -51,7 +51,7 @@ const Radio: Component<RadioProps> & {
 
         <span
           class={cs(
-            'absolute inset-0 rounded-inherit [border:1px_solid_var(--ant-color-border)] bg-white',
+            'absolute inset-0 rounded-inherit [border:1px_solid_var(--ant-color-border)] bg-[var(--ant-color-bg-container)]',
             checked() &&
               (props.disabled
                 ? 'flex justify-center items-center before:content-empty before:block before:w-8px before:h-8px before:bg-[var(--ant-radio-dot-color-disabled)] before:rounded-50%'

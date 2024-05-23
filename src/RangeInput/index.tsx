@@ -177,7 +177,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         content={
           <div
             ref={tooltipContent}
-            class="bg-white w-200px max-h-400px overflow-auto"
+            class="w-200px max-h-400px overflow-auto"
             style={{ width: `${width()}px` }}
           >
             {props.content({
@@ -212,7 +212,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
               when={!isNil(tempValue()[0])}
               fallback={
                 <input
-                  class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                  class="h-30px [outline:none] bg-inherit placeholder-text-[var(--ant-color-text-placeholder)]"
                   placeholder={props.placeholder?.[0]}
                   readOnly
                 />
@@ -227,7 +227,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
               when={!isNil(tempValue()[1])}
               fallback={
                 <input
-                  class="h-30px [outline:none] bg-inherit placeholder-text-[rgba(0,0,0,.25)]"
+                  class="h-30px [outline:none] bg-inherit placeholder-text-[var(--ant-color-text-placeholder)]"
                   placeholder={props.placeholder?.[1]}
                   readOnly
                 />

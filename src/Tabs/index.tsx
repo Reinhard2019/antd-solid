@@ -108,7 +108,7 @@ const Tabs: Component<TabsProps> = _props => {
     <Element
       class={cs(
         props.class,
-        'flex',
+        'flex [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.placement === 'top' && 'flex-col',
         props.placement === 'bottom' && 'flex-col-reverse',
         props.placement === 'right' && 'flex-row-reverse',

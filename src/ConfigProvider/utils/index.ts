@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid'
+import { TinyColor } from '@ctrl/tinycolor'
 import { type SeedToken, type CssVariables } from '../types'
 import genDarkColorMapToken from '../dark'
 import genLightColorMapToken from '../light'
@@ -11,18 +12,32 @@ export function createCssVariables(
   const mapToken = theme === 'dark' ? genDarkColorMapToken(token) : genLightColorMapToken(token)
 
   const aliasToken = {
+    // ============== Background ============== //
+    colorFillContent: mapToken.colorFillSecondary,
+    colorFillContentHover: mapToken.colorFill,
+    colorFillAlter: mapToken.colorFillQuaternary,
+    colorBgContainerDisabled: mapToken.colorFillTertiary,
+
+    // ============== Split ============== //
+    colorBorderBg: mapToken.colorBgContainer,
+    colorSplit: getAlphaColor(mapToken.colorBorderSecondary, mapToken.colorBgContainer),
+
+    // ============== Text ============== //
     colorTextPlaceholder: mapToken.colorTextQuaternary,
     colorTextDisabled: mapToken.colorTextQuaternary,
     colorTextHeading: mapToken.colorText,
+    colorTextLabel: mapToken.colorTextSecondary,
+    colorTextDescription: mapToken.colorTextTertiary,
     colorTextLightSolid: mapToken.colorWhite,
-
+    colorHighlight: mapToken.colorError,
     colorBgTextHover: mapToken.colorFillSecondary,
     colorBgTextActive: mapToken.colorFill,
-    colorBgContainerDisabled: mapToken.colorFillTertiary,
 
-    colorSplit: getAlphaColor(mapToken.colorBorderSecondary, mapToken.colorBgContainer),
     colorIcon: mapToken.colorTextTertiary,
     colorIconHover: mapToken.colorText,
+
+    colorErrorOutline: getAlphaColor(mapToken.colorErrorBg, mapToken.colorBgContainer),
+    colorWarningOutline: getAlphaColor(mapToken.colorWarningBg, mapToken.colorBgContainer),
 
     controlItemBgHover: mapToken.colorFillTertiary,
     controlItemBgActive: mapToken.colorPrimaryBg,
@@ -30,7 +45,22 @@ export function createCssVariables(
     controlItemBgActiveDisabled: mapToken.colorFill,
     controlTmpOutline: mapToken.colorFillQuaternary,
     controlOutline: getAlphaColor(mapToken.colorPrimaryBg, mapToken.colorBgContainer),
+
+    fontWeightStrong: 600,
+
+    opacityLoading: 0.65,
+
+    linkDecoration: 'none',
+    linkHoverDecoration: 'none',
+    linkFocusDecoration: 'none',
+
+    controlPaddingHorizontal: 12,
+    controlPaddingHorizontalSM: 8,
   }
+
+  const colorFillAlterSolid = new TinyColor(aliasToken.colorFillAlter)
+    .onBackground(mapToken.colorBgContainer)
+    .toHexShortString()
 
   return {
     '--ant-color-primary': mapToken.colorPrimary,
@@ -131,16 +161,16 @@ export function createCssVariables(
     '--ant-button-border-color-disabled': mapToken.colorBorder,
     '--ant-button-default-bg': mapToken.colorBgContainer,
 
-    '--ant-radio-dot-color-disabled': 'rgba(0, 0, 0, 0.25)',
-    '--ant-radio-button-checked-bg-disabled': 'rgba(0, 0, 0, 0.15)',
+    '--ant-radio-dot-color-disabled': aliasToken.colorTextDisabled,
+    '--ant-radio-button-checked-bg-disabled': aliasToken.controlItemBgActiveDisabled,
 
-    '--ant-collapse-header-bg': 'rgba(0, 0, 0, 0.02)',
+    '--ant-collapse-header-bg': aliasToken.colorFillAlter,
     '--ant-collapse-header-padding': '12px 16px',
     '--ant-collapse-content-padding': '16px',
 
-    '--ant-select-option-selected-bg': '#e6f4ff',
-    '--ant-select-option-active-bg': 'rgba(0, 0, 0, 0.04)',
-    '--ant-select-multiple-item-bg': 'rgba(0, 0, 0, 0.06)',
+    '--ant-select-option-selected-bg': aliasToken.controlItemBgActive,
+    '--ant-select-option-active-bg': aliasToken.controlItemBgHover,
+    '--ant-select-multiple-item-bg': mapToken.colorFillSecondary,
     '--ant-select-multiple-item-height': '24px',
 
     '--ant-tree-expand-icon-width': '24px',
@@ -150,26 +180,31 @@ export function createCssVariables(
 
     '--ant-alert-default-padding': '8px 12px',
 
-    '--ant-tabs-card-bg': 'rgba(0, 0, 0, 0.02)',
+    '--ant-tabs-card-bg': aliasToken.colorFillAlter,
 
-    '--ant-progress-remaining-color': 'rgba(0, 0, 0, 0.06)',
+    '--ant-progress-remaining-color': mapToken.colorFillSecondary,
 
-    '--ant-segmented-item-color': 'rgba(0, 0, 0, 0.65)',
-    '--ant-segmented-item-hover-bg': 'rgba(0, 0, 0, 0.06)',
-    '--ant-segmented-item-active-bg': 'rgba(0, 0, 0, 0.15)',
+    '--ant-segmented-item-color': aliasToken.colorTextLabel,
+    '--ant-segmented-item-hover-color': mapToken.colorText,
+    '--ant-segmented-item-selected-color': mapToken.colorText,
+    '--ant-segmented-item-selected-bg': mapToken.colorBgElevated,
+    '--ant-segmented-item-hover-bg': mapToken.colorFillSecondary,
+    '--ant-segmented-item-active-bg': mapToken.colorFill,
 
-    '--ant-table-header-bg': '#fafafa',
-    '--ant-table-row-hover-bg': '#fafafa',
-    '--ant-table-border-color': '#f0f0f0',
+    '--ant-table-header-bg': colorFillAlterSolid,
+    '--ant-table-row-hover-bg': colorFillAlterSolid,
+    '--ant-table-border-color': mapToken.colorBorderSecondary,
 
-    '--ant-slider-rail-bg': 'rgba(0, 0, 0, 0.04)',
-    '--ant-slider-rail-hover-bg': 'rgba(0, 0, 0, 0.06)',
-    '--ant-slider-track-bg': '#91caff',
-    '--ant-slider-track-hover-bg': '#69b1ff',
-    '--ant-slider-handle-color': '#91caff',
-    '--ant-slider-handle-active-color': '#1677ff',
-    '--ant-slider-handle-color-disabled': '#bfbfbf',
-    '--ant-slider-track-bg-disabled': 'rgba(0, 0, 0, 0.04)',
+    '--ant-slider-rail-bg': mapToken.colorFillTertiary,
+    '--ant-slider-rail-hover-bg': mapToken.colorFillSecondary,
+    '--ant-slider-track-bg': mapToken.colorPrimaryBorder,
+    '--ant-slider-track-hover-bg': mapToken.colorPrimaryBorderHover,
+    '--ant-slider-handle-color': mapToken.colorPrimaryBorder,
+    '--ant-slider-handle-active-color': mapToken.colorPrimary,
+    '--ant-slider-handle-color-disabled': new TinyColor(aliasToken.colorTextDisabled)
+      .onBackground(mapToken.colorBgContainer)
+      .toHexShortString(),
+    '--ant-slider-track-bg-disabled': aliasToken.colorBgContainerDisabled,
 
     '--ant-modal-content-bg': mapToken.colorBgElevated,
     '--ant-modal-title-color': aliasToken.colorTextHeading,

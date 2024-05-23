@@ -164,7 +164,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   return (
     <Element
       class={cs(
-        'flex w-full relative',
+        'flex w-full relative [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         Compact.compactItemClass,
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
