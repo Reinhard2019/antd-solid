@@ -91,7 +91,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     on(
       () => props.value,
       input => {
-        if (Number(input) === Number(value())) return
+        if (input === value()) return
         setValue(props.value)
       },
       {
