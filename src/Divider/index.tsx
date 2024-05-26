@@ -2,8 +2,9 @@ import { type ParentProps, type Component, Show, mergeProps, createMemo } from '
 import cs from 'classnames'
 import { useSize } from '../hooks'
 import Element from '../Element'
+import { type StyleProps } from '../types'
 
-export interface DividerProps extends ParentProps {
+export interface DividerProps extends ParentProps, StyleProps {
   dashed?: boolean
   /**
    * 分割线标题的位置
@@ -45,15 +46,18 @@ const Divider: Component<DividerProps> = _props => {
       fallback={
         <Element
           class={cs(
+            props.class,
             'my-[var(--ant-margin-lg)] border-width-[1px_0_0] border-[var(--ant-color-split)]',
             props.dashed ? 'border-dashed' : 'border-solid',
           )}
+          style={props.style}
         />
       }
     >
       <Element
         ref={container}
         class={cs(
+          props.class,
           'my-[var(--ant-margin)] flex items-center relative',
           [
             'before:content-empty before:block before:absolute before:left-0 before:w-[var(--ant-divider-children-start)] before:border-width-[1px_0_0] before:border-[var(--ant-color-split)]',
@@ -68,6 +72,7 @@ const Divider: Component<DividerProps> = _props => {
           '--ant-divider-text-padding-inline': '1em',
           '--ant-divider-children-start': `${childrenStart()}px`,
           '--ant-divider-children-end': `${childrenStart() + childrenWidth()}px`,
+          ...props.style,
         }}
       >
         <span
