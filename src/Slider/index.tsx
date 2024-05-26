@@ -109,7 +109,7 @@ const Slider: Component<SliderProps> = _props => {
         <div
           ref={handle}
           class={cs(
-            'absolute top-1/2 -translate-1/2 box-content w-10px h-10px bg-[var(--ant-color-bg-elevated)] rounded-1/2 border-solid border-2px cursor-pointer',
+            'absolute top-1/2 -translate-1/2 box-content w-10px h-10px bg-[var(--ant-color-bg-container-secondary)] rounded-1/2 border-solid border-2px cursor-pointer',
             props.disabled
               ? 'border-[var(--ant-slider-handle-color-disabled)]'
               : [

@@ -1,11 +1,14 @@
 import React from 'react'
-import { type Component, createMemo, type JSXElement } from 'solid-js'
+import { type Component, createMemo, type JSXElement, useContext } from 'solid-js'
 import { omit } from 'lodash-es'
+import { type ConfigProviderProps } from 'antd/es/config-provider'
+import { ConfigProvider as ConfigProviderReact, theme as themeReact } from 'antd'
 import { solidToReact } from './solid'
 import ReactToSolid from './ReactToSolid'
-import { ConfigProvider } from 'antd'
 import zhCN from './zh_CN'
-import { type ConfigProviderProps } from 'antd/es/config-provider'
+import ConfigProviderContext from '../ConfigProvider/context'
+
+const { darkAlgorithm } = themeReact
 
 /**
  * 将组件 props 中的 className 替换为 class
@@ -53,9 +56,15 @@ export function reactToSolidComponent<P extends {} = {}>(
   defaultProps?: P,
 ) {
   return function (props: P) {
+    const { theme } = useContext(ConfigProviderContext)
     return (
       <ReactToSolid
-        component={component}
+        component={configProvider(component, {
+          locale: zhCN,
+          theme: {
+            algorithm: theme() === 'dark' ? darkAlgorithm : undefined,
+          },
+        })}
         props={{ ...defaultProps, ...props }}
         container={typeof container === 'function' ? container() : container}
       />
@@ -69,17 +78,14 @@ export function reactToSolidComponent<P extends {} = {}>(
  * @param configProviderProps
  * @returns
  */
-export function configProvider<P extends {} = {}>(
+function configProvider<P extends {} = {}>(
   component: React.FunctionComponent<P> | React.ComponentClass<P>,
   configProviderProps?: ConfigProviderProps,
 ) {
   return function (props: P) {
     return React.createElement(
-      ConfigProvider,
-      {
-        locale: zhCN,
-        ...configProviderProps,
-      },
+      ConfigProviderReact,
+      configProviderProps,
       React.createElement(component, props),
     )
   }

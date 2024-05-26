@@ -97,6 +97,8 @@ export function createCssVariables(
     '--ant-color-text-quaternary': mapToken.colorTextQuaternary,
     '--ant-color-text-disabled': aliasToken.colorTextDisabled,
     '--ant-color-text-heading': aliasToken.colorTextHeading,
+    '--ant-color-text-label': aliasToken.colorTextLabel,
+    '--ant-color-text-description': aliasToken.colorTextDescription,
     '--ant-color-text-placeholder': aliasToken.colorTextPlaceholder,
     '--ant-color-text-light-solid': aliasToken.colorTextLightSolid,
 
@@ -104,7 +106,8 @@ export function createCssVariables(
     '--ant-color-bg-text-active': aliasToken.colorBgTextActive,
     '--ant-color-bg-container': mapToken.colorBgContainer,
     '--ant-color-bg-container-disabled': aliasToken.colorBgContainerDisabled,
-    '--ant-color-bg-elevated': mapToken.colorBgElevated,
+    '--ant-color-bg-container-secondary': mapToken.colorBgContainerSecondary,
+    '--ant-color-bg-container-tertiary': mapToken.colorBgContainerTertiary,
     '--ant-color-bg-spotlight': mapToken.colorBgSpotlight,
     '--ant-color-bg-layout': mapToken.colorBgLayout,
 
@@ -187,7 +190,7 @@ export function createCssVariables(
     '--ant-segmented-item-color': aliasToken.colorTextLabel,
     '--ant-segmented-item-hover-color': mapToken.colorText,
     '--ant-segmented-item-selected-color': mapToken.colorText,
-    '--ant-segmented-item-selected-bg': mapToken.colorBgElevated,
+    '--ant-segmented-item-selected-bg': mapToken.colorBgContainerSecondary,
     '--ant-segmented-item-hover-bg': mapToken.colorFillSecondary,
     '--ant-segmented-item-active-bg': mapToken.colorFill,
 
@@ -206,7 +209,7 @@ export function createCssVariables(
       .toHexShortString(),
     '--ant-slider-track-bg-disabled': aliasToken.colorBgContainerDisabled,
 
-    '--ant-modal-content-bg': mapToken.colorBgElevated,
+    '--ant-modal-content-bg': mapToken.colorBgContainerTertiary,
     '--ant-modal-title-color': aliasToken.colorTextHeading,
   }
 }

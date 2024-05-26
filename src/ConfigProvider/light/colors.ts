@@ -41,7 +41,8 @@ export const generateNeutralColorPalettes: GenerateNeutralColorMap = (
 
     colorBgLayout: getSolidColor(colorBgBase, 4),
     colorBgContainer: getSolidColor(colorBgBase, 0),
-    colorBgElevated: getSolidColor(colorBgBase, 0),
+    colorBgContainerSecondary: getSolidColor(colorBgBase, 0),
+    colorBgContainerTertiary: getSolidColor(colorBgBase, 0),
     colorBgSpotlight: getAlphaColor(colorTextBase, 0.85),
     colorBgBlur: 'transparent',
 

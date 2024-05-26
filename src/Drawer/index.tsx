@@ -165,7 +165,7 @@ const Drawer: Component<DrawerProps> = _props => {
                 top: 'ant-drawer-content-top',
                 bottom: 'ant-drawer-content-bottom',
               }[props.placement],
-              'absolute bg-[var(--ant-color-bg-elevated)] grid [grid-template-rows:auto_1fr]',
+              'absolute bg-[var(--ant-color-bg-container-tertiary)] grid [grid-template-rows:auto_1fr]',
             )}
             style={{
               width: direction() === 'horizontal' ? props.width : undefined,
