@@ -11,8 +11,8 @@ import Element from '../Element'
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {
     textarea?: boolean
-    defaultValue?: string | undefined
-    value?: string | undefined
+    defaultValue?: string | null | undefined
+    value?: string | null | undefined
     addonBefore?: JSXElement
     addonAfter?: JSXElement
     prefix?: JSXElement
