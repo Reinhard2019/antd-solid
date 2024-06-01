@@ -20,6 +20,7 @@ import { type StringOrJSXElement } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import DelayShow from '../DelayShow'
 import Element from '../Element'
+import createControllableValue from '../hooks/createControllableValue'
 
 export interface Tab {
   key: string
@@ -42,9 +43,21 @@ export interface TabsProps {
   navClass?: string
   navItemClass?: string
   contentClass?: string
+  defaultActiveKey?: string
+  /**
+   * 当前激活 tab 面板的 key
+   */
+  activeKey?: string
+  /**
+   * 切换面板的回调
+   * @param activeKey
+   * @returns
+   */
+  onChange?: (activeKey: string) => void
   items: Tab[]
   addonBefore?: JSX.Element
   addonAfter?: JSX.Element
+  disabled?: boolean
 }
 
 const Tabs: Component<TabsProps> = _props => {
@@ -52,14 +65,18 @@ const Tabs: Component<TabsProps> = _props => {
     {
       type: 'line',
       placement: 'top',
+      disabled: false,
     } as const,
     _props,
   )
 
-  const [selectedItem, setSelectedItem] = createSignal<Tab | undefined>(
-    untrack(() => props.items[0]),
-  )
-  const isSelectedItem = createSelector(() => selectedItem()?.key)
+  const [activeKey, setActiveKey] = createControllableValue<string>(props, {
+    defaultValuePropName: 'defaultActiveKey',
+    valuePropName: 'activeKey',
+    trigger: 'onChange',
+    defaultValue: untrack(() => props.items[0]?.key),
+  })
+  const isSelectedItem = createSelector(() => activeKey())
   const [selectedBarStyle, setSelectedBarStyle] = createSignal<JSX.CSSProperties>({
     left: '0px',
     width: '0px',
@@ -160,7 +177,7 @@ const Tabs: Component<TabsProps> = _props => {
                     )}
                     aria-label={isSelectedItem(item.key) ? 'selected' : undefined}
                     onClick={() => {
-                      setSelectedItem(item)
+                      setActiveKey(item.key)
                       updateSelectedBarStyle()
                     }}
                   >
@@ -188,10 +205,11 @@ const Tabs: Component<TabsProps> = _props => {
             <Segmented
               class="grow"
               block
+              disabled={props.disabled}
               options={props.items.map(item => ({
                 label: item.label,
                 value: item.key,
-                onClick: () => setSelectedItem(item),
+                onClick: () => setActiveKey(item.key),
               }))}
             />
           </Match>
@@ -236,7 +254,7 @@ const Tabs: Component<TabsProps> = _props => {
                         : 'bg-[var(--ant-tabs-card-bg)]',
                     )}
                     onClick={() => {
-                      setSelectedItem(item)
+                      setActiveKey(item.key)
                       updateSelectedBarStyle()
                     }}
                   >
