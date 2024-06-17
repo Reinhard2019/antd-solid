@@ -206,10 +206,13 @@ const Tabs: Component<TabsProps> = _props => {
               class="grow"
               block
               disabled={props.disabled}
+              value={activeKey()}
+              onChange={key => {
+                setActiveKey(key as string)
+              }}
               options={props.items.map(item => ({
                 label: item.label,
                 value: item.key,
-                onClick: () => setActiveKey(item.key),
               }))}
             />
           </Match>
