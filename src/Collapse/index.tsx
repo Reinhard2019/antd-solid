@@ -1,12 +1,12 @@
-import { type JSX, type Component, For, Show } from 'solid-js'
+import { type Component, For, Show } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
-import { type StringOrJSXElement, type Key } from '../types'
+import { type StringOrJSXElement, type Key, type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
 
-export interface CollapseItem {
+export interface CollapseItem extends StyleProps {
   key: Key
   label: StringOrJSXElement
   children: StringOrJSXElement
@@ -16,8 +16,7 @@ export interface CollapseItem {
   extra?: StringOrJSXElement
 }
 
-export interface CollapseProps {
-  class?: string
+export interface CollapseProps extends StyleProps {
   defaultActiveKey?: Key[]
   activeKey?: Key[]
   /**
@@ -27,7 +26,6 @@ export interface CollapseProps {
    */
   onChange?: (value: Key[]) => void
   items: CollapseItem[]
-  style?: JSX.CSSProperties
 }
 
 const Collapse: Component<CollapseProps> = props => {
@@ -40,14 +38,20 @@ const Collapse: Component<CollapseProps> = props => {
   return (
     <Element
       class={cs(
-        'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] border-b-0',
+        'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.class,
       )}
       style={props.style}
     >
       <For each={props.items}>
         {item => (
-          <div class="[border-bottom:1px_solid_var(--ant-color-border)] first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] cursor-pointer">
+          <div
+            class={cs(
+              item.class,
+              '[&:not(:last-child)]:[border-bottom:1px_solid_var(--ant-color-border)] first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] cursor-pointer',
+            )}
+            style={item.style}
+          >
             <div
               class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)] flex justify-between items-center"
               onClick={() => {
