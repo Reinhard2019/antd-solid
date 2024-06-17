@@ -1,4 +1,4 @@
-import { type Signal, createSignal, createEffect, untrack } from 'solid-js'
+import { type Signal, createSignal, untrack, createMemo } from 'solid-js'
 
 export interface Options<T> {
   defaultValue?: T
@@ -47,15 +47,8 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
   }
   defaultValue = valueConvertor(defaultValue)
 
-  const [value, _setValue] = createSignal(defaultValue)
-
-  // 为什么不使用 on defer？
-  // 因为 value 值如果在初始化和 createEffect 第一次执行期间发生变化，则无法正确更新 value
-  createEffect(() => {
-    if (!isControlled()) return
-
-    _setValue(valueConvertor(getValue()) as any)
-  })
+  const [_value, _setValue] = createSignal(defaultValue)
+  const value = createMemo(() => (isControlled() ? valueConvertor(getValue()) : _value()))
 
   const setValue = (v: ((prev: T) => T) | T | undefined) => {
     const newValue = valueConvertor(typeof v === 'function' ? (v as (prev: T) => T)(value()!) : v)
