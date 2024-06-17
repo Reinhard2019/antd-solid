@@ -51,6 +51,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     defaultValue = untrack(() => props.defaultValue)
   }
 
+  // 上一个格式正确的值
   let validValue: number | null = null
   const updateValidValue = (
     v: number | string | null | undefined,
@@ -92,7 +93,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
       () => props.value,
       input => {
         if (input === value()) return
-        setValue(props.value)
+        updateValidValue(input, { ignoreOnChange: true })
+        setValue(input)
       },
       {
         defer: true,
