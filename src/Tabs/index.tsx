@@ -15,6 +15,7 @@ import {
   Show,
 } from 'solid-js'
 import cs from 'classnames'
+import { Dynamic } from 'solid-js/web'
 import Segmented from '../Segmented'
 import { type StringOrJSXElement } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
@@ -58,6 +59,10 @@ export interface TabsProps {
   addonBefore?: JSX.Element
   addonAfter?: JSX.Element
   disabled?: boolean
+  /**
+   * 被隐藏时是否销毁 DOM 结构
+   */
+  destroyInactiveTabPane?: boolean
 }
 
 const Tabs: Component<TabsProps> = _props => {
@@ -276,14 +281,17 @@ const Tabs: Component<TabsProps> = _props => {
 
       <For each={props.items}>
         {item => (
-          <DelayShow when={isSelectedItem(item.key)}>
+          <Dynamic
+            component={props.destroyInactiveTabPane ? Show : DelayShow}
+            when={isSelectedItem(item.key)}
+          >
             <div
               class={cs(props.contentClass, 'grow')}
               style={{ display: isSelectedItem(item.key) ? 'block' : 'none' }}
             >
               {unwrapStringOrJSXElement(item.children)}
             </div>
-          </DelayShow>
+          </Dynamic>
         )}
       </For>
     </Element>
