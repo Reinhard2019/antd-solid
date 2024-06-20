@@ -41,8 +41,8 @@ const columns: Array<TableColumn<Row>> = [
   },
 ]
 
-const Index: Component = () => {
+const App: Component = () => {
   return <Table columns={columns} dataSource={dataSource} />
 }
 
-export default Index
+export default App

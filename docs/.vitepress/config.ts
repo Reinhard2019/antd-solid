@@ -81,6 +81,7 @@ export default defineConfig({
           { text: 'Modal 对话框', link: '/components/modal' },
           { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
           { text: 'Progress 进度条', link: '/components/progress' },
+          { text: 'Spin 加载中', link: '/components/spin' },
         ],
       },
       {
