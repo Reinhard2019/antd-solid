@@ -28,10 +28,10 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
     status?: 'error' | 'warning'
     /**
      * 设置尺寸
-     * 默认 'default'
+     * 默认 'middle'
      * 高度分别为 40px、32px 和 24px
      */
-    size?: 'small' | 'default' | 'large'
+    size?: 'small' | 'middle' | 'large'
     autoFocus?: boolean
     allowClear?: boolean
     style?: JSX.CSSProperties
@@ -41,7 +41,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
   }
 
 const statusClassDict = {
-  default: (disabled: boolean) =>
+  middle: (disabled: boolean) =>
     cs(
       '[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
@@ -65,7 +65,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   _props: CommonInputProps<T> &
   Omit<JSX.InputHTMLAttributes<T>, 'style' | 'onChange' | 'onInput' | 'onKeyDown'>,
 ) {
-  const props = mergeProps({ size: 'default' as const }, _props)
+  const props = mergeProps({ size: 'middle' as const }, _props)
   const [{ style, onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
@@ -100,18 +100,18 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
     cs(
       {
         small: 'px-7px py-0 rounded-[var(--ant-border-radius-sm)]',
-        default: 'px-11px py-4px rounded-[var(--ant-border-radius)]',
+        middle: 'px-11px py-4px rounded-[var(--ant-border-radius)]',
         large: 'px-11px py-7px rounded-[var(--ant-border-radius-lg)]',
       }[props.size],
       !props.textarea &&
         {
           small: 'h-24px',
-          default: 'h-32px',
+          middle: 'h-32px',
           large: 'h-40px',
         }[props.size],
       props.addonBefore ? 'rounded-l-0' : compactItemRoundedLeftClass,
       props.addonAfter ? 'rounded-r-0' : compactItemRoundedRightClass,
-      statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
+      statusClassDict[props.status ?? 'middle'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
     ),
