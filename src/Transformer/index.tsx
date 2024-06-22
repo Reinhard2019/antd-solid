@@ -20,6 +20,18 @@ export interface TransformerProps {
   defaultValue?: TransformValue
   value?: TransformValue
   onChange?: (value: TransformValue) => void
+  /**
+   * 移动位置时触发
+   */
+  onMove?: (value: Pick<TransformValue, 'x' | 'y'>) => void
+  /**
+   * 缩放时触发
+   */
+  onResize?: (value: Partial<Pick<TransformValue, 'x' | 'y' | 'width' | 'height'>>) => void
+  /**
+   * 旋转时触发
+   */
+  onRotate?: (value: Pick<TransformValue, 'rotate'>) => void
 }
 
 type ResizeDirection =
@@ -97,11 +109,15 @@ const Transformer: Component<TransformerProps> = _props => {
     const parentRotation = getParentRotation()
     const onMouseMove = (e: MouseEvent) => {
       const { movementX, movementY } = rotateMove(e, parentRotation)
+      const changedValue = {
+        x: value().x + movementX,
+        y: value().y + movementY,
+      }
       setValue(v => ({
         ...v,
-        x: v.x + movementX,
-        y: v.y + movementY,
+        ...changedValue,
       }))
+      props.onMove?.(changedValue)
     }
     window.addEventListener('mousemove', onMouseMove)
 
@@ -130,50 +146,52 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const parentRotation = getParentRotation()
     const onMouseMove = (_e: MouseEvent) => {
-      setValue(v => {
-        const newV = { ...v }
-        if (
-          direction === 'left' ||
-          direction === 'right' ||
-          direction === 'topLeft' ||
-          direction === 'topRight' ||
-          direction === 'bottomLeft' ||
-          direction === 'bottomRight'
-        ) {
-          const { movementX: _movementX } = rotateMove(_e, parentRotation)
-          const movementX =
-            direction === 'right' || direction === 'topRight' || direction === 'bottomRight'
-              ? _movementX
-              : -_movementX
-          newV.x =
-            newV.x -
-            (direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
-              ? movementX
-              : 0)
-          newV.width = newV.width + movementX
-        }
-        if (
-          direction === 'top' ||
-          direction === 'bottom' ||
-          direction === 'topLeft' ||
-          direction === 'topRight' ||
-          direction === 'bottomLeft' ||
-          direction === 'bottomRight'
-        ) {
-          const { movementY: _movementY } = rotateMove(_e, parentRotation)
-          const movementY =
-            direction === 'bottom' || direction === 'bottomLeft' || direction === 'bottomRight'
-              ? _movementY
-              : -_movementY
-          newV.y =
-            newV.y -
-            (direction === 'top' || direction === 'topLeft' || direction === 'topRight'
-              ? movementY
-              : 0)
-          newV.height = newV.height + movementY
-        }
-        return newV
-      })
+      const changedValue: Partial<TransformValue> = {}
+      const { movementX: _movementX, movementY: _movementY } = rotateMove(_e, parentRotation)
+      if (
+        direction === 'left' ||
+        direction === 'right' ||
+        direction === 'topLeft' ||
+        direction === 'topRight' ||
+        direction === 'bottomLeft' ||
+        direction === 'bottomRight'
+      ) {
+        const movementX =
+          direction === 'right' || direction === 'topRight' || direction === 'bottomRight'
+            ? _movementX
+            : -_movementX
+        changedValue.x =
+          value().x -
+          (direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
+            ? movementX
+            : 0)
+        changedValue.width = value().width + movementX
+      }
+      if (
+        direction === 'top' ||
+        direction === 'bottom' ||
+        direction === 'topLeft' ||
+        direction === 'topRight' ||
+        direction === 'bottomLeft' ||
+        direction === 'bottomRight'
+      ) {
+        const movementY =
+          direction === 'bottom' || direction === 'bottomLeft' || direction === 'bottomRight'
+            ? _movementY
+            : -_movementY
+        changedValue.y =
+          value().y -
+          (direction === 'top' || direction === 'topLeft' || direction === 'topRight'
+            ? movementY
+            : 0)
+        changedValue.height = value().height + movementY
+      }
+
+      setValue(v => ({
+        ...v,
+        ...changedValue,
+      }))
+      props.onResize?.(changedValue)
 
       updateResizeSvgPosition(_e)
     }
@@ -234,6 +252,7 @@ const Transformer: Component<TransformerProps> = _props => {
         ...v,
         rotate,
       }))
+      props.onRotate?.({ rotate })
     }
     window.addEventListener('mousemove', onMouseMove)
 
