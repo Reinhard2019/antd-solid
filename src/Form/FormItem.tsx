@@ -8,7 +8,6 @@ import {
   createEffect,
   on,
   type Component,
-  onMount,
 } from 'solid-js'
 import { isNil, set, unset } from 'lodash-es'
 import { nanoid } from 'nanoid'
@@ -48,7 +47,7 @@ const FormItem = (props: FormItemProps) => {
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
 
-  onMount(() => {
+  createEffect(() => {
     if (props.name && props.rules) {
       set(rulesDict, props.name, props.rules)
       set(setErrMsgDict, props.name, setErrMsg)
