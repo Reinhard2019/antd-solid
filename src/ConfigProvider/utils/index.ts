@@ -114,8 +114,14 @@ export function createCssVariables(
     '--ant-color-white': mapToken.colorWhite,
     '--ant-color-bg-mask': mapToken.colorBgMask,
 
+    '--ant-color-fill': mapToken.colorFill,
+    '--ant-color-fill-secondary': mapToken.colorFillSecondary,
+    '--ant-color-fill-tertiary': mapToken.colorFillTertiary,
+    '--ant-color-fill-quaternary': mapToken.colorFillQuaternary,
+
     '--ant-control-outline': aliasToken.controlOutline,
     '--ant-control-item-bg-active': aliasToken.controlItemBgActive,
+    '--ant-control-item-bg-hover': mapToken.colorFillTertiary,
 
     '--ant-font-weight-strong': '600',
 
