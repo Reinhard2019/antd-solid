@@ -300,8 +300,12 @@ const Transformer: Component<TransformerProps> = _props => {
   return (
     <Element
       ref={container}
-      class={cs('border-solid border-white relative box-content')}
+      class={cs(
+        'border-2px border-solid border-white shadow-[var(--ant-transformer-box-shadow)] relative box-content',
+      )}
       style={{
+        '--ant-transformer-box-shadow':
+          '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
         width: `${value().width}px`,
         height: `${value().height}px`,
         'border-width': `${borderWidth}px`,
@@ -311,37 +315,37 @@ const Transformer: Component<TransformerProps> = _props => {
       onMouseDown={onMoveMouseDown}
     >
       <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white absolute top-0 left-0 -translate-1/2"
-        {...getResizeHandlerProps('topLeft')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
-        {...getResizeHandlerProps('topRight')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2"
-        {...getResizeHandlerProps('bottomLeft')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white absolute bottom-0 right-0 translate-1/2"
-        {...getResizeHandlerProps('bottomRight')}
-      />
-
-      <div
-        class="cursor-none rounded-3px w-22px h-6px bg-white absolute top-0 left-1/2 -translate-1/2"
+        class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-1/2 -translate-1/2"
         {...getResizeHandlerProps('top')}
       />
       <div
-        class="cursor-none rounded-3px w-22px h-6px bg-white absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
+        class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
         {...getResizeHandlerProps('bottom')}
       />
       <div
-        class="cursor-none rounded-3px w-6px h-22px bg-white absolute top-1/2 left-0 -translate-1/2"
+        class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 left-0 -translate-1/2"
         {...getResizeHandlerProps('left')}
       />
       <div
-        class="cursor-none rounded-3px w-6px h-22px bg-white absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2"
+        class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2"
         {...getResizeHandlerProps('right')}
+      />
+
+      <div
+        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-0 -translate-1/2"
+        {...getResizeHandlerProps('topLeft')}
+      />
+      <div
+        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
+        {...getResizeHandlerProps('topRight')}
+      />
+      <div
+        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2"
+        {...getResizeHandlerProps('bottomLeft')}
+      />
+      <div
+        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 right-0 translate-1/2"
+        {...getResizeHandlerProps('bottomRight')}
       />
 
       <div
