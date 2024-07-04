@@ -91,10 +91,10 @@ function warning(props: MethodProps) {
         closeIcon={false}
         {...props}
         title={
-          <>
-            <span class="i-ant-design:exclamation-circle text-22px mr-12px text-[var(--ant-color-warning)]" />
+          <div class="flex items-center gap-12px">
+            <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
             {props.title}
-          </>
+          </div>
         }
         children={<div class="ml-34px">{props.children}</div>}
         defaultOpen
@@ -221,13 +221,50 @@ function createModal<P extends {} = {}, T = void>(
   }
 }
 
+function useModal() {
+  const [open, setOpen] = createSignal(false)
+  const [modalProps, setModalProps] = createSignal<ModalProps>({})
+  const modal = {
+    warning: (props: ModalProps) => {
+      setModalProps(props)
+      setOpen(true)
+    },
+  }
+  const getContextHolder = () => (
+    <Modal
+      width="416px"
+      maskClosable={false}
+      closeIcon={false}
+      {...modalProps()}
+      title={
+        <div class="flex items-center gap-12px">
+          <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
+          {modalProps().title}
+        </div>
+      }
+      children={<div class="ml-34px">{modalProps().children}</div>}
+      open={open()}
+      onOk={() => {
+        setOpen(false)
+        modalProps().onOk?.()
+      }}
+      onCancel={() => {
+        setOpen(false)
+        modalProps().onCancel?.()
+      }}
+    />
+  )
+  return [modal, getContextHolder] as const
+}
+
 // 单位 s
 const transitionDuration = 0.3
 
 const Modal: Component<ModalProps> & {
-  warning: typeof warning
   useModalProps: typeof useModalProps
   createModal: typeof createModal
+  warning: typeof warning
+  useModal: typeof useModal
 } = _props => {
   const props = mergeProps(
     {
@@ -398,7 +435,8 @@ const Modal: Component<ModalProps> & {
 }
 
 Modal.useModalProps = useModalProps
-Modal.warning = warning
 Modal.createModal = createModal
+Modal.warning = warning
+Modal.useModal = useModal
 
 export default Modal
