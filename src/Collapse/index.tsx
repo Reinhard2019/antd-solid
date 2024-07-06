@@ -9,7 +9,7 @@ import Element from '../Element'
 export interface CollapseItem extends StyleProps {
   key: Key
   label: StringOrJSXElement
-  children: StringOrJSXElement
+  children: StringOrJSXElement | false
   /**
    * 自定义渲染每个面板右上角的内容
    */
@@ -55,6 +55,8 @@ const Collapse: Component<CollapseProps> = props => {
             <div
               class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)] flex justify-between items-center"
               onClick={() => {
+                if (item.children === false) return
+
                 setActiveKey(keys => {
                   if (keys.includes(item.key)) {
                     return keys.filter(key => key !== item.key)
@@ -64,13 +66,15 @@ const Collapse: Component<CollapseProps> = props => {
               }}
             >
               <span>
-                <span
-                  class={cs(
-                    'i-ant-design:right-outlined',
-                    'mr-[var(--ant-margin-sm)] duration-.3s',
-                    activeKey().includes(item.key) && 'rotate-[90deg]',
-                  )}
-                />
+                <Show when={item.children !== false}>
+                  <span
+                    class={cs(
+                      'i-ant-design:right-outlined',
+                      'mr-[var(--ant-margin-sm)] duration-.3s',
+                      activeKey().includes(item.key) && 'rotate-[90deg]',
+                    )}
+                  />
+                </Show>
                 {unwrapStringOrJSXElement(item.label)}
               </span>
 
@@ -90,10 +94,10 @@ const Collapse: Component<CollapseProps> = props => {
                 }).finished.finally(done)
               }}
             >
-              <Show when={activeKey().includes(item.key)}>
+              <Show when={activeKey().includes(item.key) && item.children !== false}>
                 <div class="overflow-hidden">
                   <div class="p-[var(--ant-collapse-content-padding)] [border-top:1px_solid_var(--ant-color-border)]">
-                    {unwrapStringOrJSXElement(item.children)}
+                    {unwrapStringOrJSXElement(item.children as StringOrJSXElement)}
                   </div>
                 </div>
               </Show>
