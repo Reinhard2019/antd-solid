@@ -1,4 +1,4 @@
-import { type Component, For, Show } from 'solid-js'
+import { type Component, For, mergeProps, Show } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
 import { type StringOrJSXElement, type Key, type StyleProps } from '../types'
@@ -26,9 +26,20 @@ export interface CollapseProps extends StyleProps {
    */
   onChange?: (value: Key[]) => void
   items: CollapseItem[]
+  /**
+   * 设置折叠面板大小
+   * 默认 'middle'
+   */
+  size?: 'small' | 'middle' | 'large'
 }
 
-const Collapse: Component<CollapseProps> = props => {
+const Collapse: Component<CollapseProps> = _props => {
+  const props = mergeProps(
+    {
+      size: 'middle',
+    },
+    _props,
+  )
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
@@ -53,7 +64,14 @@ const Collapse: Component<CollapseProps> = props => {
             style={item.style}
           >
             <div
-              class="bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] p-[var(--ant-collapse-header-padding)] flex justify-between items-center"
+              class={cs(
+                'bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] flex justify-between items-center',
+                {
+                  small: 'py-[--ant-padding-xs] px-[--ant-padding-sm]',
+                  middle: 'p-[var(--ant-collapse-header-padding)]',
+                  large: 'py-[--ant-padding] px-[--ant-padding-lg]',
+                }[props.size],
+              )}
               onClick={() => {
                 if (item.children === false) return
 
@@ -96,7 +114,16 @@ const Collapse: Component<CollapseProps> = props => {
             >
               <Show when={activeKey().includes(item.key) && item.children !== false}>
                 <div class="overflow-hidden">
-                  <div class="p-[var(--ant-collapse-content-padding)] [border-top:1px_solid_var(--ant-color-border)]">
+                  <div
+                    class={cs(
+                      '[border-top:1px_solid_var(--ant-color-border)]',
+                      {
+                        small: 'p-[--ant-padding-sm]',
+                        middle: 'p-[--ant-collapse-content-padding]',
+                        large: 'p-[--ant-padding-lg]',
+                      }[props.size],
+                    )}
+                  >
                     {unwrapStringOrJSXElement(item.children as StringOrJSXElement)}
                   </div>
                 </div>

@@ -14,6 +14,13 @@ outline: deep
 
 <Code path="collapse/Base" />
 
+### 面板尺寸
+
+折叠面板有大、中、小三种尺寸。
+通过设置 `size` 为 `large` `small` 分别把折叠面板设为大、小尺寸。若不设置 `size`，则尺寸默认为中。
+
+<Code path="collapse/Size" />
+
 ### 额外节点
 
 自定义渲染每个面板右上角的内容。
