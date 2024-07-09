@@ -41,7 +41,7 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
   }
 
 const statusClassDict = {
-  middle: (disabled: boolean) =>
+  default: (disabled: boolean) =>
     cs(
       '[border:1px_solid_var(--ant-color-border)]',
       !disabled &&
@@ -111,7 +111,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         }[props.size],
       props.addonBefore ? 'rounded-l-0' : compactItemRoundedLeftClass,
       props.addonAfter ? 'rounded-r-0' : compactItemRoundedRightClass,
-      statusClassDict[props.status ?? 'middle'](!!inputProps.disabled),
+      statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
     ),
