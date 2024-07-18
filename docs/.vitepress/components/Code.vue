@@ -72,7 +72,9 @@ onMounted(() => {
         import('solid-js/web').then(({ render, createComponent }) => {
           render(() => createComponent(ConfigProvider, {
             theme: isDark.value ? 'dark' : 'light',
-            children: () => createComponent(App, {})
+            get children() {
+              return createComponent(App, {})
+            }
           }), app.value!)
         })
       })
