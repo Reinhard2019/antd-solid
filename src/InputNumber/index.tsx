@@ -19,6 +19,10 @@ export interface InputNumberProps
   > {
   defaultValue?: number | null | undefined
   value?: number | null | undefined
+  /**
+   * 占位值，为空时显示的值
+   */
+  placeholderValue?: number | null | undefined
   onChange?: (value: number | null) => void
   min?: number
   max?: number
@@ -130,7 +134,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
           </div>
         </div>
       }
-      value={`${value() ?? ''}`}
+      value={`${value() ?? props.placeholderValue ?? ''}`}
       onKeyDown={e => {
         switch (e.key) {
           case 'ArrowUp':
