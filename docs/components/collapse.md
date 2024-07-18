@@ -21,6 +21,12 @@ outline: deep
 
 <Code path="collapse/Size" />
 
+### 简洁风格
+
+一套没有边框的简洁样式。
+
+<Code path="collapse/Bordered" />
+
 ### 额外节点
 
 自定义渲染每个面板右上角的内容。

@@ -21,23 +21,27 @@ export interface CollapseProps extends StyleProps {
   activeKey?: Key[]
   /**
    * 切换面板的回调
-   * @param value
-   * @returns
    */
   onChange?: (value: Key[]) => void
-  items: CollapseItem[]
+  items: CollapseItem[] | undefined | null
   /**
    * 设置折叠面板大小
    * 默认 'middle'
    */
   size?: 'small' | 'middle' | 'large'
+  /**
+   * 带边框风格的折叠面板
+   * 默认 true
+   */
+  bordered?: boolean
 }
 
 const Collapse: Component<CollapseProps> = _props => {
   const props = mergeProps(
     {
       size: 'middle',
-    },
+      bordered: true,
+    } as const,
     _props,
   )
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
@@ -49,7 +53,8 @@ const Collapse: Component<CollapseProps> = _props => {
   return (
     <Element
       class={cs(
-        'rounded-[var(--ant-border-radius-lg)] [border:1px_solid_var(--ant-color-border)] [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        'rounded-[var(--ant-border-radius-lg)] [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        props.bordered && '[border:1px_solid_var(--ant-color-border)]',
         props.class,
       )}
       style={props.style}
@@ -58,14 +63,16 @@ const Collapse: Component<CollapseProps> = _props => {
         {item => (
           <div
             class={cs(
+              'first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] overflow-hidden',
+              props.bordered &&
+                '[&:not(:last-child)]:[border-bottom:1px_solid_var(--ant-color-border)]',
               item.class,
-              '[&:not(:last-child)]:[border-bottom:1px_solid_var(--ant-color-border)] first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] cursor-pointer',
             )}
             style={item.style}
           >
             <div
               class={cs(
-                'bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] flex justify-between items-center',
+                'bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] flex justify-between items-center cursor-pointer',
                 {
                   small: 'py-[--ant-padding-xs] px-[--ant-padding-sm]',
                   middle: 'p-[var(--ant-collapse-header-padding)]',
@@ -116,7 +123,7 @@ const Collapse: Component<CollapseProps> = _props => {
                 <div class="overflow-hidden">
                   <div
                     class={cs(
-                      '[border-top:1px_solid_var(--ant-color-border)]',
+                      props.bordered && '[border-top:1px_solid_var(--ant-color-border)]',
                       {
                         small: 'p-[--ant-padding-sm]',
                         middle: 'p-[--ant-collapse-content-padding]',
