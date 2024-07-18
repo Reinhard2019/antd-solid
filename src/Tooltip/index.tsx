@@ -425,7 +425,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               open() ? 'block' : 'hidden',
             )}
             style={{
-              transform: `translate(clamp(0px, calc(var(--translate-x) + ${props.offset?.[0] ?? 0}px), calc(100vw - 100%)), clamp(0px, calc(var(--translate-y) + ${props.offset?.[1] ?? 0}px), calc(100vh - 100%)))`,
+              transform: `translate(calc(var(--translate-x) + ${props.offset?.[0] ?? 0}px), calc(var(--translate-y) + ${props.offset?.[1] ?? 0}px))`,
             }}
             onClick={e => {
               e.stopPropagation()
