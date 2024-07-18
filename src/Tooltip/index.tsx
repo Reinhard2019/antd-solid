@@ -10,6 +10,9 @@ import {
   onCleanup,
   createMemo,
   untrack,
+  createSignal,
+  on,
+  createRenderEffect,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
@@ -76,6 +79,11 @@ export interface TooltipProps {
    * 默认 0.1
    */
   mouseLeaveDelay?: number
+  /**
+   * 气泡被遮挡时自动调整位置
+   * 默认 true
+   */
+  autoAdjustOverflow?: boolean
 }
 
 /**
@@ -102,6 +110,98 @@ export const getContent = (content: TooltipProps['content'], close: () => void) 
   return typeof content === 'function' ? content(close) : content
 }
 
+const ARROW_STYLE_DICT: Record<TooltipPlacement, JSX.CSSProperties> = {
+  top: {
+    'border-top-color': 'var(--color)',
+    top: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    left: '50%',
+    transform: 'translateX(-50%)',
+  },
+  topLeft: {
+    'border-top-color': 'var(--color)',
+    top: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    left: '8px',
+  },
+  topRight: {
+    'border-top-color': 'var(--color)',
+    top: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    right: '8px',
+  },
+  bottom: {
+    'border-bottom-color': 'var(--color)',
+    bottom: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    left: '50%',
+    transform: 'translateX(-50%)',
+  },
+  bottomLeft: {
+    'border-bottom-color': 'var(--color)',
+    bottom: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    left: '8px',
+  },
+  bottomRight: {
+    'border-bottom-color': 'var(--color)',
+    bottom: '100%',
+    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
+    right: '8px',
+  },
+  left: {
+    'border-left-color': 'var(--color)',
+    top: '50%',
+    right: 0,
+    transform: 'translate(100%, -50%)',
+  },
+  leftTop: {
+    'border-left-color': 'var(--color)',
+    top: '8px',
+    right: 0,
+    transform: 'translate(100%, 0)',
+  },
+  leftBottom: {
+    'border-left-color': 'var(--color)',
+    bottom: '8px',
+    right: 0,
+    transform: 'translate(100%, 0)',
+  },
+  right: {
+    'border-right-color': 'var(--color)',
+    top: '50%',
+    left: 0,
+    transform: 'translate(-100%, -50%)',
+  },
+  rightTop: {
+    'border-right-color': 'var(--color)',
+    top: '8px',
+    left: 0,
+    transform: 'translate(-100%, 0)',
+  },
+  rightBottom: {
+    'border-right-color': 'var(--color)',
+    bottom: '8px',
+    left: 0,
+    transform: 'translate(-100%, 0)',
+  },
+}
+
+const REVERSE_PLACEMENT_DICT: Record<TooltipPlacement, TooltipPlacement> = {
+  top: 'bottom',
+  topLeft: 'bottomLeft',
+  topRight: 'bottomRight',
+  bottom: 'top',
+  bottomLeft: 'topLeft',
+  bottomRight: 'topRight',
+  left: 'right',
+  leftTop: 'rightTop',
+  leftBottom: 'rightBottom',
+  right: 'left',
+  rightTop: 'leftTop',
+  rightBottom: 'leftBottom',
+}
+
 const Tooltip: Component<TooltipProps> = _props => {
   const props = mergeProps(
     {
@@ -113,7 +213,8 @@ const Tooltip: Component<TooltipProps> = _props => {
       offset: [0, 0],
       mouseLeaveDelay: 0.1,
       plain: false,
-    },
+      autoAdjustOverflow: true,
+    } as const,
     _props,
   )
 
@@ -176,6 +277,15 @@ const Tooltip: Component<TooltipProps> = _props => {
   })
 
   const arrowOffset = createMemo(() => (props.arrow ? 8 : 0))
+  const [reverse, setReverse] = createSignal(false)
+  createRenderEffect(
+    on(open, () => {
+      setReverse(false)
+    }),
+  )
+  const reversedPlacement = createMemo(() =>
+    reverse() ? REVERSE_PLACEMENT_DICT[props.placement] : props.placement,
+  )
   const setTranslate = () => {
     if (!contentRef) return
 
@@ -185,231 +295,227 @@ const Tooltip: Component<TooltipProps> = _props => {
       return
     }
 
-    const childrenRect = _children.getBoundingClientRect()
+    const _childrenRect = _children.getBoundingClientRect()
+    const childrenRect = {
+      left: _childrenRect.left + (props.offset?.[0] ?? 0),
+      right: _childrenRect.right + (props.offset?.[0] ?? 0),
+      top: _childrenRect.top + (props.offset?.[1] ?? 0),
+      bottom: _childrenRect.bottom + (props.offset?.[1] ?? 0),
+      width: _childrenRect.width,
+      height: _childrenRect.height,
+    }
+    let translateX = 0
+    let translateY = 0
+
     switch (props.placement) {
       case 'top':
-        contentRef.style.setProperty(
-          '--translate-x',
-          `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
-        )
-        contentRef.style.setProperty(
-          '--translate-y',
-          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-        )
-        return
-      case 'topLeft':
-        contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
-        contentRef.style.setProperty(
-          '--translate-y',
-          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-        )
-        return
-      case 'topRight':
-        contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-        contentRef.style.setProperty(
-          '--translate-y',
-          `calc(${childrenRect.top - arrowOffset()}px - 100%)`,
-        )
-        return
       case 'bottom':
-        contentRef.style.setProperty(
-          '--translate-x',
-          `calc(${childrenRect.left + childrenRect.width / 2}px - 50%)`,
-        )
-        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-        return
+        translateX = childrenRect.left + childrenRect.width / 2 - contentRef.clientWidth / 2
+        break
+      case 'topLeft':
       case 'bottomLeft':
-        contentRef.style.setProperty('--translate-x', `${childrenRect.left}px`)
-        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-        return
+        translateX = childrenRect.left
+        break
+      case 'topRight':
       case 'bottomRight':
-        contentRef.style.setProperty('--translate-x', `calc(${childrenRect.right}px - 100%)`)
-        contentRef.style.setProperty('--translate-y', `${childrenRect.bottom + arrowOffset()}px`)
-        return
+        translateX = childrenRect.right - contentRef.clientWidth
+        break
       case 'left':
-        contentRef.style.setProperty(
-          '--translate-x',
-          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-        )
-        contentRef.style.setProperty(
-          '--translate-y',
-          `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
-        )
-        return
-      case 'leftTop':
-        contentRef.style.setProperty(
-          '--translate-x',
-          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-        )
-        contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
-        return
-      case 'leftBottom':
-        contentRef.style.setProperty(
-          '--translate-x',
-          `calc(${childrenRect.left - arrowOffset()}px - 100%)`,
-        )
-        contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
-        return
       case 'right':
-        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-        contentRef.style.setProperty(
-          '--translate-y',
-          `calc(${childrenRect.top + childrenRect.height / 2}px - 50%)`,
-        )
-        return
+        translateY = childrenRect.top + childrenRect.height / 2 - contentRef.clientHeight / 2
+        break
+      case 'leftTop':
       case 'rightTop':
-        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-        contentRef.style.setProperty('--translate-y', `${childrenRect.top}px`)
-        return
+        translateY = childrenRect.top
+        break
+      case 'leftBottom':
       case 'rightBottom':
-        contentRef.style.setProperty('--translate-x', `${childrenRect.right + arrowOffset()}px`)
-        contentRef.style.setProperty('--translate-y', `calc(${childrenRect.bottom}px - 100%)`)
+        translateY = childrenRect.bottom - contentRef.clientHeight
+        break
     }
-  }
-  createEffect(() => {
-    if (!open()) return
 
-    setTranslate()
-  })
-  // 监听滚动
-  createEffect(() => {
-    if (!open()) return
-
-    const cleanupFnList: Array<() => void> = []
-
-    const _children = resolvedChildren() as HTMLElement
-    const scrollList = collectScroll(_children)
-    scrollList.forEach(scroll => {
-      const onScroll = () => {
-        untrack(setTranslate)
+    const updateTranslateByMainPlacement = (type: 'top' | 'bottom' | 'left' | 'right') => {
+      switch (type) {
+        case 'top':
+          translateY = childrenRect.top - arrowOffset() - contentRef.clientHeight
+          break
+        case 'bottom':
+          translateY = childrenRect.bottom + arrowOffset()
+          break
+        case 'left':
+          translateX = childrenRect.left - arrowOffset() - contentRef.clientWidth
+          break
+        case 'right':
+          translateX = childrenRect.right + arrowOffset()
+          break
       }
-      scroll.addEventListener('scroll', onScroll)
-      cleanupFnList.push(() => {
-        scroll.removeEventListener('scroll', onScroll)
-      })
-    })
-
-    onCleanup(() => {
-      cleanupFnList.forEach(fn => {
-        fn()
-      })
-    })
-  })
-  // 监听 children 的 size 变化
-  createEffect(() => {
-    const _children = resolvedChildren() as HTMLElement
-    const ro = new ResizeObserver(() => {
-      setTranslate()
-    })
-    ro.observe(_children)
-    onCleanup(() => {
-      ro.disconnect()
-    })
-  })
-  // 监听 children 的位置变化
-  createEffect(() => {
-    const _children = resolvedChildren() as HTMLElement
-
-    const config = { attributes: true }
-    const ro = new MutationObserver(() => {
-      setTranslate()
-    })
-    ro.observe(_children, config)
-
-    onCleanup(() => {
-      ro.disconnect()
-    })
-  })
-  const arrowStyle = createMemo(() => {
-    switch (props.placement) {
-      case 'top':
-        return {
-          'border-top-color': 'var(--color)',
-          top: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          left: '50%',
-          transform: 'translateX(-50%)',
-        } as JSX.CSSProperties
-      case 'topLeft':
-        return {
-          'border-top-color': 'var(--color)',
-          top: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          left: '8px',
-        } as JSX.CSSProperties
-      case 'topRight':
-        return {
-          'border-top-color': 'var(--color)',
-          top: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          right: '8px',
-        } as JSX.CSSProperties
-      case 'bottom':
-        return {
-          'border-bottom-color': 'var(--color)',
-          bottom: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          left: '50%',
-          transform: 'translateX(-50%)',
-        } as JSX.CSSProperties
-      case 'bottomLeft':
-        return {
-          'border-bottom-color': 'var(--color)',
-          bottom: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          left: '8px',
-        } as JSX.CSSProperties
-      case 'bottomRight':
-        return {
-          'border-bottom-color': 'var(--color)',
-          bottom: '100%',
-          filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
-          right: '8px',
-        } as JSX.CSSProperties
-      case 'left':
-        return {
-          'border-left-color': 'var(--color)',
-          top: '50%',
-          right: 0,
-          transform: 'translate(100%, -50%)',
-        } as JSX.CSSProperties
-      case 'leftTop':
-        return {
-          'border-left-color': 'var(--color)',
-          top: '8px',
-          right: 0,
-          transform: 'translate(100%, 0)',
-        } as JSX.CSSProperties
-      case 'leftBottom':
-        return {
-          'border-left-color': 'var(--color)',
-          bottom: '8px',
-          right: 0,
-          transform: 'translate(100%, 0)',
-        } as JSX.CSSProperties
-      case 'right':
-        return {
-          'border-right-color': 'var(--color)',
-          top: '50%',
-          left: 0,
-          transform: 'translate(-100%, -50%)',
-        } as JSX.CSSProperties
-      case 'rightTop':
-        return {
-          'border-right-color': 'var(--color)',
-          top: '8px',
-          left: 0,
-          transform: 'translate(-100%, 0)',
-        } as JSX.CSSProperties
-      case 'rightBottom':
-        return {
-          'border-right-color': 'var(--color)',
-          bottom: '8px',
-          left: 0,
-          transform: 'translate(-100%, 0)',
-        } as JSX.CSSProperties
     }
-  })
+
+    if (props.autoAdjustOverflow) {
+      switch (props.placement) {
+        case 'top':
+        case 'topLeft':
+        case 'topRight':
+          if (reverse()) {
+            updateTranslateByMainPlacement('bottom')
+            if (translateY + contentRef.clientHeight > window.innerHeight) {
+              setReverse(false)
+              updateTranslateByMainPlacement('top')
+            }
+          } else {
+            updateTranslateByMainPlacement('top')
+            if (translateY < 0) {
+              setReverse(true)
+              updateTranslateByMainPlacement('bottom')
+            }
+          }
+          break
+        case 'bottom':
+        case 'bottomLeft':
+        case 'bottomRight':
+          if (reverse()) {
+            updateTranslateByMainPlacement('top')
+            if (translateY < 0) {
+              setReverse(false)
+              updateTranslateByMainPlacement('bottom')
+            }
+          } else {
+            updateTranslateByMainPlacement('bottom')
+            if (translateY + contentRef.clientHeight > window.innerHeight) {
+              setReverse(true)
+              updateTranslateByMainPlacement('top')
+            }
+          }
+          break
+        case 'left':
+        case 'leftTop':
+        case 'leftBottom':
+          if (reverse()) {
+            updateTranslateByMainPlacement('right')
+            if (translateX < 0) {
+              setReverse(false)
+              updateTranslateByMainPlacement('left')
+            }
+          } else {
+            updateTranslateByMainPlacement('left')
+            if (translateX + contentRef.clientWidth > window.innerWidth) {
+              setReverse(true)
+              updateTranslateByMainPlacement('right')
+            }
+          }
+          break
+        case 'right':
+        case 'rightTop':
+        case 'rightBottom':
+          if (reverse()) {
+            updateTranslateByMainPlacement('left')
+            if (translateX + contentRef.clientWidth > window.innerWidth) {
+              setReverse(false)
+              updateTranslateByMainPlacement('right')
+            }
+          } else {
+            updateTranslateByMainPlacement('right')
+            if (translateX < 0) {
+              setReverse(true)
+              updateTranslateByMainPlacement('left')
+            }
+          }
+          break
+      }
+    } else {
+      switch (props.placement) {
+        case 'top':
+        case 'topLeft':
+        case 'topRight':
+          updateTranslateByMainPlacement('top')
+          break
+        case 'bottom':
+        case 'bottomLeft':
+        case 'bottomRight':
+          updateTranslateByMainPlacement('bottom')
+          break
+        case 'left':
+        case 'leftTop':
+        case 'leftBottom':
+          updateTranslateByMainPlacement('left')
+          break
+        case 'right':
+        case 'rightTop':
+        case 'rightBottom':
+          updateTranslateByMainPlacement('right')
+          break
+      }
+    }
+
+    contentRef.style.setProperty('--translate-x', `${translateX}px`)
+    contentRef.style.setProperty('--translate-y', `${translateY}px`)
+  }
+  createEffect(
+    on(open, () => {
+      if (!open()) return
+
+      setTranslate()
+    }),
+  )
+  // 监听滚动
+  createEffect(
+    on([open, resolvedChildren], () => {
+      if (!open()) return
+
+      const cleanupFnList: Array<() => void> = []
+
+      const _children = resolvedChildren() as HTMLElement
+      const scrollList = collectScroll(_children)
+      scrollList.forEach(scroll => {
+        const onScroll = () => {
+          untrack(setTranslate)
+        }
+        scroll.addEventListener('scroll', onScroll)
+        cleanupFnList.push(() => {
+          scroll.removeEventListener('scroll', onScroll)
+        })
+      })
+
+      onCleanup(() => {
+        cleanupFnList.forEach(fn => {
+          fn()
+        })
+      })
+    }),
+  )
+  // 监听 children 的 size 变化
+  createEffect(
+    on([open, resolvedChildren], () => {
+      if (!open()) return
+
+      const _children = resolvedChildren() as HTMLElement
+      const ro = new ResizeObserver(() => {
+        setTranslate()
+      })
+      ro.observe(_children)
+      onCleanup(() => {
+        ro.disconnect()
+      })
+    }),
+  )
+  // 监听 children 的位置变化
+  createEffect(
+    on([open, resolvedChildren], () => {
+      if (!open()) return
+
+      const _children = resolvedChildren() as HTMLElement
+
+      const config = { attributes: true }
+      const ro = new MutationObserver(() => {
+        setTranslate()
+      })
+      ro.observe(_children, config)
+
+      onCleanup(() => {
+        ro.disconnect()
+      })
+    }),
+  )
 
   return (
     <>
@@ -425,7 +531,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               open() ? 'block' : 'hidden',
             )}
             style={{
-              transform: `translate(calc(var(--translate-x) + ${props.offset?.[0] ?? 0}px), calc(var(--translate-y) + ${props.offset?.[1] ?? 0}px))`,
+              transform: 'translate(var(--translate-x), var(--translate-y))',
             }}
             onClick={e => {
               e.stopPropagation()
@@ -450,7 +556,7 @@ const Tooltip: Component<TooltipProps> = _props => {
                   '--color': props.plain
                     ? 'var(--ant-color-bg-container-secondary)'
                     : 'var(--ant-color-bg-spotlight)',
-                  ...arrowStyle(),
+                  ...ARROW_STYLE_DICT[reversedPlacement()],
                 }}
               />
             </Show>
