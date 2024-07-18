@@ -56,7 +56,6 @@ const InputNumber: Component<InputNumberProps> = _props => {
   const updateValidValue = (
     v: number | string | null | undefined,
     options?: {
-      ignoreValid?: boolean
       ignoreOnChange?: boolean
     },
   ) => {
@@ -65,13 +64,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     if (!isEmptyValue(v)) {
       valueNum = Number(v)
 
-      if (options?.ignoreValid) {
-        if (Number.isNaN(valueNum)) {
-          valueNum = null
-        } else {
-          valueNum = clampValue(floorValue(valueNum!))
-        }
-      } else if (
+      if (
         Number.isNaN(valueNum) ||
         valueNum !== clampValue(valueNum!) ||
         valueNum !== floorValue(valueNum!)
@@ -108,10 +101,10 @@ const InputNumber: Component<InputNumberProps> = _props => {
       newValue = addon
     } else {
       const num = Number(value())
-      newValue = Number.isNaN(num) ? null : NP.plus(num, addon)
+      newValue = NP.plus(Number.isNaN(num) ? validValue ?? 0 : num, addon)
     }
 
-    updateValidValue(newValue, { ignoreValid: true })
+    updateValidValue(newValue)
     setValue(validValue)
   }
   const up = () => {
@@ -155,7 +148,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
         updateValidValue(newValue)
       }}
       onBlur={e => {
-        updateValidValue(value(), { ignoreValid: true })
+        updateValidValue(value())
         setValue(validValue)
 
         dispatchEventHandlerUnion(props.onBlur, e)
