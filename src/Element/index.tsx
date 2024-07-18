@@ -18,7 +18,7 @@ function Element<T = JSX.HTMLAttributes<HTMLDivElement>>(_props: ElementProps<T>
     },
     _props,
   )
-  const { cssVariablesClass, cssVariables } = useContext(ConfigProviderContext)
+  const { theme, cssVariablesClass, cssVariables } = useContext(ConfigProviderContext)
 
   onMount(() => {
     let styleTag = document.head.querySelector(`[data-token-hash=${cssVariablesClass}]`)
@@ -32,6 +32,14 @@ function Element<T = JSX.HTMLAttributes<HTMLDivElement>>(_props: ElementProps<T>
       .join('\n')
     styleTag.innerHTML = `
         .${cssVariablesClass} {
+          ${
+  theme() === 'dark'
+    ? `
+            color-scheme: dark;
+
+          `
+    : ''
+}
           ${cssVariablesStr}
         }
       `
