@@ -1,4 +1,4 @@
-import { type ParentProps, type Component, Show, mergeProps, createMemo } from 'solid-js'
+import { type ParentProps, type Component, Show, mergeProps, createMemo, children } from 'solid-js'
 import cs from 'classnames'
 import { useSize } from '../hooks'
 import Element from '../Element'
@@ -11,13 +11,19 @@ export interface DividerProps extends ParentProps, StyleProps {
    * 默认 'center'
    */
   orientation?: 'left' | 'right' | 'center'
+  /**
+   * 水平还是垂直类型
+   * 默认 'horizontal'
+   */
+  type?: 'horizontal' | 'vertical'
 }
 
 const Divider: Component<DividerProps> = _props => {
   const props = mergeProps(
     {
       orientation: 'center',
-    },
+      type: 'horizontal',
+    } as const,
     _props,
   )
 
@@ -25,8 +31,8 @@ const Divider: Component<DividerProps> = _props => {
   const containerSize = useSize(() => container)
   const containerWidth = createMemo(() => containerSize()?.width ?? 0)
 
-  let children: HTMLSpanElement | undefined
-  const childrenSize = useSize(() => children)
+  let childrenRef: HTMLSpanElement | undefined
+  const childrenSize = useSize(() => childrenRef)
   const childrenWidth = createMemo(() => childrenSize()?.width ?? 0)
 
   const orientationMargin = 0.05
@@ -40,14 +46,19 @@ const Divider: Component<DividerProps> = _props => {
       })[props.orientation]!,
   )
 
+  const resolvedChildren = children(() => props.children)
+
   return (
     <Show
-      when={props.children}
+      when={resolvedChildren() && props.type === 'horizontal'}
       fallback={
         <Element
           class={cs(
             props.class,
-            'my-[var(--ant-margin-lg)] border-width-[1px_0_0] border-[var(--ant-color-split)]',
+            'border-[--ant-color-split]',
+            props.type === 'horizontal'
+              ? 'my-[--ant-margin-lg] border-width-[1px_0_0]'
+              : 'mx-[--ant-margin-xs] inline-block border-width-[0_1px_0_0] h-0.9em [vertical-align:middle]',
             props.dashed ? 'border-dashed' : 'border-solid',
           )}
           style={props.style}
@@ -76,13 +87,13 @@ const Divider: Component<DividerProps> = _props => {
         }}
       >
         <span
-          ref={children}
+          ref={childrenRef}
           class="inline-block px-[var(--ant-divider-text-padding-inline)]"
           style={{
             transform: `translateX(${childrenStart()}px)`,
           }}
         >
-          {props.children}
+          {resolvedChildren()}
         </span>
       </Element>
     </Show>

@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="divider/Text" />
 
+### 垂直分割线
+
+使用 `type="vertical"` 设置为行内的垂直分割线。
+
+<Code path="divider/Vertical" />
+
 ## API
 
 ### Divider
