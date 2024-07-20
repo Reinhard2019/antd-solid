@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="select/Base" />
 
+### 尺寸
+
+有 `small`、`medium` 和 `large` 尺寸。
+
+<Code path="select/Size" />
+
 ### 可清空
 
 注意只有选了值才能清空值。

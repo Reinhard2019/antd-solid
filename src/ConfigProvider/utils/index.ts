@@ -174,13 +174,10 @@ export function createCssVariables(
     '--ant-radio-button-checked-bg-disabled': aliasToken.controlItemBgActiveDisabled,
 
     '--ant-collapse-header-bg': aliasToken.colorFillAlter,
-    '--ant-collapse-header-padding': '12px 16px',
-    '--ant-collapse-content-padding': '16px',
 
     '--ant-select-option-selected-bg': aliasToken.controlItemBgActive,
     '--ant-select-option-active-bg': aliasToken.controlItemBgHover,
     '--ant-select-multiple-item-bg': mapToken.colorFillSecondary,
-    '--ant-select-multiple-item-height': '24px',
 
     '--ant-tree-expand-icon-width': '24px',
     '--ant-tree-node-wrapper-padding': '2px 0',

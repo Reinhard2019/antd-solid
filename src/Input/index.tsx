@@ -1,5 +1,5 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, mergeProps, onMount, splitProps } from 'solid-js'
+import { Show, createMemo, onMount, splitProps, useContext } from 'solid-js'
 import type { JSX, JSXElement, Component } from 'solid-js'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
@@ -7,6 +7,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import Compact from '../Compact'
 import { setRef } from '../utils/solid'
 import Element from '../Element'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {
@@ -62,10 +63,11 @@ const statusClassDict = {
 }
 
 export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
-  _props: CommonInputProps<T> &
+  props: CommonInputProps<T> &
   Omit<JSX.InputHTMLAttributes<T>, 'style' | 'onChange' | 'onInput' | 'onKeyDown'>,
 ) {
-  const props = mergeProps({ size: 'middle' as const }, _props)
+  const { componentSize } = useContext(ConfigProviderContext)
+  const size = createMemo(() => props.size ?? componentSize())
   const [{ style, onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
@@ -102,13 +104,13 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         small: 'px-7px py-0 rounded-[var(--ant-border-radius-sm)]',
         middle: 'px-11px py-4px rounded-[var(--ant-border-radius)]',
         large: 'px-11px py-7px rounded-[var(--ant-border-radius-lg)]',
-      }[props.size],
+      }[size()],
       !props.textarea &&
         {
           small: 'h-24px',
           middle: 'h-32px',
           large: 'h-40px',
-        }[props.size],
+        }[size()],
       props.addonBefore ? 'rounded-l-0' : compactItemRoundedLeftClass,
       props.addonAfter ? 'rounded-r-0' : compactItemRoundedRightClass,
       statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
@@ -164,7 +166,12 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   return (
     <Element
       class={cs(
-        'flex w-full relative [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        'flex w-full relative text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        {
+          small: '[font-size:var(--ant-font-size)]',
+          middle: '[font-size:var(--ant-font-size)]',
+          large: '[font-size:var(--ant-font-size-lg)]',
+        }[size()],
         Compact.compactItemClass,
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',

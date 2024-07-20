@@ -1,10 +1,11 @@
-import { type Component, For, mergeProps, Show } from 'solid-js'
+import { type Component, createMemo, For, mergeProps, Show, useContext } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
 import { type StringOrJSXElement, type Key, type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface CollapseItem extends StyleProps {
   key: Key
@@ -37,13 +38,14 @@ export interface CollapseProps extends StyleProps {
 }
 
 const Collapse: Component<CollapseProps> = _props => {
+  const { componentSize } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
-      size: 'middle',
       bordered: true,
     } as const,
     _props,
   )
+  const size = createMemo(() => props.size ?? componentSize())
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
@@ -53,17 +55,24 @@ const Collapse: Component<CollapseProps> = _props => {
   return (
     <Element
       class={cs(
-        'rounded-[var(--ant-border-radius-lg)] [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        'rounded-[var(--ant-border-radius-lg)] overflow-hidden [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.bordered && '[border:1px_solid_var(--ant-color-border)]',
         props.class,
       )}
-      style={props.style}
+      style={{
+        '--ant-collapse-header-padding': '12px 16px',
+        '--ant-collapse-content-padding': {
+          small: 'var(--ant-padding-sm)',
+          middle: 'var(--ant-padding)',
+          large: 'var(--ant-padding-lg)',
+        }[size()],
+        ...props.style,
+      }}
     >
       <For each={props.items}>
         {item => (
           <div
             class={cs(
-              'first:rounded-t-[var(--ant-border-radius-lg)] last:rounded-b-[var(--ant-border-radius-lg)] overflow-hidden',
               props.bordered &&
                 '[&:not(:last-child)]:[border-bottom:1px_solid_var(--ant-color-border)]',
               item.class,
@@ -77,7 +86,7 @@ const Collapse: Component<CollapseProps> = _props => {
                   small: 'py-[--ant-padding-xs] px-[--ant-padding-sm]',
                   middle: 'p-[var(--ant-collapse-header-padding)]',
                   large: 'py-[--ant-padding] px-[--ant-padding-lg]',
-                }[props.size],
+                }[size()],
               )}
               onClick={() => {
                 if (item.children === false) return
@@ -123,12 +132,8 @@ const Collapse: Component<CollapseProps> = _props => {
                 <div class="overflow-hidden">
                   <div
                     class={cs(
-                      props.bordered && '[border-top:1px_solid_var(--ant-color-border)]',
-                      {
-                        small: 'p-[--ant-padding-sm]',
-                        middle: 'p-[--ant-collapse-content-padding]',
-                        large: 'p-[--ant-padding-lg]',
-                      }[props.size],
+                      props.bordered &&
+                        '[border-top:1px_solid_var(--ant-color-border)] p-[--ant-collapse-content-padding]',
                     )}
                   >
                     {unwrapStringOrJSXElement(item.children as StringOrJSXElement)}

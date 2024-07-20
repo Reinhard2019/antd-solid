@@ -30,16 +30,11 @@ function Element<T = JSX.HTMLAttributes<HTMLDivElement>>(_props: ElementProps<T>
     const cssVariablesStr = Object.entries(cssVariables())
       .map(([key, value]) => `${key}: ${value};`)
       .join('\n')
+
     styleTag.innerHTML = `
         .${cssVariablesClass} {
-          ${
-  theme() === 'dark'
-    ? `
-            color-scheme: dark;
+          ${theme() === 'dark' ? 'color-scheme: dark;' : ''}
 
-          `
-    : ''
-}
           ${cssVariablesStr}
         }
       `

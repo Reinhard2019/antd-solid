@@ -1,7 +1,8 @@
-import { mergeProps, type Component, type JSX } from 'solid-js'
+import { createMemo, mergeProps, useContext, type Component, type JSX } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Element from '../Element'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface SwitchProps {
   defaultChecked?: boolean
@@ -9,13 +10,15 @@ export interface SwitchProps {
   onChange?: (checked: boolean) => void
   /**
    * 开关大小
-   * 默认 'default'
+   * 默认 'middle'
    */
-  size?: 'default' | 'small'
+  size?: 'small' | 'middle' | 'large'
 }
 
 const Switch: Component<SwitchProps> = _props => {
-  const props = mergeProps({ size: 'default' } as const, _props)
+  const { componentSize } = useContext(ConfigProviderContext)
+  const props = mergeProps({ size: 'middle' } as const, _props)
+  const size = createMemo(() => componentSize() ?? props.size)
   const [checked, setChecked] = createControllableValue<boolean>(props, {
     defaultValuePropName: 'defaultChecked',
     valuePropName: 'checked',
@@ -27,9 +30,10 @@ const Switch: Component<SwitchProps> = _props => {
       class={cs(
         'rounded-100px relative vertical-middle',
         {
-          default: 'w-44px h-22px',
+          large: 'w-56px h-28px',
+          middle: 'w-40px h-22px',
           small: 'w-28px h-16px',
-        }[props.size],
+        }[size()],
         checked() ? 'bg-[var(--ant-color-primary)]' : 'bg-[rgba(0,0,0,0.45)]',
       )}
       onClick={() => setChecked(c => !c)}
@@ -38,9 +42,10 @@ const Switch: Component<SwitchProps> = _props => {
         class={cs(
           'rounded-50% bg-white absolute top-1/2 -translate-y-1/2 transition-left',
           {
-            default: 'w-18px h-18px',
+            large: 'w-24px h-24px',
+            middle: 'w-18px h-18px',
             small: 'w-12px h-12px',
-          }[props.size],
+          }[size()],
           checked() ? 'right-2px' : 'left-2px',
         )}
       />

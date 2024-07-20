@@ -14,9 +14,9 @@ outline: deep
 
 <Code path="switch/Base" />
 
-### 两种大小
+### 尺寸
 
-`size="small"` 表示小号开关。
+有 `small`、`medium` 和 `large` 尺寸。
 
 <Code path="switch/Size" />
 

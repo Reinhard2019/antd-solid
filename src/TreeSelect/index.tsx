@@ -22,6 +22,7 @@ export interface TreeSelectProps<T extends {} = TreeSelectNode>
   | 'disabled'
   | 'placeholder'
   | 'status'
+  | 'size'
   | 'optionLabelRender'
   >,
   Pick<TreeProps<T>, 'treeData' | 'checkable' | 'checkStrategy'> {
@@ -47,6 +48,7 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     'disabled',
     'placeholder',
     'status',
+    'size',
     'optionLabelRender',
   ])
   const [treeProps] = splitProps(props, ['treeData', 'checkable', 'checkStrategy'])

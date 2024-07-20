@@ -1,7 +1,8 @@
-import { type JSXElement, For, Show, mergeProps, type Accessor } from 'solid-js'
+import { type JSXElement, For, Show, type Accessor, useContext, createMemo } from 'solid-js'
 import cs from 'classnames'
 import Empty from '../Empty'
 import Element from '../Element'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement
@@ -14,7 +15,7 @@ export interface TableProps<R extends {}> {
   /**
    * 默认 'middle'
    */
-  size?: 'large' | 'middle' | 'small'
+  size?: 'small' | 'middle' | 'large'
 }
 
 const sizeClassDict = {
@@ -23,13 +24,9 @@ const sizeClassDict = {
   small: 'p-8px leading-22px',
 }
 
-const Table = <R extends {}>(_props: TableProps<R>) => {
-  const props = mergeProps(
-    {
-      size: 'middle',
-    } as const,
-    _props,
-  )
+const Table = <R extends {}>(props: TableProps<R>) => {
+  const { componentSize } = useContext(ConfigProviderContext)
+  const size = createMemo(() => props.size ?? componentSize())
 
   return (
     <Element class="[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]">
@@ -40,7 +37,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
               {item => (
                 <th
                   class={cs(
-                    sizeClassDict[props.size],
+                    sizeClassDict[size()],
                     'bg-[var(--ant-table-header-bg)] font-bold [border-bottom:1px_solid_var(--ant-table-border-color)] text-left',
                   )}
                 >
@@ -58,7 +55,7 @@ const Table = <R extends {}>(_props: TableProps<R>) => {
                   {item => (
                     <td
                       class={cs(
-                        sizeClassDict[props.size],
+                        sizeClassDict[size()],
                         '[border-bottom:1px_solid_var(--ant-table-border-color)]',
                       )}
                     >

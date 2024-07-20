@@ -1,5 +1,5 @@
-import { type ParentProps, type Component, createMemo, mergeProps } from 'solid-js'
-import Context from './context'
+import { type ParentProps, type Component, createMemo, mergeProps, useContext } from 'solid-js'
+import ConfigProviderContext from './context'
 import { type SeedToken } from './types'
 import { createCssVariables, getCssVariablesClass } from './utils'
 import { darkSeedToken, lightSeedToken } from './seed'
@@ -11,12 +11,24 @@ interface ConfigProviderProps extends ParentProps {
    */
   theme?: 'light' | 'dark'
   token?: SeedToken
+  /**
+   * 设置 antd 组件大小
+   * 默认 'middle'
+   */
+  componentSize?: 'small' | 'middle' | 'large'
 }
 
-const ConfigProvider: Component<ConfigProviderProps> = _props => {
+function useConfig() {
+  return useContext(ConfigProviderContext)
+}
+
+const ConfigProvider: Component<ConfigProviderProps> & {
+  useConfig: typeof useConfig
+} = _props => {
   const props = mergeProps(
     {
       theme: 'light',
+      componentSize: 'middle',
     } as const,
     _props,
   )
@@ -27,12 +39,19 @@ const ConfigProvider: Component<ConfigProviderProps> = _props => {
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
 
   return (
-    <Context.Provider
-      value={{ theme: () => props.theme, cssVariablesClass: getCssVariablesClass(), cssVariables }}
+    <ConfigProviderContext.Provider
+      value={{
+        theme: () => props.theme,
+        cssVariablesClass: getCssVariablesClass(),
+        cssVariables,
+        componentSize: () => props.componentSize,
+      }}
     >
       {props.children}
-    </Context.Provider>
+    </ConfigProviderContext.Provider>
   )
 }
+
+ConfigProvider.useConfig = useConfig
 
 export default ConfigProvider

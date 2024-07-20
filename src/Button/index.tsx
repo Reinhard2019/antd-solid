@@ -7,11 +7,13 @@ import {
   createSignal,
   createMemo,
   splitProps,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
 import { wave } from '../utils/animation'
 import Element from '../Element'
+import ConfigProviderContext from '../ConfigProvider/context'
 
 export interface ButtonProps
   extends ParentProps,
@@ -22,7 +24,7 @@ export interface ButtonProps
   /**
    * 默认: middle
    */
-  size?: 'large' | 'middle' | 'small'
+  size?: 'small' | 'middle' | 'large'
   class?: string
   style?: JSX.CSSProperties
   /**
@@ -98,10 +100,9 @@ const typeClassMap = {
 } as const
 
 const Button: Component<ButtonProps> = _props => {
-  const props = mergeProps(
-    { type: 'default', size: 'middle', danger: false, disabled: false } as const,
-    _props,
-  )
+  const { componentSize } = useContext(ConfigProviderContext)
+  const props = mergeProps({ type: 'default', danger: false, disabled: false } as const, _props)
+  const size = createMemo(() => props.size ?? componentSize())
   const [, buttonElementProps] = splitProps(props, ['type', 'size', 'loading', 'danger'])
   const [innerLoading, setLoading] = createSignal(false)
   const loading = createMemo(() =>
@@ -118,7 +119,7 @@ const Button: Component<ButtonProps> = _props => {
         'relative cursor-pointer [font-size:var(--ant-font-size)]',
         'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
         props.class,
-        sizeClassMap[props.size!],
+        sizeClassMap[size()],
         props.disabled && 'cursor-not-allowed',
         typeClassMap[props.type!](props.danger, props.disabled),
         loading() && 'opacity-65',
