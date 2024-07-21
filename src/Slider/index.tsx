@@ -16,8 +16,8 @@ import useFocus from '../hooks/useFocus'
 import Element from '../Element'
 
 export interface SliderProps {
-  defaultValue?: number
-  value?: number
+  defaultValue?: number | null
+  value?: number | null
   onChange?: (value: number) => void
   disabled?: boolean
   /**
