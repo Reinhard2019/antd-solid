@@ -7,7 +7,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import RotateSvg from '../assets/svg/Rotate'
 import ResizeSvg from '../assets/svg/Resize'
 import Element from '../Element'
-import { getRotationAngleOfMatrix, radToDeg } from '../utils/math'
+import { degToRad, getRotationAngleOfMatrix, radToDeg } from '../utils/math'
 
 export interface TransformValue {
   x: number
@@ -107,22 +107,18 @@ const Transformer: Component<TransformerProps> = _props => {
   }
 
   // 将鼠标 x/y 方向的移动值转换为父元素 x/y 方向的移动值
-  const rotateMove = (point: [number, number], _parentRotation: number) => {
+  const rotateMove = (point: [number, number], _rotation: number) => {
     // 将超出[0, 360]范围的角度转换为[0, 360]
-    const parentRotation =
-      _parentRotation >= 0
-        ? _parentRotation % (Math.PI * 2)
-        : Math.PI * 2 + (_parentRotation % (Math.PI * 2))
+    const rotation =
+      _rotation >= 0 ? _rotation % (Math.PI * 2) : Math.PI * 2 + (_rotation % (Math.PI * 2))
 
     let x = point[0]
     let y = point[1]
-    if (parentRotation !== 0) {
+    if (rotation !== 0) {
       const clientYRatio =
-        inRange(parentRotation, 0, Math.PI / 2) || inRange(parentRotation, Math.PI, Math.PI * 1.5)
-          ? 1
-          : -1
-      x = point[0] * Math.cos(parentRotation) + point[1] * Math.cos(parentRotation) * clientYRatio
-      y = -point[0] * Math.sin(parentRotation) + point[1] * Math.sin(parentRotation) * clientYRatio
+        inRange(rotation, 0, Math.PI / 2) || inRange(rotation, Math.PI, Math.PI * 1.5) ? 1 : -1
+      x = point[0] * Math.cos(rotation) + point[1] * Math.cos(rotation) * clientYRatio
+      y = -point[0] * Math.sin(rotation) + point[1] * Math.sin(rotation) * clientYRatio
     }
 
     return [x, y]
@@ -212,13 +208,16 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
-    const parentRotation = getParentRotation()
+    const rotation = getParentRotation() + degToRad(value().rotate)
     const onMouseMove = (_e: MouseEvent) => {
       const changedValue: Partial<TransformValue> = {}
-      // TODO value().rotate 不为 0 的情况下 resize 有问题，x、y 值不对
-      const [_movementX, _movementY] = rotateMove([_e.movementX, _e.movementY], parentRotation).map(
+      const [movementX, movementY] = rotateMove([_e.movementX, _e.movementY], rotation).map(
         v => v * props.parentScale,
       )
+      let widthOffset = 0
+      let xOffset = 0
+      let heightOffset = 0
+      let yOffset = 0
       if (
         direction === 'left' ||
         direction === 'right' ||
@@ -227,16 +226,16 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomLeft' ||
         direction === 'bottomRight'
       ) {
-        const movementX =
+        widthOffset =
           direction === 'right' || direction === 'topRight' || direction === 'bottomRight'
-            ? _movementX
-            : -_movementX
-        changedValue.x =
-          value().x -
-          (direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
             ? movementX
-            : 0)
-        changedValue.width = value().width + movementX
+            : -movementX
+        widthOffset = Math.max(-value().width, widthOffset)
+        xOffset =
+          direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
+            ? widthOffset
+            : 0
+        changedValue.width = value().width + widthOffset
       }
       if (
         direction === 'top' ||
@@ -246,17 +245,40 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomLeft' ||
         direction === 'bottomRight'
       ) {
-        const movementY =
+        heightOffset =
           direction === 'bottom' || direction === 'bottomLeft' || direction === 'bottomRight'
-            ? _movementY
-            : -_movementY
-        changedValue.y =
-          value().y -
-          (direction === 'top' || direction === 'topLeft' || direction === 'topRight'
             ? movementY
-            : 0)
-        changedValue.height = value().height + movementY
+            : -movementY
+        heightOffset = Math.max(-value().height, heightOffset)
+        yOffset =
+          direction === 'top' || direction === 'topLeft' || direction === 'topRight'
+            ? heightOffset
+            : 0
+        changedValue.height = value().height + heightOffset
       }
+
+      let newPoint = new DOMPoint(value().x, value().y)
+      if (value().rotate !== 0) {
+        const centerX = value().x + value().width / 2
+        const centerY = value().y + value().height / 2
+        const rotateCenterMatrix = new DOMMatrix()
+          .translateSelf(centerX, centerY)
+          .rotateSelf(value().rotate)
+          .translateSelf(-centerX, -centerY)
+        const newCenterX = centerX + (widthOffset !== 0 ? movementX / 2 : 0)
+        const newCenterY = centerY + (heightOffset !== 0 ? movementY / 2 : 0)
+        const newCenter = new DOMPoint(newCenterX, newCenterY).matrixTransform(rotateCenterMatrix)
+        const rotateNewCenterMatrix = new DOMMatrix()
+          .translateSelf(newCenter.x, newCenter.y)
+          .rotateSelf(value().rotate)
+          .translateSelf(-newCenter.x, -newCenter.y)
+          .invertSelf()
+        newPoint = newPoint
+          .matrixTransform(rotateCenterMatrix)
+          .matrixTransform(rotateNewCenterMatrix)
+      }
+      changedValue.x = newPoint.x - xOffset
+      changedValue.y = newPoint.y - yOffset
 
       setValue(v => ({
         ...v,
