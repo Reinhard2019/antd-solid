@@ -119,18 +119,17 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
       : get(node, childrenFieldName)
   }
 
-  const [selectedKeys, setSelectedKeys] = createControllableValue<Key[]>(props, {
+  const [_selectedKeys, setSelectedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultSelectedKeys',
     valuePropName: 'selectedKeys',
     trigger: 'onSelect',
-    valueConvertor: v => (Array.isArray(v) ? v : []),
   })
+  const selectedKeys = createMemo(() => _selectedKeys() ?? [])
 
-  const [expandedKeys, setExpandedKeys] = createControllableValue<Key[]>(props, {
+  const [_expandedKeys, setExpandedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultExpandedKeys',
     valuePropName: 'expandedKeys',
     trigger: 'onExpand',
-    valueConvertor: v => (Array.isArray(v) ? v : []),
     defaultValue: untrack(() => {
       if (!props.defaultExpandAll) return []
       const collectKeys = (list: T[] | undefined): Key[] => {
@@ -140,16 +139,17 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
       return collectKeys(props.treeData)
     }),
   })
+  const expandedKeys = createMemo(() => _expandedKeys() ?? [])
 
   const [_checkedKeys, setCheckedKeys] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultCheckedKeys',
     valuePropName: 'checkedKeys',
     trigger: 'onCheck',
-    valueConvertor: v => (Array.isArray(v) ? v : []),
   })
   // TODO
   // 由于 treeForEach 中会对 checkedKeys 直接修改，为避免直接修改外部的传值，这里先拷贝一份
-  const checkedKeys = createMemo(() => [..._checkedKeys()])
+  const checkedKeys = createMemo(() => [...(_checkedKeys() ?? [])])
+
   const checkedMap = createMemo(() => {
     const map = new Map<Key, CheckNode<T>>()
     const checkedKeyDict = new Map(checkedKeys()?.map(k => [k, true]))
