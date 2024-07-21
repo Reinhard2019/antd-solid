@@ -1,5 +1,13 @@
-import { type Component, splitProps, untrack, createSignal, mergeProps, createMemo } from 'solid-js'
-import { clamp, floor, isNil } from 'lodash-es'
+import {
+  type Component,
+  splitProps,
+  untrack,
+  createSignal,
+  mergeProps,
+  createRenderEffect,
+  on,
+} from 'solid-js'
+import { clamp, floor, isNil, isNumber } from 'lodash-es'
 import NP from 'number-precision'
 import { CommonInput, type InputProps } from '../Input'
 import { dispatchEventHandlerUnion } from '../utils/solid'
@@ -44,10 +52,25 @@ const InputNumber: Component<InputNumberProps> = _props => {
   const floorValue = (v: number) =>
     untrack(() => (typeof props.precision === 'number' ? floor(v, props.precision) : v))
 
-  const [_value, setValue] = createSignal<number | string | null | undefined>(
+  const [value, setValue] = createSignal<number | string | null | undefined>(
     untrack(() => props.defaultValue),
   )
-  const value = createMemo(() => (isControlled() ? props.value : _value()))
+  createRenderEffect(
+    on(
+      () => props.value,
+      () => {
+        if (isControlled()) {
+          setValue(props.value)
+        }
+      },
+    ),
+  )
+  const [inFocus, setInFocus] = createSignal(false)
+  createRenderEffect(() => {
+    if (!isNumber(value()) && isNumber(props.placeholderValue) && !inFocus()) {
+      setValue(props.placeholderValue)
+    }
+  })
 
   // 上一个格式正确的值
   let validValue: number | null = null
@@ -113,7 +136,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
           </div>
         </div>
       }
-      value={`${value() ?? props.placeholderValue ?? ''}`}
+      value={`${value() ?? ''}`}
       onKeyDown={e => {
         switch (e.key) {
           case 'ArrowUp':
@@ -130,11 +153,15 @@ const InputNumber: Component<InputNumberProps> = _props => {
         setValue(newValue)
         updateValidValue(newValue)
       }}
+      onFocus={() => {
+        setInFocus(true)
+      }}
       onBlur={e => {
         updateValidValue(value())
         setValue(validValue)
 
         dispatchEventHandlerUnion(props.onBlur, e)
+        setInFocus(false)
       }}
     />
   )
