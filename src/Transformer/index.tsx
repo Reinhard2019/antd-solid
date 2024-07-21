@@ -51,6 +51,11 @@ export interface TransformerProps {
      */
     gap?: number
   }
+  /**
+   * 对 resize、rotate icon 以及边框进行缩放
+   * 通常用于在父元素放大或缩小时，要保证 Transformer 显示正常的情况
+   */
+  parentScale?: number
 }
 
 type ResizeDirection =
@@ -67,12 +72,20 @@ const Transformer: Component<TransformerProps> = _props => {
   const props = mergeProps(
     {
       transformOrigin: ['center', 'center'],
-    },
+      parentScale: 1,
+    } as const,
     _props,
   )
-  const adsorbGap = createMemo(() => (props.adsorb ? props.adsorb.gap ?? 5 : 0))
+  const adsorbGap = createMemo(() =>
+    props.adsorb ? (props.adsorb.gap ?? 5) * props.parentScale : 0,
+  )
+  const scaleVariables = createMemo(() => ({
+    '--un-scale-x': props.parentScale,
+    '--un-scale-y': props.parentScale,
+    '--un-scale-z': props.parentScale,
+  }))
 
-  let container: HTMLDivElement | undefined
+  let containerRef: HTMLDivElement | undefined
   const [value, setValue] = createControllableValue<TransformValue>(props, {
     defaultValue: {
       x: 0,
@@ -85,7 +98,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
   // 获取父元素旋转角度
   const getParentRotation = () => {
-    const parentElement = container?.parentElement
+    const parentElement = containerRef?.parentElement
     if (!parentElement) return 0
 
     const { transform } = getComputedStyle(parentElement)
@@ -131,14 +144,14 @@ const Transformer: Component<TransformerProps> = _props => {
     const parentRotation = getParentRotation()
     const [startClientX, startClientY] = rotateMove([e.clientX, e.clientY], parentRotation)
     const { x: startTranslateX, y: startTranslateY } = value()
-    const startOffsetX = startTranslateX - startClientX
-    const startOffsetY = startTranslateY - startClientY
 
     const onMouseMove = (_e: MouseEvent) => {
       const [clientX, clientY] = rotateMove([_e.clientX, _e.clientY], parentRotation)
+      const offsetX = (clientX - startClientX) * props.parentScale
+      const offsetY = (clientY - startClientY) * props.parentScale
       const changedValue = {
-        x: startOffsetX + clientX,
-        y: startOffsetY + clientY,
+        x: startTranslateX + offsetX,
+        y: startTranslateY + offsetY,
       }
       if (props.adsorb) {
         const _adsorbLine: AdsorbLine = {}
@@ -191,12 +204,6 @@ const Transformer: Component<TransformerProps> = _props => {
   }
 
   let resizing = false
-  /**
-   * 监听 resize
-   * @param e
-   * @param propertyName 指定哪个属性会被修改，为空时代表 width 和 height 同时会被修改
-   * @returns
-   */
   const onResizeMouseDown = (e: MouseEvent, direction: ResizeDirection) => {
     e.stopPropagation()
 
@@ -208,7 +215,10 @@ const Transformer: Component<TransformerProps> = _props => {
     const parentRotation = getParentRotation()
     const onMouseMove = (_e: MouseEvent) => {
       const changedValue: Partial<TransformValue> = {}
-      const [_movementX, _movementY] = rotateMove([_e.movementX, _e.movementY], parentRotation)
+      // TODO value().rotate 不为 0 的情况下 resize 有问题，x、y 值不对
+      const [_movementX, _movementY] = rotateMove([_e.movementX, _e.movementY], parentRotation).map(
+        v => v * props.parentScale,
+      )
       if (
         direction === 'left' ||
         direction === 'right' ||
@@ -290,25 +300,25 @@ const Transformer: Component<TransformerProps> = _props => {
         if (resizing) return
         setResizeDirection(false)
       },
+      style: scaleVariables(),
     }
   }
 
   const onRotateMouseDown = (e: MouseEvent) => {
     e.stopPropagation()
-    if (!container) return
-
-    const { x, y, width, height } = container.getBoundingClientRect()
-    const centerX = x + width / 2
-    const centerY = y + height / 2
+    if (!containerRef) return
 
     const originUserSelect = document.body.style.userSelect
     document.body.style.userSelect = 'none'
 
+    const { x, y, width, height } = containerRef.getBoundingClientRect()
+    const centerX = x + width / 2
+    const centerY = y + height / 2
+    const parentRotation = getParentRotation()
+
     const onMouseMove = (_e: MouseEvent) => {
       const { clientX, clientY } = _e
-      const rotate = radToDeg(
-        Math.atan2(centerX - clientX, clientY - centerY) - getParentRotation(),
-      )
+      const rotate = radToDeg(Math.atan2(centerX - clientX, clientY - centerY) - parentRotation)
       setValue(v => ({
         ...v,
         rotate,
@@ -338,11 +348,11 @@ const Transformer: Component<TransformerProps> = _props => {
   }
   const resizeRotate = createMemo(() => {
     const _resizeDirection = resizeDirection()
-    const parentRotationDeg = radToDeg(getParentRotation())
-    if (!_resizeDirection) return parentRotationDeg
+    const rotationDeg = radToDeg(getParentRotation()) + value().rotate
+    if (!_resizeDirection) return rotationDeg
 
     return (
-      parentRotationDeg +
+      rotationDeg +
       {
         top: 0,
         bottom: 0,
@@ -356,26 +366,29 @@ const Transformer: Component<TransformerProps> = _props => {
     )
   })
 
-  const borderWidth = 1
-
   return (
-    <Element class="absolute">
+    <Element class="relative">
       <div
-        ref={container}
-        class={cs(
-          'border-2px border-solid border-white shadow-[var(--ant-transformer-box-shadow)] absolute box-content',
-        )}
+        ref={containerRef}
+        class={cs('shadow-[var(--ant-transformer-box-shadow)] absolute')}
         style={{
           '--ant-transformer-box-shadow':
             '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
           width: `${value().width}px`,
           height: `${value().height}px`,
-          'border-width': `${borderWidth}px`,
           'transform-origin': `${value().x + value().width / 2}px ${value().y + value().height / 2}px`,
-          transform: `rotate(${value().rotate}deg) translate(${value().x - borderWidth}px, ${value().y - borderWidth}px)`,
+          transform: `rotate(${value().rotate}deg) translate(${value().x}px, ${value().y}px)`,
         }}
         onMouseDown={onMoveMouseDown}
       >
+        {/* 边框 */}
+        <div
+          class="border-2px border-solid border-white absolute inset-0 box-content"
+          style={{
+            'border-width': `${1 * props.parentScale}px`,
+          }}
+        />
+
         <div
           class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-1/2 -translate-1/2"
           {...getResizeHandlerProps('top')}
@@ -411,8 +424,12 @@ const Transformer: Component<TransformerProps> = _props => {
         />
 
         <div
-          class="rounded-1/2 color-white absolute left-1/2 -translate-x-1/2 -bottom-36px flex justify-center items-center cursor-pointer text-24px"
+          class="rounded-1/2 color-white absolute left-1/2 -translate-x-1/2 flex justify-center items-center cursor-pointer text-24px"
           onMouseDown={onRotateMouseDown}
+          style={{
+            ...scaleVariables(),
+            bottom: `${-36 * props.parentScale}px`,
+          }}
         >
           <RotateSvg />
         </div>
@@ -433,8 +450,9 @@ const Transformer: Component<TransformerProps> = _props => {
 
       <Show when={adsorbLine()?.left}>
         <div
-          class="absolute w-2px bg-[--ant-color-primary]"
+          class="absolute bg-[--ant-color-primary]"
           style={{
+            width: `${2 * props.parentScale}px`,
             transform: 'translateX(-50%)',
             height: `${props.adsorb?.height ?? 0}px`,
           }}
@@ -442,8 +460,9 @@ const Transformer: Component<TransformerProps> = _props => {
       </Show>
       <Show when={adsorbLine()?.right}>
         <div
-          class="absolute -left-1px w-2px bg-[--ant-color-primary]"
+          class="absolute -left-1px bg-[--ant-color-primary]"
           style={{
+            width: `${2 * props.parentScale}px`,
             transform: `translateX(calc(${props.adsorb?.width ?? 0}px - 50%))`,
             height: `${props.adsorb?.height ?? 0}px`,
           }}
@@ -451,8 +470,9 @@ const Transformer: Component<TransformerProps> = _props => {
       </Show>
       <Show when={adsorbLine()?.centerX}>
         <div
-          class="absolute w-2px bg-[--ant-color-primary]"
+          class="absolute bg-[--ant-color-primary]"
           style={{
+            width: `${2 * props.parentScale}px`,
             transform: `translateX(calc(${(props.adsorb?.width ?? 0) / 2}px - 50%))`,
             height: `${props.adsorb?.height ?? 0}px`,
           }}
@@ -460,14 +480,19 @@ const Transformer: Component<TransformerProps> = _props => {
       </Show>
       <Show when={adsorbLine()?.top}>
         <div
-          class="absolute h-2px bg-[--ant-color-primary]"
-          style={{ transform: 'translateY(-50%)', width: `${props.adsorb?.width ?? 0}px` }}
+          class="absolute bg-[--ant-color-primary]"
+          style={{
+            height: `${2 * props.parentScale}px`,
+            transform: 'translateY(-50%)',
+            width: `${props.adsorb?.width ?? 0}px`,
+          }}
         />
       </Show>
       <Show when={adsorbLine()?.bottom}>
         <div
-          class="absolute h-2px bg-[--ant-color-primary]"
+          class="absolute bg-[--ant-color-primary]"
           style={{
+            height: `${2 * props.parentScale}px`,
             transform: `translateY(calc(${props.adsorb?.height ?? 0}px - 50%))`,
             width: `${props.adsorb?.width ?? 0}px`,
           }}
@@ -475,8 +500,9 @@ const Transformer: Component<TransformerProps> = _props => {
       </Show>
       <Show when={adsorbLine()?.centerY}>
         <div
-          class="absolute h-2px bg-[--ant-color-primary]"
+          class="absolute bg-[--ant-color-primary]"
           style={{
+            height: `${2 * props.parentScale}px`,
             transform: `translateY(calc(${(props.adsorb?.height ?? 0) / 2}px - 50%))`,
             width: `${props.adsorb?.width ?? 0}px`,
           }}
