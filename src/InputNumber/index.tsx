@@ -1,12 +1,4 @@
-import {
-  type Component,
-  createEffect,
-  on,
-  splitProps,
-  untrack,
-  createSignal,
-  mergeProps,
-} from 'solid-js'
+import { type Component, splitProps, untrack, createSignal, mergeProps, createMemo } from 'solid-js'
 import { clamp, floor, isNil } from 'lodash-es'
 import NP from 'number-precision'
 import { CommonInput, type InputProps } from '../Input'
@@ -44,16 +36,18 @@ const InputNumber: Component<InputNumberProps> = _props => {
   )
   const [_, inputProps] = splitProps(props, ['defaultValue', 'value', 'onChange', 'onBlur'])
 
+  // 为什么不使用 Object.hasOwn？
+  // solid 的 proxy 对象对于任何 key，都会返回 true
+  const isControlled = () => Object.keys(props).includes('value')
+
   const clampValue = (v: number) => untrack(() => clamp(v, props.min, props.max))
   const floorValue = (v: number) =>
     untrack(() => (typeof props.precision === 'number' ? floor(v, props.precision) : v))
 
-  let defaultValue = null
-  if (Object.keys(props).includes('value')) {
-    defaultValue = untrack(() => props.value)
-  } else if (Object.keys(props).includes('defaultValue')) {
-    defaultValue = untrack(() => props.defaultValue)
-  }
+  const [_value, setValue] = createSignal<number | string | null | undefined>(
+    untrack(() => props.defaultValue),
+  )
+  const value = createMemo(() => (isControlled() ? props.value : _value()))
 
   // 上一个格式正确的值
   let validValue: number | null = null
@@ -82,22 +76,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     validValue = valueNum
     if (!options?.ignoreOnChange) untrack(() => props.onChange?.(validValue))
   }
-  updateValidValue(defaultValue, { ignoreOnChange: true })
-
-  const [value, setValue] = createSignal<number | string | null | undefined>(defaultValue)
-  createEffect(
-    on(
-      () => props.value,
-      input => {
-        if (input === value()) return
-        updateValidValue(input, { ignoreOnChange: true })
-        setValue(input)
-      },
-      {
-        defer: true,
-      },
-    ),
-  )
+  updateValidValue(untrack(value), { ignoreOnChange: true })
 
   const add = (addon: number) => {
     let newValue: number | null
