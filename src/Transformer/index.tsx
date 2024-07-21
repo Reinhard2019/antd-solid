@@ -2,6 +2,7 @@ import { Show, createMemo, createSignal, mergeProps, type Component, type JSX } 
 import cs from 'classnames'
 import { inRange } from 'lodash-es'
 import { Portal } from 'solid-js/web'
+import NP from 'number-precision'
 import createControllableValue from '../hooks/createControllableValue'
 import RotateSvg from '../assets/svg/Rotate'
 import ResizeSvg from '../assets/svg/Resize'
@@ -32,6 +33,24 @@ export interface TransformerProps {
    * 旋转时触发
    */
   onRotate?: (value: Pick<TransformValue, 'rotate'>) => void
+  /**
+   * 吸附功能
+   */
+  adsorb?: {
+    /**
+     * 吸附容器宽度
+     */
+    width: number
+    /**
+     * 吸附容器高度
+     */
+    height: number
+    /**
+     * 吸附误差，鼠标位于吸附误差范围内时，吸附
+     * 默认 5
+     */
+    gap?: number
+  }
 }
 
 type ResizeDirection =
@@ -51,6 +70,7 @@ const Transformer: Component<TransformerProps> = _props => {
     },
     _props,
   )
+  const adsorbGap = createMemo(() => (props.adsorb ? props.adsorb.gap ?? 5 : 0))
 
   let container: HTMLDivElement | undefined
   const [value, setValue] = createControllableValue<TransformValue>(props, {
@@ -74,44 +94,84 @@ const Transformer: Component<TransformerProps> = _props => {
   }
 
   // 将鼠标 x/y 方向的移动值转换为父元素 x/y 方向的移动值
-  const rotateMove = (e: MouseEvent, _parentRotation: number) => {
+  const rotateMove = (point: [number, number], _parentRotation: number) => {
     // 将超出[0, 360]范围的角度转换为[0, 360]
     const parentRotation =
       _parentRotation >= 0
         ? _parentRotation % (Math.PI * 2)
         : Math.PI * 2 + (_parentRotation % (Math.PI * 2))
 
-    let movementX = e.movementX
-    let movementY = e.movementY
+    let x = point[0]
+    let y = point[1]
     if (parentRotation !== 0) {
-      const movementYRatio =
+      const clientYRatio =
         inRange(parentRotation, 0, Math.PI / 2) || inRange(parentRotation, Math.PI, Math.PI * 1.5)
           ? 1
           : -1
-      movementX =
-        e.movementX * Math.cos(parentRotation) +
-        e.movementY * Math.cos(parentRotation) * movementYRatio
-      movementY =
-        -e.movementX * Math.sin(parentRotation) +
-        e.movementY * Math.sin(parentRotation) * movementYRatio
+      x = point[0] * Math.cos(parentRotation) + point[1] * Math.cos(parentRotation) * clientYRatio
+      y = -point[0] * Math.sin(parentRotation) + point[1] * Math.sin(parentRotation) * clientYRatio
     }
 
-    return {
-      movementX,
-      movementY,
-    }
+    return [x, y]
   }
 
-  const onMoveMouseDown = () => {
+  interface AdsorbLine {
+    left?: boolean
+    right?: boolean
+    top?: boolean
+    bottom?: boolean
+    centerX?: boolean
+    centerY?: boolean
+  }
+  const [adsorbLine, setAdsorbLine] = createSignal<AdsorbLine>({})
+  const onMoveMouseDown = (e: MouseEvent) => {
     const originUserSelect = document.body.style.userSelect
     document.body.style.userSelect = 'none'
 
     const parentRotation = getParentRotation()
-    const onMouseMove = (e: MouseEvent) => {
-      const { movementX, movementY } = rotateMove(e, parentRotation)
+    const [startClientX, startClientY] = rotateMove([e.clientX, e.clientY], parentRotation)
+    const { x: startTranslateX, y: startTranslateY } = value()
+    const startOffsetX = startTranslateX - startClientX
+    const startOffsetY = startTranslateY - startClientY
+
+    const onMouseMove = (_e: MouseEvent) => {
+      const [clientX, clientY] = rotateMove([_e.clientX, _e.clientY], parentRotation)
       const changedValue = {
-        x: value().x + movementX,
-        y: value().y + movementY,
+        x: startOffsetX + clientX,
+        y: startOffsetY + clientY,
+      }
+      if (props.adsorb) {
+        const _adsorbLine: AdsorbLine = {}
+
+        const right = NP.minus(props.adsorb.width, value().width)
+        const centerX = right / 2
+        const bottom = NP.minus(props.adsorb.height, value().height)
+        const centerY = bottom / 2
+        if (inRange(changedValue.x, -adsorbGap(), adsorbGap())) {
+          changedValue.x = 0
+          _adsorbLine.left = true
+        }
+        if (inRange(changedValue.x, right - adsorbGap(), right + adsorbGap())) {
+          changedValue.x = right
+          _adsorbLine.right = true
+        }
+        if (inRange(changedValue.x, centerX - adsorbGap(), centerX + adsorbGap())) {
+          changedValue.x = centerX
+          _adsorbLine.centerX = true
+        }
+        if (inRange(changedValue.y, -adsorbGap(), adsorbGap())) {
+          changedValue.y = 0
+          _adsorbLine.top = true
+        }
+        if (inRange(changedValue.y, bottom - adsorbGap(), bottom + adsorbGap())) {
+          changedValue.y = bottom
+          _adsorbLine.bottom = true
+        }
+        if (inRange(changedValue.y, centerY - adsorbGap(), centerY + adsorbGap())) {
+          changedValue.y = centerY
+          _adsorbLine.centerY = true
+        }
+        setAdsorbLine(_adsorbLine)
       }
       setValue(v => ({
         ...v,
@@ -123,6 +183,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const onMouseUp = () => {
       document.body.style.userSelect = originUserSelect
+      setAdsorbLine({})
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
     }
@@ -147,7 +208,7 @@ const Transformer: Component<TransformerProps> = _props => {
     const parentRotation = getParentRotation()
     const onMouseMove = (_e: MouseEvent) => {
       const changedValue: Partial<TransformValue> = {}
-      const { movementX: _movementX, movementY: _movementY } = rotateMove(_e, parentRotation)
+      const [_movementX, _movementY] = rotateMove([_e.movementX, _e.movementY], parentRotation)
       if (
         direction === 'left' ||
         direction === 'right' ||
@@ -298,74 +359,128 @@ const Transformer: Component<TransformerProps> = _props => {
   const borderWidth = 1
 
   return (
-    <Element
-      ref={container}
-      class={cs(
-        'border-2px border-solid border-white shadow-[var(--ant-transformer-box-shadow)] relative box-content',
-      )}
-      style={{
-        '--ant-transformer-box-shadow':
-          '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
-        width: `${value().width}px`,
-        height: `${value().height}px`,
-        'border-width': `${borderWidth}px`,
-        'transform-origin': `${value().x + value().width / 2}px ${value().y + value().height / 2}px`,
-        transform: `rotate(${value().rotate}deg) translate(${value().x - borderWidth}px, ${value().y - borderWidth}px)`,
-      }}
-      onMouseDown={onMoveMouseDown}
-    >
+    <Element class="absolute">
       <div
-        class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-1/2 -translate-1/2"
-        {...getResizeHandlerProps('top')}
-      />
-      <div
-        class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
-        {...getResizeHandlerProps('bottom')}
-      />
-      <div
-        class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 left-0 -translate-1/2"
-        {...getResizeHandlerProps('left')}
-      />
-      <div
-        class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2"
-        {...getResizeHandlerProps('right')}
-      />
-
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-0 -translate-1/2"
-        {...getResizeHandlerProps('topLeft')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
-        {...getResizeHandlerProps('topRight')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2"
-        {...getResizeHandlerProps('bottomLeft')}
-      />
-      <div
-        class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 right-0 translate-1/2"
-        {...getResizeHandlerProps('bottomRight')}
-      />
-
-      <div
-        class="rounded-1/2 color-white absolute left-1/2 -translate-x-1/2 -bottom-36px flex justify-center items-center cursor-pointer text-24px"
-        onMouseDown={onRotateMouseDown}
+        ref={container}
+        class={cs(
+          'border-2px border-solid border-white shadow-[var(--ant-transformer-box-shadow)] absolute box-content',
+        )}
+        style={{
+          '--ant-transformer-box-shadow':
+            '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
+          width: `${value().width}px`,
+          height: `${value().height}px`,
+          'border-width': `${borderWidth}px`,
+          'transform-origin': `${value().x + value().width / 2}px ${value().y + value().height / 2}px`,
+          transform: `rotate(${value().rotate}deg) translate(${value().x - borderWidth}px, ${value().y - borderWidth}px)`,
+        }}
+        onMouseDown={onMoveMouseDown}
       >
-        <RotateSvg />
+        <div
+          class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-1/2 -translate-1/2"
+          {...getResizeHandlerProps('top')}
+        />
+        <div
+          class="cursor-none rounded-3px w-22px h-6px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2"
+          {...getResizeHandlerProps('bottom')}
+        />
+        <div
+          class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 left-0 -translate-1/2"
+          {...getResizeHandlerProps('left')}
+        />
+        <div
+          class="cursor-none rounded-3px w-6px h-22px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2"
+          {...getResizeHandlerProps('right')}
+        />
+
+        <div
+          class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 left-0 -translate-1/2"
+          {...getResizeHandlerProps('topLeft')}
+        />
+        <div
+          class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute top-0 right-0 translate-x-1/2 -translate-y-1/2"
+          {...getResizeHandlerProps('topRight')}
+        />
+        <div
+          class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 left-0 -translate-x-1/2 translate-y-1/2"
+          {...getResizeHandlerProps('bottomLeft')}
+        />
+        <div
+          class="cursor-none rounded-1/2 w-12px h-12px bg-white shadow-[var(--ant-transformer-box-shadow)] absolute bottom-0 right-0 translate-1/2"
+          {...getResizeHandlerProps('bottomRight')}
+        />
+
+        <div
+          class="rounded-1/2 color-white absolute left-1/2 -translate-x-1/2 -bottom-36px flex justify-center items-center cursor-pointer text-24px"
+          onMouseDown={onRotateMouseDown}
+        >
+          <RotateSvg />
+        </div>
+
+        <Show when={resizeDirection()}>
+          <Portal>
+            <ResizeSvg
+              class="absolute pointer-events-none"
+              style={{
+                top: `${resizeSvgPosition().y}px`,
+                left: `${resizeSvgPosition().x}px`,
+                transform: `translate(-50%, -50%) rotate(${resizeRotate()}deg)`,
+              }}
+            />
+          </Portal>
+        </Show>
       </div>
 
-      <Show when={resizeDirection()}>
-        <Portal>
-          <ResizeSvg
-            class="absolute pointer-events-none"
-            style={{
-              top: `${resizeSvgPosition().y}px`,
-              left: `${resizeSvgPosition().x}px`,
-              transform: `translate(-50%, -50%) rotate(${resizeRotate()}deg)`,
-            }}
-          />
-        </Portal>
+      <Show when={adsorbLine()?.left}>
+        <div
+          class="absolute w-2px bg-[--ant-color-primary]"
+          style={{
+            transform: 'translateX(-50%)',
+            height: `${props.adsorb?.height ?? 0}px`,
+          }}
+        />
+      </Show>
+      <Show when={adsorbLine()?.right}>
+        <div
+          class="absolute -left-1px w-2px bg-[--ant-color-primary]"
+          style={{
+            transform: `translateX(calc(${props.adsorb?.width ?? 0}px - 50%))`,
+            height: `${props.adsorb?.height ?? 0}px`,
+          }}
+        />
+      </Show>
+      <Show when={adsorbLine()?.centerX}>
+        <div
+          class="absolute w-2px bg-[--ant-color-primary]"
+          style={{
+            transform: `translateX(calc(${(props.adsorb?.width ?? 0) / 2}px - 50%))`,
+            height: `${props.adsorb?.height ?? 0}px`,
+          }}
+        />
+      </Show>
+      <Show when={adsorbLine()?.top}>
+        <div
+          class="absolute h-2px bg-[--ant-color-primary]"
+          style={{ transform: 'translateY(-50%)', width: `${props.adsorb?.width ?? 0}px` }}
+        />
+      </Show>
+      <Show when={adsorbLine()?.bottom}>
+        <div
+          class="absolute h-2px bg-[--ant-color-primary]"
+          style={{
+            transform: `translateY(calc(${props.adsorb?.height ?? 0}px - 50%))`,
+            width: `${props.adsorb?.width ?? 0}px`,
+          }}
+        />
+      </Show>
+      <Show when={adsorbLine()?.centerY}>
+        <div
+          class="absolute h-2px bg-[--ant-color-primary]"
+          style={{
+            transform: `translateY(calc(${(props.adsorb?.height ?? 0) / 2}px - 50%))`,
+            width: `${props.adsorb?.width ?? 0}px`,
+          }}
+        />
       </Show>
     </Element>
   )

@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="transformer/Base" />
 
+### 吸附
+
+吸附功能。
+
+<Code path="transformer/Adsorb" />
+
 ## API
 
 ### Transformer 变形器
