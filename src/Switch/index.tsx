@@ -13,6 +13,10 @@ export interface SwitchProps {
    * 默认 'middle'
    */
   size?: 'small' | 'middle' | 'large'
+  /**
+   * 是否禁用
+   */
+  disabled?: boolean
 }
 
 const Switch: Component<SwitchProps> = _props => {
@@ -35,8 +39,12 @@ const Switch: Component<SwitchProps> = _props => {
           small: 'w-28px h-16px',
         }[size()],
         checked() ? 'bg-[var(--ant-color-primary)]' : 'bg-[rgba(0,0,0,0.45)]',
+        props.disabled && 'opacity-[--ant-opacity-loading] cursor-not-allowed',
       )}
-      onClick={() => setChecked(c => !c)}
+      onClick={() => {
+        if (props.disabled) return
+        setChecked(c => !c)
+      }}
     >
       <div
         class={cs(

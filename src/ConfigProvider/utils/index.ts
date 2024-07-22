@@ -166,6 +166,8 @@ export function createCssVariables(
     '--ant-border-radius': '6px',
     '--ant-border-radius-lg': '8px',
 
+    '--ant-opacity-loading': '0.65',
+
     '--ant-button-default-color': mapToken.colorText,
     '--ant-button-border-color-disabled': mapToken.colorBorder,
     '--ant-button-default-bg': mapToken.colorBgContainer,
