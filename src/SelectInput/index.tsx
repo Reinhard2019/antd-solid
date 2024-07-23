@@ -155,7 +155,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
           }}
           tabIndex="0"
           onClick={e => {
-            setOpen(true)
+            setOpen(v => !v)
             setWidth(e.currentTarget.offsetWidth)
             e.currentTarget.focus()
           }}
