@@ -153,7 +153,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
         setValue(newValue)
         updateValidValue(newValue)
       }}
-      onFocus={() => {
+      onFocus={e => {
+        dispatchEventHandlerUnion(props.onFocus, e)
         setInFocus(true)
       }}
       onBlur={e => {
