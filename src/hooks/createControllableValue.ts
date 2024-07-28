@@ -1,4 +1,4 @@
-import { type Signal, createSignal, untrack, createMemo } from 'solid-js'
+import { type Signal, createSignal, untrack, on, createComputed } from 'solid-js'
 
 export interface Options<T> {
   defaultValue?: T
@@ -35,11 +35,16 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
   const defaultValue = Object.keys(props).includes(defaultValuePropName)
     ? untrack(() => props[defaultValuePropName])
     : options.defaultValue
-  const [_value, _setValue] = createSignal(defaultValue)
-  const value = createMemo(() => (isControlled() ? getValue() : _value()))
+  const [value, _setValue] = createSignal<T>(defaultValue as T)
+  createComputed(
+    on(getValue, () => {
+      if (isControlled()) _setValue(getValue() as any)
+    }),
+  )
 
   const setValue = (v: ((prev: T) => T) | T | undefined) => {
     const newValue = typeof v === 'function' ? (v as (prev: T) => T)(value()! as T) : v
+    if (newValue === value()) return
 
     if (!isControlled()) {
       _setValue(newValue as any)
