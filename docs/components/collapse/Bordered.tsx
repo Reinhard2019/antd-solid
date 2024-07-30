@@ -8,7 +8,7 @@ const text = () => (
   </div>
 )
 
-const items: CollapseProps['items'] = [
+const items: CollapseProps['each'] = [
   {
     key: '1',
     label: 'This is panel header 1',
@@ -25,6 +25,10 @@ const items: CollapseProps['items'] = [
     children: text,
   },
 ]
-const App: Component = () => <Collapse items={items} bordered={false} defaultActiveKey={['1']} />
+const App: Component = () => (
+  <Collapse each={items} bordered={false} defaultActiveItems={['1']}>
+    {item => <Collapse.Item label={item.label}>{item.children}</Collapse.Item>}
+  </Collapse>
+)
 
 export default App
