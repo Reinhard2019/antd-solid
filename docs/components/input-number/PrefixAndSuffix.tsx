@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { InputNumber, Select } from 'antd-solid'
 
-const selectBefore = (
+const selectBefore = () => (
   <Select
     defaultValue="add"
     options={[
@@ -17,7 +17,7 @@ const selectBefore = (
     style={{ width: '60px' }}
   />
 )
-const selectAfter = (
+const selectAfter = () => (
   <Select
     defaultValue="USD"
     options={[

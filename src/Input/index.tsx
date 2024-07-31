@@ -5,19 +5,20 @@ import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
 import Compact from '../Compact'
-import { setRef } from '../utils/solid'
+import { setRef, unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
 import ConfigProviderContext from '../ConfigProvider/context'
+import { type StringOrJSXElement } from '../types'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
   JSX.CustomAttributes<T> & {
     textarea?: boolean
     defaultValue?: string | null | undefined
     value?: string | null | undefined
-    addonBefore?: JSXElement
-    addonAfter?: JSXElement
-    prefix?: JSXElement
-    suffix?: JSXElement
+    addonBefore?: StringOrJSXElement
+    addonAfter?: StringOrJSXElement
+    prefix?: StringOrJSXElement
+    suffix?: StringOrJSXElement
     placeholder?: string
     /**
      * 仅供 InputNumber 使用
@@ -98,6 +99,11 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   const compactItemRoundedLeftClass = 'p[.ant-compact>:first-child]:rounded-l-6px'
   const compactItemRoundedRightClass = 'p[.ant-compact>:last-child]:rounded-r-6px'
 
+  const addonBefore = createMemo(() => unwrapStringOrJSXElement(props.addonBefore))
+  const addonAfter = createMemo(() => unwrapStringOrJSXElement(props.addonAfter))
+  const prefix = createMemo(() => unwrapStringOrJSXElement(props.prefix))
+  const suffix = createMemo(() => unwrapStringOrJSXElement(props.suffix))
+
   const inputWrapClass = createMemo(() =>
     cs(
       {
@@ -111,15 +117,15 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
           middle: 'h-32px',
           large: 'h-40px',
         }[size()],
-      props.addonBefore ? 'rounded-l-0' : compactItemRoundedLeftClass,
-      props.addonAfter ? 'rounded-r-0' : compactItemRoundedRightClass,
+      addonBefore() ? 'rounded-l-0' : compactItemRoundedLeftClass,
+      addonAfter() ? 'rounded-r-0' : compactItemRoundedRightClass,
       statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
       Compact.compactItemRounded0Class,
       Compact.compactItemZIndexClass,
     ),
   )
   const hasPrefixOrSuffix = createMemo(
-    () => !isNil(props.prefix) || !isNil(props.suffix) || !isNil(props.actions),
+    () => !isNil(prefix()) || !isNil(suffix()) || !isNil(props.actions),
   )
   const inputJSX = (
     <Dynamic<Component<JSX.InputHTMLAttributes<HTMLInputElement>>>
@@ -178,7 +184,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
       )}
       style={style}
     >
-      <Show when={props.addonBefore}>
+      <Show when={addonBefore()}>
         <div
           class={cs(
             'ant-input-addon',
@@ -187,7 +193,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
             compactItemRoundedLeftClass,
           )}
         >
-          {props.addonBefore}
+          {addonBefore()}
         </div>
       </Show>
 
@@ -199,14 +205,14 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
             ['[--actions-display:none]', !inputProps.disabled && 'hover:[--actions-display:block]'],
           )}
         >
-          <Show when={props.prefix}>
-            <div class="mr-4px">{props.prefix}</div>
+          <Show when={prefix()}>
+            <div class="mr-4px">{prefix()}</div>
           </Show>
 
           {inputJSX}
 
-          <Show when={props.suffix}>
-            <div class="ml-4px">{props.suffix}</div>
+          <Show when={suffix()}>
+            <div class="ml-4px">{suffix()}</div>
           </Show>
 
           <Show when={props.actions}>
@@ -217,7 +223,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         </div>
       </Show>
 
-      <Show when={props.addonAfter}>
+      <Show when={addonAfter()}>
         <div
           class={cs(
             'ant-input-addon',
@@ -226,7 +232,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
             compactItemRoundedRightClass,
           )}
         >
-          {props.addonAfter}
+          {addonAfter()}
         </div>
       </Show>
 
