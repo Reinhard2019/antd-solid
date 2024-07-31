@@ -27,6 +27,11 @@ export interface InputNumberProps
   min?: number
   max?: number
   precision?: number
+  /**
+   * 每次改变步数，可以为小数
+   * 默认 1
+   */
+  step?: number
 }
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
@@ -39,6 +44,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     {
       min: -Infinity,
       max: Infinity,
+      step: 1,
     },
     _props,
   )
@@ -114,10 +120,10 @@ const InputNumber: Component<InputNumberProps> = _props => {
     setValue(validValue)
   }
   const up = () => {
-    add(1)
+    add(props.step)
   }
   const down = () => {
-    add(-1)
+    add(-props.step)
   }
 
   return (
