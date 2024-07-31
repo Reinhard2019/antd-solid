@@ -1,4 +1,4 @@
-import { type Accessor, createMemo, For, type JSX, mergeProps, Show, useContext } from 'solid-js'
+import { type Accessor, createMemo, For, type JSX, Show, useContext } from 'solid-js'
 import cs from 'classnames'
 import { isEmpty } from 'lodash-es'
 import { type StyleProps } from '../types'
@@ -22,25 +22,19 @@ export interface CollapseProps<T = any> extends StyleProps {
    */
   size?: 'small' | 'middle' | 'large'
   /**
-   * 带边框风格的折叠面板
-   * 默认 true
+   * 类型
+   * 默认 'line'
    */
-  bordered?: boolean
+  type?: 'line' | 'card'
   each: T[] | undefined | null
   fallback?: JSX.Element
   children: (item: T, index: Accessor<number>) => JSX.Element
 }
 
-function Collapse<T = any>(_props: CollapseProps<T>) {
+function Collapse<T = any>(props: CollapseProps<T>) {
   const { componentSize } = useContext(ConfigProviderContext)
-  const props = mergeProps(
-    {
-      bordered: true,
-    } as const,
-    _props,
-  )
-  const bordered = createMemo(() => props.bordered)
   const size = createMemo(() => props.size ?? componentSize())
+  const type = createMemo(() => props.type ?? 'line')
   const [activeItems, setActiveItems] = createControllableValue<T[]>(props, {
     defaultValuePropName: 'defaultActiveItems',
     valuePropName: 'activeItems',
@@ -51,23 +45,40 @@ function Collapse<T = any>(_props: CollapseProps<T>) {
     <Show when={!isEmpty(props.each)} fallback={props.fallback}>
       <Element
         class={cs(
-          'rounded-[var(--ant-border-radius-lg)] overflow-hidden [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-          props.bordered && '[border:1px_solid_var(--ant-color-border)]',
+          '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+          type() === 'card' &&
+            'rounded-[var(--ant-border-radius-lg)] overflow-hidden [border:1px_solid_var(--ant-color-border)]',
           props.class,
         )}
         style={{
-          '--ant-collapse-header-padding': '12px 16px',
-          '--ant-collapse-content-padding': {
-            small: 'var(--ant-padding-sm)',
-            middle: 'var(--ant-padding)',
-            large: 'var(--ant-padding-lg)',
+          '--ant-collapse-header-padding': {
+            small: 'var(--ant-padding-xs) var(--ant-padding-sm)',
+            middle: 'var(--ant-padding-sm) var(--ant-padding)',
+            large: 'var(--ant-padding) var(--ant-padding-lg)',
+          }[size()],
+          '--ant-collapse-content-padding':
+            type() === 'line'
+              ? {
+                small: 'var(--ant-padding-sm) 0 0 0',
+                middle: 'var(--ant-padding) 0 0 0',
+                large: 'var(--ant-padding-lg) 0 0 0',
+              }[size()]
+              : {
+                small: 'var(--ant-padding-sm)',
+                middle: 'var(--ant-padding)',
+                large: 'var(--ant-padding-lg)',
+              }[size()],
+          '--ant-collapse-divider-margin': {
+            small: 'var(--ant-margin-sm) 0',
+            middle: 'var(--ant-margin) 0',
+            large: 'var(--ant-margin-lg) 0',
           }[size()],
           ...props.style,
         }}
       >
         <CollapseContext.Provider
           value={{
-            bordered,
+            type,
             size,
             activeItems,
             setActiveItems,
@@ -78,6 +89,7 @@ function Collapse<T = any>(_props: CollapseProps<T>) {
               <CollapseItemContext.Provider
                 value={{
                   item,
+                  index,
                 }}
               >
                 {props.children(item, index)}

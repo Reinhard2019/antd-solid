@@ -2,7 +2,7 @@ import { type Component } from 'solid-js'
 import { Collapse, type CollapseProps } from 'antd-solid'
 
 const text = () => (
-  <div style={{ 'padding-left': '24px' }}>
+  <div>
     A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found
     as a welcome guest in many households across the world.
   </div>
@@ -26,7 +26,7 @@ const items: CollapseProps['each'] = [
   },
 ]
 const App: Component = () => (
-  <Collapse each={items} bordered={false} defaultActiveItems={['1']}>
+  <Collapse each={items} type="card" defaultActiveItems={['1']}>
     {item => <Collapse.Item label={item.label}>{item.children}</Collapse.Item>}
   </Collapse>
 )

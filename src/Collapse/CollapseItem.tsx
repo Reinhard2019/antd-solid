@@ -14,81 +14,83 @@ export interface CollapseItemProps extends StyleProps, ParentProps {
 }
 
 const CollapseItem: Component<CollapseItemProps> = props => {
-  const { bordered, size, activeItems, setActiveItems } = useContext(CollapseContext)
-  const { item } = useContext(CollapseItemContext)
+  const { type, activeItems, setActiveItems } = useContext(CollapseContext)
+  const { item, index } = useContext(CollapseItemContext)
   const resolvedChildren = children(() => props.children)
   const resolvedExtra = children(() => props.extra)
 
   return (
-    <div
-      class={cs(
-        bordered() && '[&:not(:last-child)]:[border-bottom:1px_solid_var(--ant-color-border)]',
-        props.class,
-      )}
-      style={props.style}
-    >
-      <div
-        class={cs(
-          'bg-[var(--ant-collapse-header-bg)] text-[var(--ant-color-text-heading)] flex justify-between items-center cursor-pointer',
-          {
-            small: 'py-[--ant-padding-xs] px-[--ant-padding-sm]',
-            middle: 'p-[var(--ant-collapse-header-padding)]',
-            large: 'py-[--ant-padding] px-[--ant-padding-lg]',
-          }[size()],
-        )}
-        onClick={() => {
-          if (props.disabledChildren) return
+    <>
+      <Show when={index() !== 0}>
+        <div
+          class={cs(
+            'h-1px bg-[var(--ant-color-split)]',
+            type() === 'line' && 'm-[--ant-collapse-divider-margin]',
+          )}
+        />
+      </Show>
 
-          if (activeItems().includes(item)) {
-            setActiveItems(activeItems().filter(key => key !== item))
-            return
-          }
-          setActiveItems([...activeItems(), item])
-        }}
-      >
-        <span>
-          <Show when={!props.disabledChildren}>
-            <span
-              class={cs(
-                'i-ant-design:right-outlined',
-                'mr-[var(--ant-margin-sm)] duration-.3s',
-                activeItems().includes(item) && 'rotate-[90deg]',
-              )}
-            />
+      <div class={props.class} style={props.style}>
+        <div
+          class={cs(
+            'text-[--ant-color-text-heading] flex justify-between items-center cursor-pointer',
+            type() === 'card' &&
+              'bg-[var(--ant-collapse-header-bg)] p-[--ant-collapse-header-padding]',
+          )}
+          onClick={() => {
+            if (props.disabledChildren) return
+
+            if (activeItems().includes(item)) {
+              setActiveItems(activeItems().filter(key => key !== item))
+              return
+            }
+            setActiveItems([...activeItems(), item])
+          }}
+        >
+          <span>
+            <Show when={!props.disabledChildren}>
+              <span
+                class={cs(
+                  'i-ant-design:right-outlined',
+                  'mr-[var(--ant-margin-sm)] duration-.3s',
+                  activeItems().includes(item) && 'rotate-[90deg]',
+                )}
+              />
+            </Show>
+            {props.label}
+          </span>
+
+          <Show when={resolvedExtra()}>
+            <span>{resolvedExtra()}</span>
           </Show>
-          {props.label}
-        </span>
-
-        <Show when={resolvedExtra()}>
-          <span>{resolvedExtra()}</span>
-        </Show>
-      </div>
-      <Transition
-        onEnter={(el, done) => {
-          el.animate([{ height: '0px' }, { height: `${el.scrollHeight}px` }], {
-            duration: 300,
-          }).finished.finally(done)
-        }}
-        onExit={(el, done) => {
-          el.animate([{ height: `${el.scrollHeight}px` }, { height: '0px' }], {
-            duration: 300,
-          }).finished.finally(done)
-        }}
-      >
-        <Show when={activeItems().includes(item) && !props.disabledChildren}>
-          <div class="overflow-hidden">
-            <div
-              class={cs(
-                bordered() &&
-                  '[border-top:1px_solid_var(--ant-color-border)] p-[--ant-collapse-content-padding]',
-              )}
-            >
-              {resolvedChildren()}
+        </div>
+        <Transition
+          onEnter={(el, done) => {
+            el.animate([{ height: '0px' }, { height: `${el.scrollHeight}px` }], {
+              duration: 300,
+            }).finished.finally(done)
+          }}
+          onExit={(el, done) => {
+            el.animate([{ height: `${el.scrollHeight}px` }, { height: '0px' }], {
+              duration: 300,
+            }).finished.finally(done)
+          }}
+        >
+          <Show when={activeItems().includes(item) && !props.disabledChildren}>
+            <div class="overflow-hidden">
+              <div
+                class={cs(
+                  'p-[--ant-collapse-content-padding]',
+                  type() === 'card' && '[border-top:1px_solid_var(--ant-color-border)]',
+                )}
+              >
+                {resolvedChildren()}
+              </div>
             </div>
-          </div>
-        </Show>
-      </Transition>
-    </div>
+          </Show>
+        </Transition>
+      </div>
+    </>
   )
 }
 

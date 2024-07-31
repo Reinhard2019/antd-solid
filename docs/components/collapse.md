@@ -21,11 +21,11 @@ outline: deep
 
 <Code path="collapse/Size" />
 
-### 简洁风格
+### 卡片样式
 
-一套没有边框的简洁样式。
+另一种样式的折叠面板。
 
-<Code path="collapse/Bordered" />
+<Code path="collapse/Card" />
 
 ### 额外节点
 

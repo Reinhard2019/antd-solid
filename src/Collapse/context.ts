@@ -3,7 +3,7 @@ import { type CollapseProps } from '.'
 
 const CollapseContext = createContext(
   {} as {
-    bordered: Accessor<boolean>
+    type: Accessor<Required<CollapseProps>['type']>
     size: Accessor<Required<CollapseProps>['size']>
     activeItems: Accessor<any[]>
     setActiveItems: Setter<any[]>
@@ -13,6 +13,7 @@ const CollapseContext = createContext(
 export const CollapseItemContext = createContext(
   {} as {
     item: any
+    index: Accessor<number>
   },
 )
 
