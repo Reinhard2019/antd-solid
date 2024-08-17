@@ -6,6 +6,7 @@ import {
   mergeProps,
   createRenderEffect,
   on,
+  createMemo,
 } from 'solid-js'
 import { clamp, floor, isNil, isNumber } from 'lodash-es'
 import NP from 'number-precision'
@@ -32,6 +33,10 @@ export interface InputNumberProps
    * 默认 1
    */
   step?: number
+  /**
+   * 指定输入框展示值的格式
+   */
+  formatter?: (value: number | string) => string
 }
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
@@ -48,7 +53,13 @@ const InputNumber: Component<InputNumberProps> = _props => {
     },
     _props,
   )
-  const [_, inputProps] = splitProps(props, ['defaultValue', 'value', 'onChange', 'onBlur'])
+  const [_, inputProps] = splitProps(props, [
+    'defaultValue',
+    'value',
+    'onChange',
+    'onBlur',
+    'formatter',
+  ])
 
   // 为什么不使用 Object.hasOwn？
   // solid 的 proxy 对象对于任何 key，都会返回 true
@@ -61,6 +72,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
   const [value, setValue] = createSignal<number | string | null | undefined>(
     untrack(() => props.defaultValue),
   )
+  const displayValue = createMemo(() =>
+    props.formatter ? props.formatter(value() ?? '') : value(),
+  )
   createRenderEffect(
     on(
       () => props.value,
@@ -71,9 +85,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
       },
     ),
   )
-  const [inFocus, setInFocus] = createSignal(false)
+  const [focusing, setFocusing] = createSignal(false)
   createRenderEffect(() => {
-    if (!isNumber(value()) && isNumber(props.placeholderValue) && !inFocus()) {
+    if (!isNumber(value()) && isNumber(props.placeholderValue) && !focusing()) {
       setValue(props.placeholderValue)
     }
   })
@@ -91,11 +105,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
     if (!isEmptyValue(v)) {
       valueNum = Number(v)
 
-      if (
-        Number.isNaN(valueNum) ||
-        valueNum !== clampValue(valueNum!) ||
-        valueNum !== floorValue(valueNum!)
-      ) {
+      if (Number.isNaN(valueNum) || valueNum !== floorValue(valueNum!)) {
         return
       }
     }
@@ -108,7 +118,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
   updateValidValue(untrack(value), { ignoreOnChange: true })
 
   const add = (addon: number) => {
-    let newValue: number | null
+    let newValue: number
     if (isEmptyValue(value())) {
       newValue = addon
     } else {
@@ -116,7 +126,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
       newValue = NP.plus(Number.isNaN(num) ? validValue ?? 0 : num, addon)
     }
 
-    updateValidValue(newValue)
+    updateValidValue(clampValue(newValue))
     setValue(validValue)
   }
   const up = () => {
@@ -129,8 +139,12 @@ const InputNumber: Component<InputNumberProps> = _props => {
   return (
     <CommonInput
       {...inputProps}
-      actions={
-        <div class="flex flex-col h-full w-24px [border-left:1px_solid_var(--ant-color-border)]">
+      rootStyle={{
+        '--ant-input-number-handle-width': '22px',
+        ...props.rootStyle,
+      }}
+      actions={() => (
+        <div class="flex flex-col h-full w-[--ant-input-number-handle-width] [border-left:1px_solid_var(--ant-color-border)] bg-[--ant-color-bg-container]">
           <div class={actionBtnClass} onClick={up}>
             <div class="i-ant-design:up-outlined" />
           </div>
@@ -141,8 +155,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
             <div class="i-ant-design:down-outlined" />
           </div>
         </div>
-      }
-      value={`${value() ?? ''}`}
+      )}
+      value={`${(focusing() ? value() : displayValue()) ?? ''}`}
       onKeyDown={e => {
         switch (e.key) {
           case 'ArrowUp':
@@ -161,14 +175,14 @@ const InputNumber: Component<InputNumberProps> = _props => {
       }}
       onFocus={e => {
         dispatchEventHandlerUnion(props.onFocus, e)
-        setInFocus(true)
+        setFocusing(true)
       }}
       onBlur={e => {
         updateValidValue(value())
-        setValue(validValue)
+        setValue(isNumber(validValue) ? clampValue(validValue) : validValue)
 
         dispatchEventHandlerUnion(props.onBlur, e)
-        setInFocus(false)
+        setFocusing(false)
       }}
     />
   )

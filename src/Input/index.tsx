@@ -1,6 +1,6 @@
 import { isNil, omit } from 'lodash-es'
 import { Show, createMemo, onMount, splitProps, useContext } from 'solid-js'
-import type { JSX, JSXElement, Component } from 'solid-js'
+import type { JSX, Component } from 'solid-js'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
@@ -8,10 +8,11 @@ import Compact from '../Compact'
 import { setRef, unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
 import ConfigProviderContext from '../ConfigProvider/context'
-import { type StringOrJSXElement } from '../types'
+import { type RootStyleProps, type StringOrJSXElement } from '../types'
 
 type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement> =
-  JSX.CustomAttributes<T> & {
+  JSX.CustomAttributes<T> &
+  RootStyleProps & {
     textarea?: boolean
     defaultValue?: string | null | undefined
     value?: string | null | undefined
@@ -21,18 +22,18 @@ type CommonInputProps<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInp
     suffix?: StringOrJSXElement
     placeholder?: string
     /**
-     * 仅供 InputNumber 使用
-     */
-    actions?: JSXElement
+       * 仅供 InputNumber 使用
+       */
+    actions?: StringOrJSXElement
     /**
-     * 设置校验状态
-     */
+       * 设置校验状态
+       */
     status?: 'error' | 'warning'
     /**
-     * 设置尺寸
-     * 默认 'middle'
-     * 高度分别为 40px、32px 和 24px
-     */
+       * 设置尺寸
+       * 默认 'middle'
+       * 高度分别为 40px、32px 和 24px
+       */
     size?: 'small' | 'middle' | 'large'
     autoFocus?: boolean
     allowClear?: boolean
@@ -69,7 +70,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
 ) {
   const { componentSize } = useContext(ConfigProviderContext)
   const size = createMemo(() => props.size ?? componentSize())
-  const [{ style, onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
+  const [{ onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',
     'class',
@@ -80,7 +81,8 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
     'onPressEnter',
     'onKeyDown',
     'actions',
-    'style',
+    'rootClass',
+    'rootStyle',
   ])
 
   let input: HTMLInputElement | HTMLTextAreaElement | undefined
@@ -103,13 +105,14 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   const addonAfter = createMemo(() => unwrapStringOrJSXElement(props.addonAfter))
   const prefix = createMemo(() => unwrapStringOrJSXElement(props.prefix))
   const suffix = createMemo(() => unwrapStringOrJSXElement(props.suffix))
+  const actions = createMemo(() => unwrapStringOrJSXElement(props.actions))
 
   const inputWrapClass = createMemo(() =>
     cs(
       {
-        small: 'px-7px py-0 rounded-[var(--ant-border-radius-sm)]',
-        middle: 'px-11px py-4px rounded-[var(--ant-border-radius)]',
-        large: 'px-11px py-7px rounded-[var(--ant-border-radius-lg)]',
+        small: 'rounded-[var(--ant-border-radius-sm)]',
+        middle: 'rounded-[var(--ant-border-radius)]',
+        large: 'rounded-[var(--ant-border-radius-lg)]',
       }[size()],
       !props.textarea &&
         {
@@ -125,7 +128,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
     ),
   )
   const hasPrefixOrSuffix = createMemo(
-    () => !isNil(prefix()) || !isNil(suffix()) || !isNil(props.actions),
+    () => !isNil(prefix()) || !isNil(suffix()) || !isNil(actions()),
   )
   const inputJSX = (
     <Dynamic<Component<JSX.InputHTMLAttributes<HTMLInputElement>>>
@@ -140,7 +143,12 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         input = el
       }}
       class={cs(
-        'w-full [outline:none] text-14px placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
+        'w-full h-full [outline:none] text-14px placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
+        {
+          small: 'px-7px py-0',
+          middle: 'px-11px py-4px',
+          large: 'px-11px py-7px]',
+        }[size()],
         !hasPrefixOrSuffix() && inputWrapClass(),
         inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
         props.class,
@@ -172,6 +180,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   return (
     <Element
       class={cs(
+        props.rootClass,
         'flex w-full relative text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         {
           small: '[font-size:var(--ant-font-size)]',
@@ -182,7 +191,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
-      style={style}
+      style={props.rootStyle}
     >
       <Show when={addonBefore()}>
         <div
@@ -205,19 +214,19 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
             ['[--actions-display:none]', !inputProps.disabled && 'hover:[--actions-display:block]'],
           )}
         >
-          <Show when={prefix()}>
+          <Show when={!isNil(prefix())}>
             <div class="mr-4px">{prefix()}</div>
           </Show>
 
           {inputJSX}
 
-          <Show when={suffix()}>
+          <Show when={!isNil(suffix())}>
             <div class="ml-4px">{suffix()}</div>
           </Show>
 
-          <Show when={props.actions}>
+          <Show when={!isNil(actions())}>
             <div class="[display:var(--actions-display)] absolute top-0 bottom-0 right-0 h-[calc(100%-2px)] translate-y-1px -translate-x-1px">
-              {props.actions}
+              {actions()}
             </div>
           </Show>
         </div>

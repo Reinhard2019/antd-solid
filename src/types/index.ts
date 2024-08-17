@@ -8,3 +8,8 @@ export interface StyleProps {
   class?: string
   style?: JSX.CSSProperties
 }
+
+export interface RootStyleProps {
+  rootClass?: string
+  rootStyle?: JSX.CSSProperties
+}
