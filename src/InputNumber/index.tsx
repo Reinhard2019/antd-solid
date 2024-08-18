@@ -94,28 +94,25 @@ const InputNumber: Component<InputNumberProps> = _props => {
 
   // 上一个格式正确的值
   let validValue: number | null = null
-  const updateValidValue = (
-    v: number | string | null | undefined,
-    options?: {
-      ignoreOnChange?: boolean
-    },
-  ) => {
+  const updateValidValue = (v: number | string | null | undefined) => {
     let valueNum: number | null = null
 
     if (!isEmptyValue(v)) {
       valueNum = Number(v)
 
       if (Number.isNaN(valueNum) || valueNum !== floorValue(valueNum!)) {
-        return
+        return false
       }
     }
 
-    if (validValue === valueNum) return
+    valueNum = isNumber(valueNum) ? clampValue(valueNum) : valueNum
+
+    if (validValue === valueNum) return false
 
     validValue = valueNum
-    if (!options?.ignoreOnChange) untrack(() => props.onChange?.(validValue))
+    return true
   }
-  updateValidValue(untrack(value), { ignoreOnChange: true })
+  updateValidValue(untrack(value))
 
   const add = (addon: number) => {
     let newValue: number
@@ -126,8 +123,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
       newValue = NP.plus(Number.isNaN(num) ? validValue ?? 0 : num, addon)
     }
 
-    updateValidValue(clampValue(newValue))
+    const success = updateValidValue(newValue)
     setValue(validValue)
+    if (success) props.onChange?.(validValue)
   }
   const up = () => {
     add(props.step)
@@ -178,8 +176,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
         setFocusing(true)
       }}
       onBlur={e => {
-        updateValidValue(value())
-        setValue(isNumber(validValue) ? clampValue(validValue) : validValue)
+        const success = updateValidValue(value())
+        setValue(validValue)
+        if (success) props.onChange?.(validValue)
 
         dispatchEventHandlerUnion(props.onBlur, e)
         setFocusing(false)
