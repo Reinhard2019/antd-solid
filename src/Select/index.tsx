@@ -23,7 +23,16 @@ interface SelectOption {
 export interface SelectProps
   extends Pick<
   SelectInputProps<Key>,
-  'multiple' | 'allowClear' | 'class' | 'style' | 'disabled' | 'placeholder' | 'status' | 'size'
+  | 'multiple'
+  | 'allowClear'
+  | 'class'
+  | 'style'
+  | 'disabled'
+  | 'placeholder'
+  | 'status'
+  | 'size'
+  | 'variant'
+  | 'getPopupContainer'
   > {
   defaultValue?: Key | Key[] | null
   value?: Key | Key[] | null
@@ -41,6 +50,8 @@ const Select: Component<SelectProps> = props => {
     'placeholder',
     'status',
     'size',
+    'variant',
+    'getPopupContainer',
   ])
   const [value, setValue] = createControllableValue<Key | Key[] | undefined>(props)
   const valueArr = createMemo(() => toArray(value(), false) as Key[])

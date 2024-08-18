@@ -6,17 +6,18 @@ import {
   Show,
   createMemo,
   useContext,
+  mergeProps,
 } from 'solid-js'
 import cs from 'classnames'
 import { compact } from 'lodash-es'
-import Tooltip from '../Tooltip'
+import Tooltip, { type TooltipProps } from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Compact from '../Compact'
 import Element from '../Element'
 import ConfigProviderContext from '../ConfigProvider/context'
 
-export interface SelectInputProps<T> {
+export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContainer'> {
   multiple?: boolean
   defaultValue?: T[] | null
   value?: T[] | null
@@ -36,33 +37,23 @@ export interface SelectInputProps<T> {
    * 默认: middle
    */
   size?: 'small' | 'middle' | 'large'
+  /**
+   * 形态变体
+   * 默认 'outlined'
+   */
+  variant?: 'outlined' | 'borderless' | 'filled'
 }
 
-const statusClassDict = {
-  default: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-border)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
-    ),
-  error: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-error)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
-    ),
-  warning: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-warning)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
-    ),
-}
-
-function SelectInput<T>(props: SelectInputProps<T>) {
+function SelectInput<T>(_props: SelectInputProps<T>) {
   let select: HTMLDivElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
+  const props = mergeProps(
+    {
+      variant: 'outlined',
+    } as const,
+    _props,
+  )
   const { componentSize } = useContext(ConfigProviderContext)
   const size = createMemo(() => props.size ?? componentSize())
   const [value, setValue] = createControllableValue<T[] | undefined>(props, {
@@ -120,6 +111,7 @@ function SelectInput<T>(props: SelectInputProps<T>) {
             {props.content(() => setOpen(false))}
           </div>
         }
+        getPopupContainer={props.getPopupContainer}
       >
         <div
           class={cs(
@@ -139,7 +131,39 @@ function SelectInput<T>(props: SelectInputProps<T>) {
               }[size()],
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
-            statusClassDict[props.status ?? 'default'](!!props.disabled),
+            props.variant === 'outlined' &&
+              {
+                default: cs(
+                  'border-1px border-solid border-[--ant-color-border]',
+                  !props.disabled &&
+                    'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
+                ),
+                error: cs(
+                  'border-1px border-solid border-[--ant-color-error]',
+                  !props.disabled &&
+                    'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
+                ),
+                warning: cs(
+                  'border-1px border-solid border-[--ant-color-warning]',
+                  !props.disabled &&
+                    'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
+                ),
+              }[props.status ?? 'default'],
+            props.variant === 'filled' &&
+              {
+                default: cs(
+                  'bg-[--ant-color-fill-tertiary]',
+                  !props.disabled && 'hover:bg-[--ant-color-fill-secondary]',
+                ),
+                error: cs(
+                  'bg-[--ant-color-error-bg]',
+                  !props.disabled && 'hover:bg-[--ant-color-error-bg-hover]',
+                ),
+                warning: cs(
+                  'bg-[--ant-color-warning-bg]',
+                  !props.disabled && 'hover:bg-[--ant-color-warning-bg-hover]',
+                ),
+              }[props.status ?? 'default'],
           )}
           style={{
             '--ant-select-input-height': {

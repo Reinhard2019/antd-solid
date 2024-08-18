@@ -32,6 +32,12 @@ outline: deep
 
 <Code path="select/Multiple" />
 
+### 多种形态
+
+可选 `outlined` `filled` `borderless` 三种形态。
+
+<Code path="select/Variant" />
+
 ### 自定义状态
 
 使用 `status` 为 Select 添加状态，可选 `error` 或者 `warning`。

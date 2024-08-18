@@ -67,21 +67,24 @@ export function createCssVariables(
     '--ant-color-primary-active': mapToken.colorPrimaryActive,
     '--ant-color-primary-hover': mapToken.colorPrimaryHover,
     '--ant-color-primary-border': mapToken.colorPrimaryBorder,
+    '--ant-color-primary-border-hover': mapToken.colorPrimaryBorderHover,
 
     '--ant-color-success': mapToken.colorSuccess,
     '--ant-color-success-border': mapToken.colorSuccessBorder,
     '--ant-color-success-bg': mapToken.colorSuccessBg,
 
     '--ant-color-error': mapToken.colorError,
+    '--ant-color-error-active': mapToken.colorErrorActive,
     '--ant-color-error-bg': mapToken.colorErrorBg,
+    '--ant-color-error-bg-hover': mapToken.colorErrorBgHover,
     '--ant-color-error-border': mapToken.colorErrorBorder,
     '--ant-color-error-border-hover': mapToken.colorErrorBorderHover,
-    '--ant-color-error-active': mapToken.colorErrorActive,
 
     '--ant-color-warning': mapToken.colorWarning,
+    '--ant-color-warning-bg': mapToken.colorWarningBg,
+    '--ant-color-warning-bg-hover': mapToken.colorWarningBgHover,
     '--ant-color-warning-border': mapToken.colorWarningBorder,
     '--ant-color-warning-border-hover': mapToken.colorWarningBorderHover,
-    '--ant-color-warning-bg': mapToken.colorWarningBg,
 
     '--ant-color-info-bg': mapToken.colorInfoBg,
     '--ant-color-info-border': mapToken.colorInfoBorder,
@@ -203,10 +206,6 @@ export function createCssVariables(
     '--ant-table-row-hover-bg': colorFillAlterSolid,
     '--ant-table-border-color': mapToken.colorBorderSecondary,
 
-    '--ant-slider-rail-bg': mapToken.colorFillTertiary,
-    '--ant-slider-rail-hover-bg': mapToken.colorFillSecondary,
-    '--ant-slider-track-bg': mapToken.colorPrimaryBorder,
-    '--ant-slider-track-hover-bg': mapToken.colorPrimaryBorderHover,
     '--ant-slider-handle-color': mapToken.colorPrimaryBorder,
     '--ant-slider-handle-active-color': mapToken.colorPrimary,
     '--ant-slider-handle-color-disabled': new TinyColor(aliasToken.colorTextDisabled)
