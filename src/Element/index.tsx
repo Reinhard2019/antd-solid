@@ -2,13 +2,14 @@ import { mergeProps, type JSX, useContext, onMount } from 'solid-js'
 import { Dynamic } from 'solid-js/web'
 import cs from 'classnames'
 import ConfigProviderContext from '../ConfigProvider/context'
+import { type StyleProps } from '../types'
 
-export type ElementProps<T = JSX.HTMLAttributes<HTMLDivElement>> = T & {
+export type ElementProps<T = JSX.HTMLAttributes<HTMLDivElement>> = T &
+StyleProps & {
   /**
-   * 默认 'div'
-   */
+     * 默认 'div'
+     */
   tag?: string
-  class?: string
 }
 
 function Element<T = JSX.HTMLAttributes<HTMLDivElement>>(_props: ElementProps<T>) {

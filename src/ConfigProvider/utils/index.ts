@@ -128,6 +128,7 @@ export function createCssVariables(
 
     '--ant-font-weight-strong': '600',
 
+    '--ant-font-size-sm': '12px',
     '--ant-font-size': '14px',
     '--ant-font-size-lg': '16px',
 

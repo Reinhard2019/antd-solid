@@ -9,7 +9,7 @@ import {
   mergeProps,
 } from 'solid-js'
 import cs from 'classnames'
-import { compact } from 'lodash-es'
+import { compact, pick } from 'lodash-es'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
@@ -67,12 +67,32 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
     () => compact([select, tooltipContent]),
   )
 
-  const [width, setWidth] = createSignal(0)
+  const [popupMatchWidth, setPopupMatchWidth] = createSignal(0)
   const [hover, setHover] = createSignal(false)
   const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
 
   const optionLabelRender = (v: T) =>
     props.optionLabelRender ? props.optionLabelRender(v) : String(v)
+
+  const style = createMemo(() => ({
+    '--ant-select-font-size': {
+      small: 'var(--ant-font-size)',
+      middle: 'var(--ant-font-size)',
+      large: 'var(--ant-font-size-lg)',
+    }[size()],
+    '--ant-select-input-padding-right': {
+      small: '7px',
+      middle: '11px',
+      large: '11px',
+    }[size()],
+    '--ant-select-input-padding-left':
+      valueArr().length && props.multiple ? '4px' : 'var(--ant-select-input-padding-right)',
+    '--ant-select-input-padding':
+      '0 var(--ant-select-input-padding-right) 0 var(--ant-select-input-padding-left)',
+    '--ant-select-input-addon-after-padding': '0 0 0 var(--ant-padding-xs)',
+    '--ant-select-popup-match-width': `${popupMatchWidth()}px`,
+    ...props.style,
+  }))
 
   return (
     <Element
@@ -90,7 +110,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
-      style={props.style}
+      style={style()}
     >
       <Tooltip
         plain
@@ -105,8 +125,10 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         content={() => (
           <div
             ref={tooltipContent}
-            class="w-200px max-h-400px overflow-auto"
-            style={{ width: `${width()}px` }}
+            class="w-[--ant-select-popup-match-width] max-h-400px overflow-auto [font-size:var(--ant-select-font-size)]"
+            style={{
+              ...pick(style(), ['--ant-select-font-size', '--ant-select-popup-match-width']),
+            }}
           >
             {props.content(() => setOpen(false))}
           </div>
@@ -116,19 +138,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         <div
           class={cs(
             'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
-            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex',
-            {
-              small: 'pr-25px [font-size:var(--ant-font-size)]',
-              middle: 'pr-29px [font-size:var(--ant-font-size)]',
-              large: 'pr-29px [font-size:var(--ant-font-size-lg)]',
-            }[size()],
-            valueArr().length && props.multiple
-              ? 'pl-4px'
-              : {
-                small: 'pl-7px',
-                middle: 'pl-11px',
-                large: 'pl-11px',
-              }[size()],
+            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding]',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
             props.variant === 'outlined' &&
@@ -180,7 +190,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
           tabIndex="0"
           onClick={e => {
             setOpen(v => !v)
-            setWidth(e.currentTarget.offsetWidth)
+            setPopupMatchWidth(e.currentTarget.offsetWidth)
             e.currentTarget.focus()
           }}
           onMouseEnter={() => setHover(true)}
@@ -202,33 +212,30 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
             <Show
               when={props.multiple}
               fallback={
-                <div class="h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] ellipsis">
+                <div class="w-full h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] ellipsis">
                   {optionLabelRender(valueArr()[0])}
                 </div>
               }
             >
-              <For each={valueArr()}>
-                {item => (
-                  <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                    {optionLabelRender(item)}
-                    <span
-                      class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                      onClick={() => setValue(valueArr().filter(v => v !== item))}
-                    />
-                  </span>
-                )}
-              </For>
+              <div class="w-full">
+                <For each={valueArr()}>
+                  {item => (
+                    <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
+                      {optionLabelRender(item)}
+                      <span
+                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
+                        onClick={() => setValue(valueArr().filter(v => v !== item))}
+                      />
+                    </span>
+                  )}
+                </For>
+              </div>
             </Show>
           </Show>
 
           <div
             class={cs(
-              'absolute top-0 bottom-0 flex items-center',
-              {
-                small: 'right-7px',
-                middle: 'right-11px',
-                large: 'right-11px',
-              }[size()],
+              'shrink-0 flex justify-end items-center p-[--ant-select-input-addon-after-padding]',
             )}
           >
             <Show
