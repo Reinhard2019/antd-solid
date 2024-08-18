@@ -174,7 +174,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         contentStyle={{
           padding: 0,
         }}
-        content={
+        content={() => (
           <div
             ref={tooltipContent}
             class="w-200px max-h-400px overflow-auto"
@@ -186,7 +186,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
               setSingleValue,
             })}
           </div>
-        }
+        )}
       >
         <div
           ref={container}

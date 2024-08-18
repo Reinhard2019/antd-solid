@@ -13,9 +13,11 @@ import {
   createSignal,
   on,
   createRenderEffect,
+  useContext,
 } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import cs from 'classnames'
+import { nanoid } from 'nanoid'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
@@ -24,6 +26,7 @@ import { isEmptyJSXElement } from '../utils/solid'
 import { isHide } from '../utils/dom'
 import useHover from '../hooks/useHover'
 import Element from '../Element'
+import TooltipContext, { type TooltipContextProps } from './context'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
 type TooltipPlacement =
@@ -50,7 +53,7 @@ export interface TooltipProps {
    */
   placement?: TooltipPlacement
   contentStyle?: JSX.CSSProperties
-  content?: JSXElement | ((close: () => void) => JSXElement)
+  content?: string | number | undefined | null | ((close: () => void) => JSXElement)
   children?: JSXElement
   open?: boolean
   onOpenChange?: (open: boolean) => void
@@ -106,7 +109,7 @@ function collectScroll(ele: HTMLElement) {
   return [window, ...scrollList]
 }
 
-export const getContent = (content: TooltipProps['content'], close: () => void) => {
+export const unwrapContent = (content: TooltipProps['content'], close: () => void) => {
   return typeof content === 'function' ? content(close) : content
 }
 
@@ -218,15 +221,32 @@ const Tooltip: Component<TooltipProps> = _props => {
     _props,
   )
 
+  // ========================== Context ===========================
+  const subPopupElements: Record<string, HTMLElement> = {}
+  const parentContext = useContext(TooltipContext)
+  const context: TooltipContextProps = {
+    registerSubPopup: (id, subPopupEle) => {
+      subPopupElements[id] = subPopupEle
+
+      parentContext?.registerSubPopup(id, subPopupEle)
+    },
+  }
+
+  // =========================== Tooltip ============================
+  const id = nanoid()
   const resolvedChildren = children(() => _props.children)
-  const content = createMemo(() => getContent(props.content, () => setOpen(false)))
   let contentRef: HTMLDivElement | undefined
+  const setPopupRef = (node: HTMLDivElement) => {
+    contentRef = node
+    parentContext?.registerSubPopup(id, node)
+  }
   const [_open, setOpen] = createControllableValue(_props, {
     defaultValue: false,
     valuePropName: 'open',
     trigger: 'onOpenChange',
   })
-  const open = createMemo(() => _open() && !isEmptyJSXElement(content()))
+  const [isEmptyContent, setIsEmptyContent] = createSignal(false)
+  const open = createMemo(() => _open() && !isEmptyContent())
   const reverseOpen = () => setOpen(v => !v)
   const show = () => setOpen(true)
   const hide = () => setOpen(false)
@@ -261,7 +281,7 @@ const Tooltip: Component<TooltipProps> = _props => {
 
           useClickAway(
             () => setOpen(false),
-            () => compact([contentRef, _children]),
+            () => compact([...Object.values(subPopupElements), contentRef, _children]),
           )
           break
         case 'focus':
@@ -337,13 +357,13 @@ const Tooltip: Component<TooltipProps> = _props => {
     const updateTranslateByMainPlacement = (type: 'top' | 'bottom' | 'left' | 'right') => {
       switch (type) {
         case 'top':
-          translateY = childrenRect.top - arrowOffset() - contentRef.clientHeight
+          translateY = childrenRect.top - arrowOffset() - contentRef!.clientHeight
           break
         case 'bottom':
           translateY = childrenRect.bottom + arrowOffset()
           break
         case 'left':
-          translateX = childrenRect.left - arrowOffset() - contentRef.clientWidth
+          translateX = childrenRect.left - arrowOffset() - contentRef!.clientWidth
           break
         case 'right':
           translateX = childrenRect.right + arrowOffset()
@@ -518,14 +538,14 @@ const Tooltip: Component<TooltipProps> = _props => {
   )
 
   return (
-    <>
+    <TooltipContext.Provider value={context}>
       {resolvedChildren()}
 
       <DelayShow when={open()}>
         <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <Element
-            ref={contentRef}
+            ref={setPopupRef}
             class={cs(
               'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
               open() ? 'block' : 'hidden',
@@ -546,7 +566,11 @@ const Tooltip: Component<TooltipProps> = _props => {
               )}
               style={props.contentStyle}
             >
-              {content()}
+              {(() => {
+                const resolvedContent = unwrapContent(props.content, () => setOpen(false))
+                setIsEmptyContent(isEmptyJSXElement(resolvedContent))
+                return resolvedContent
+              })()}
             </div>
 
             <Show when={props.arrow}>
@@ -563,7 +587,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           </Element>
         </Portal>
       </DelayShow>
-    </>
+    </TooltipContext.Provider>
   )
 }
 

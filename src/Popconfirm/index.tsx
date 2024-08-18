@@ -39,7 +39,7 @@ const Popconfirm: Component<PopconfirmProps> = props => {
       trigger="click"
       open={open()}
       onOpenChange={setOpen}
-      content={
+      content={() => (
         <div>
           <div class="mb-8px flex items-center">
             <span class="i-ant-design:exclamation-circle-fill text-#faad14" />
@@ -72,7 +72,7 @@ const Popconfirm: Component<PopconfirmProps> = props => {
             </Button>
           </div>
         </div>
-      }
+      )}
       {...tooltipProps}
     >
       {mergedProps.children}

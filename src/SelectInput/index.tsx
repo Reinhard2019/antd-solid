@@ -102,7 +102,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         contentStyle={{
           padding: 0,
         }}
-        content={
+        content={() => (
           <div
             ref={tooltipContent}
             class="w-200px max-h-400px overflow-auto"
@@ -110,7 +110,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
           >
             {props.content(() => setOpen(false))}
           </div>
-        }
+        )}
         getPopupContainer={props.getPopupContainer}
       >
         <div
