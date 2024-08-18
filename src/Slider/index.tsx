@@ -56,40 +56,42 @@ export interface SliderProps extends StyleProps {
 }
 
 const Slider: Component<SliderProps> = _props => {
-  let container: HTMLDivElement | undefined
-  let handle: HTMLDivElement | undefined
+  let containerRef: HTMLDivElement | undefined
+  let handleRef: HTMLDivElement | undefined
 
   const props = mergeProps({ min: 0, max: 100, step: 1, tooltip: true }, _props)
-  const [_value, setValue] = createControllableValue<number>(props)
+  const [_value, _setValue] = createControllableValue<number>(props)
   const value = createMemo(() =>
     clamp(typeof _value() === 'number' ? _value() : 0, props.min, props.max),
   )
+  const setValue = (v: number) => {
+    const _v = clamp(NP.times(Math.round(v / props.step), props.step), props.min, props.max)
+    _setValue(_v)
+  }
   const gap = createMemo(() => props.max - props.min)
-  const progress = createMemo(() => ((value() - props.min) / gap()) * 100)
-  const isHover = useHover(() => handle)
-  const isFocus = useFocus(() => handle)
+  const progress = createMemo(() => (value() - props.min) / gap())
+  const isHover = useHover(() => handleRef)
+  const isFocus = useFocus(() => handleRef)
   const [isDragging, setIsDragging] = createSignal(false)
   const resolvedHandle = children(() => unwrapStringOrJSXElement(props.handle))
-
-  const stepFormatter = (v: number) => NP.times(Math.floor(v / props.step), props.step)
 
   // 注册键盘监听
   createEffect(() => {
     if (props.disabled) return
 
     const onKeydown = (e: KeyboardEvent) => {
-      if (document.activeElement !== handle) return
+      if (document.activeElement !== handleRef) return
 
       switch (e.code) {
         case 'ArrowLeft':
         case 'ArrowDown':
           e.preventDefault()
-          setValue(stepFormatter(NP.minus(value(), props.step)))
+          setValue(NP.minus(value(), props.step))
           break
         case 'ArrowRight':
         case 'ArrowUp':
           e.preventDefault()
-          setValue(stepFormatter(NP.plus(value(), props.step)))
+          setValue(NP.plus(value(), props.step))
           e.preventDefault()
           break
       }
@@ -104,8 +106,8 @@ const Slider: Component<SliderProps> = _props => {
 
   return (
     <Element
-      ref={container}
-      class={cs(props.class, 'relative', props.disabled && 'cursor-not-allowed')}
+      ref={containerRef}
+      class={cs(props.class, 'relative cursor-pointer', props.disabled && 'cursor-not-allowed')}
       style={{
         '--ant-slider-rail-size': '4px', // 轨道高度
         '--ant-slider-handle-size': '14px', // 抓取点元素大小
@@ -115,6 +117,16 @@ const Slider: Component<SliderProps> = _props => {
         '--ant-slider-track-hover-bg': 'var(--ant-color-primary-border-hover)',
         padding: 'calc((var(--ant-slider-handle-size) - var(--ant-slider-rail-size)) / 2) 0',
         ...props.style,
+      }}
+      onClick={e => {
+        const handleWidth = handleRef?.offsetWidth ?? 0
+        const halfHandleWidth = handleWidth / 2
+        const offsetX = clamp(
+          e.offsetX - halfHandleWidth,
+          0,
+          containerRef!.offsetWidth - handleWidth,
+        )
+        setValue(props.min + (offsetX / (containerRef!.offsetWidth - handleWidth)) * gap())
       }}
     >
       {/* 背景轨道 */}
@@ -134,17 +146,20 @@ const Slider: Component<SliderProps> = _props => {
             : ['bg-[var(--ant-slider-track-bg)] hover:bg-[var(--ant-slider-track-hover-bg)]'],
         )}
         style={{
-          width: `${progress()}%`,
+          width: `${progress() * 100}%`,
         }}
       />
       {/* handle 轨道 */}
       <div class="absolute left-[calc(var(--ant-slider-handle-size)/2)] right-[calc(var(--ant-slider-handle-size)/2)] top-1/2 -translate-y-1/2">
         <Tooltip open={props.tooltip && (isHover() || isFocus() || isDragging())} content={value()}>
           <div
-            ref={handle}
+            ref={handleRef}
             class="absolute top-1/2 -translate-1/2 w-[--ant-slider-handle-size] h-[--ant-slider-handle-size]"
             style={{
-              left: `${progress()}%`,
+              left: `${progress() * 100}%`,
+            }}
+            onClick={e => {
+              e.stopPropagation()
             }}
             onMouseDown={e => {
               if (props.disabled) return
@@ -153,16 +168,11 @@ const Slider: Component<SliderProps> = _props => {
               const startValue = value()
               setIsDragging(true)
 
-              const handleClientWidth = e.currentTarget.clientWidth
+              const handleWidth = handleRef!.offsetWidth
 
               const onMouseMove = (_e: MouseEvent) => {
                 const moveX = _e.clientX - startX
-                console.log('handleClientWidth', handleClientWidth)
-                setValue(
-                  stepFormatter(
-                    startValue + (moveX / (container!.clientWidth - handleClientWidth)) * gap(),
-                  ),
-                )
+                setValue(startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap())
               }
               window.addEventListener('mousemove', onMouseMove)
 

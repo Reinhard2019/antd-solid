@@ -14,6 +14,12 @@ outline: deep
 
 <Code path="color-picker/Base" />
 
+### 清除颜色
+
+清除已选择的颜色。
+
+<Code path="color-picker/Clear" />
+
 ## API
 
 ### InputNumber

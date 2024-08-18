@@ -156,7 +156,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
           </div>
         </div>
       )}
-      value={`${(focusing() ? value() : displayValue()) ?? ''}`}
+      value={`${focusing() ? value() : displayValue()}`}
       onKeyDown={e => {
         switch (e.key) {
           case 'ArrowUp':

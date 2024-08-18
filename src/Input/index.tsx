@@ -65,8 +65,11 @@ const statusClassDict = {
 }
 
 export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = HTMLInputElement>(
-  props: CommonInputProps<T> &
-  Omit<JSX.InputHTMLAttributes<T>, 'style' | 'onChange' | 'onInput' | 'onKeyDown'>,
+  props: Omit<
+  JSX.InputHTMLAttributes<T>,
+  'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix'
+  > &
+  CommonInputProps<T>,
 ) {
   const { componentSize } = useContext(ConfigProviderContext)
   const size = createMemo(() => props.size ?? componentSize())
@@ -109,6 +112,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
 
   const inputWrapClass = createMemo(() =>
     cs(
+      'p-[--ant-input-padding]',
       {
         small: 'rounded-[var(--ant-border-radius-sm)]',
         middle: 'rounded-[var(--ant-border-radius)]',
@@ -143,12 +147,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         input = el
       }}
       class={cs(
-        'w-full h-full [outline:none] text-14px placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
-        {
-          small: 'px-7px py-0',
-          middle: 'px-11px py-4px',
-          large: 'px-11px py-7px]',
-        }[size()],
+        'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
         !hasPrefixOrSuffix() && inputWrapClass(),
         inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
         props.class,
@@ -181,23 +180,30 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
     <Element
       class={cs(
         props.rootClass,
-        'flex w-full relative text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-        {
-          small: '[font-size:var(--ant-font-size)]',
-          middle: '[font-size:var(--ant-font-size)]',
-          large: '[font-size:var(--ant-font-size-lg)]',
-        }[size()],
+        'flex w-full relative text-[var(--ant-color-text)] leading-[var(--ant-line-height)] [font-size:var(--ant-input-font-size)]',
         Compact.compactItemClass,
         inputProps.disabled &&
           'bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)] cursor-not-allowed',
       )}
-      style={props.rootStyle}
+      style={{
+        '--ant-input-padding': {
+          small: '0 7px',
+          middle: '4px 11px',
+          large: '7px 11px',
+        }[size()],
+        '--ant-input-font-size': {
+          small: 'var(--ant-font-size)',
+          middle: 'var(--ant-font-size)',
+          large: 'var(--ant-font-size-lg)',
+        }[size()],
+        ...props.rootStyle,
+      }}
     >
       <Show when={addonBefore()}>
         <div
           class={cs(
             'ant-input-addon',
-            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px text-14px',
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px',
             Compact.compactItemRounded0Class,
             compactItemRoundedLeftClass,
           )}
@@ -236,7 +242,7 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
         <div
           class={cs(
             'ant-input-addon',
-            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px text-14px',
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px',
             Compact.compactItemRounded0Class,
             compactItemRoundedRightClass,
           )}
@@ -263,8 +269,11 @@ export function CommonInput<T extends HTMLInputElement | HTMLTextAreaElement = H
   )
 }
 
-export type InputProps = Omit<CommonInputProps, 'actions' | 'textarea'> &
-Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onInput' | 'onKeyDown'>
+export type InputProps = Omit<
+JSX.InputHTMLAttributes<HTMLInputElement>,
+'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix'
+> &
+Omit<CommonInputProps, 'actions' | 'textarea'>
 
 export type TextAreaProps = Omit<
 CommonInputProps<HTMLTextAreaElement>,

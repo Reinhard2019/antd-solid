@@ -5,6 +5,7 @@ const Base: Component = () => {
   return (
     <ColorPicker
       defaultValue="#1677ff"
+      allowClear
       onChange={value => {
         console.log('onChange', value)
       }}
