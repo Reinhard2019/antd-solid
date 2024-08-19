@@ -70,6 +70,7 @@ export { default as Element } from './Element'
 export type { ElementProps } from './Element'
 export { default as Cursor } from './Cursor'
 export type { CursorProps } from './Cursor'
+export { default as message } from './Message'
 
 export { default as ConfigProvider } from './ConfigProvider'
 export { default as Fragment } from './Fragment'
@@ -82,5 +83,3 @@ export { default as useScroll } from './hooks/useScroll'
 export { default as useHover } from './hooks/useHover'
 export { default as useFocus } from './hooks/useFocus'
 export { default as useVirtualList } from './hooks/useVirtualList'
-
-export { message } from 'antd'

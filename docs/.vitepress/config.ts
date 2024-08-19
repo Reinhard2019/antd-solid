@@ -77,6 +77,7 @@ export default defineConfig({
         items: [
           { text: 'Alert 警告提示', link: '/components/alert' },
           { text: 'Drawer 抽屉', link: '/components/drawer' },
+          { text: 'Message 全局提示', link: '/components/message' },
           { text: 'Modal 对话框', link: '/components/modal' },
           { text: 'Popconfirm 气泡确认框', link: '/components/popconfirm' },
           { text: 'Progress 进度条', link: '/components/progress' },
