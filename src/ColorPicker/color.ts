@@ -12,8 +12,21 @@ import {
   type CMYK,
   type Numberify,
 } from '@ctrl/tinycolor'
+import { isNil } from 'lodash-es'
 
-export type ColorInput = string | number | RGB | RGBA | HSL | HSLA | HSV | HSVA | CMYK | Color
+export type ColorInput =
+  | string
+  | number
+  | null
+  | undefined
+  | RGB
+  | RGBA
+  | HSL
+  | HSLA
+  | HSV
+  | HSVA
+  | CMYK
+  | Color
 
 /**
  * 扩展 TinyColor
@@ -28,6 +41,7 @@ class Color extends TinyColor {
   private readonly v: number = 0
 
   constructor(color?: ColorInput, opts?: Partial<TinyColorOptions>) {
+    color = isNil(color) ? undefined : color
     color = color instanceof Color ? color.toHsv() : color
 
     super(color, opts)
@@ -74,15 +88,17 @@ class Color extends TinyColor {
   }
 }
 
-function isHsv(color: RGB | RGBA | HSL | HSLA | HSV | HSVA | CMYK): color is HSV {
+function isHsv(color: ColorInput): color is HSV {
   return (
+    !isNil(color) &&
+    typeof color === 'object' &&
     isValidCSSUnit((color as HSV).h) &&
     isValidCSSUnit((color as HSV).s) &&
     isValidCSSUnit((color as HSV).v)
   )
 }
 
-function isHsva(color: RGB | RGBA | HSL | HSLA | HSV | HSVA | CMYK): color is HSVA {
+function isHsva(color: ColorInput): color is HSVA {
   return isHsv(color) && isValidCSSUnit((color as HSVA).a)
 }
 
