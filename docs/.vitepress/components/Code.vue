@@ -102,10 +102,7 @@ onMounted(() => {
         import babelPresetSolid from 'https://cdn.jsdelivr.net/npm/babel-preset-solid@1.8.4/+esm';
         import * as SolidJs from "https://jspm.dev/solid-js";
         import * as SolidJsWeb from "https://jspm.dev/solid-js/web";
-        import React from "https://cdn.jsdelivr.net/npm/react@18.2.0/+esm";
-        import ReactDOM from "https://cdn.jsdelivr.net/npm/react-dom@18.2.0/+esm";
         import * as Nanoid from "https://cdn.jsdelivr.net/npm/nanoid@5.0.2/+esm";
-        import * as Antd from "https://cdn.jsdelivr.net/npm/antd@5.10.2/+esm";
         import Classnames from "https://cdn.jsdelivr.net/npm/classnames@2.3.2/+esm";
         import Lodash from "https://cdn.jsdelivr.net/npm/lodash-es@4.17.21/+esm";
         import * as Yup from "https://cdn.jsdelivr.net/npm/yup@1.3.2/+esm";
@@ -114,10 +111,7 @@ onMounted(() => {
 
         window.SolidJs = SolidJs;
         window.SolidJsWeb = SolidJsWeb;
-        window.React = React;
-        window.ReactDOM = ReactDOM;
         window.Nanoid = Nanoid;
-        window.Antd = Antd;
         window.Classnames = Classnames;
         window.Lodash = Lodash;
         window.Yup = Yup;
@@ -134,8 +128,6 @@ onMounted(() => {
             lodash: Lodash,
             nanoid: Nanoid,
             classnames: Classnames,
-            react: React,
-          'react-dom': ReactDOM,
           }
           return libMap[name]
         }

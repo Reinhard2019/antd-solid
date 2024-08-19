@@ -23,8 +23,6 @@
     "@solidjs/testing-library": "^0.7.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@types/lodash-es": "^4.17.7",
-    "@types/react": "^18.0.26",
-    "@types/react-dom": "^18.0.9",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "@unocss/cli": "^0.51.8",
@@ -68,8 +66,6 @@
     "nanoid": "^5.0.1",
     "number-precision": "^1.6.0",
     "prismjs": "^1.29.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "solid-js": "^1.8.15",
     "solid-transition-group": "^0.2.3",
     "yup": "^1.2.0"

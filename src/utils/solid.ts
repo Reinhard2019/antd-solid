@@ -1,7 +1,5 @@
-import React from 'react'
 import { type JSXElement, type JSX, untrack, type Ref } from 'solid-js'
 import { isNil } from 'lodash-es'
-import SolidToReact from './SolidToReact'
 import { type StringOrJSXElement } from '../types'
 
 /**
@@ -19,14 +17,6 @@ export function isBaseType(
     value === null ||
     value === undefined
   )
-}
-
-export function solidToReact(children: JSXElement) {
-  return isBaseType(children)
-    ? children
-    : React.createElement(SolidToReact, {
-      children,
-    })
 }
 
 export function dispatchEventHandlerUnion<T, E extends Event>(

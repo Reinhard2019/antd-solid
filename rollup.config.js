@@ -83,9 +83,6 @@ export default [
       globals: {
         'solid-js': 'SolidJs',
         'solid-js/web': 'SolidJsWeb',
-        antd: 'Antd',
-        react: 'React',
-        'react-dom/client': 'ReactDOM',
         nanoid: 'Nanoid',
         classnames: 'Classnames',
         'lodash-es': 'Lodash',
@@ -105,16 +102,6 @@ export default [
       terser(),
       cleanup(),
     ],
-    external: [
-      'uno.css',
-      'solid-js',
-      'solid-js/web',
-      'react',
-      'react-dom/client',
-      'antd',
-      'nanoid',
-      'lodash-es',
-      'classnames',
-    ],
+    external: ['uno.css', 'solid-js', 'solid-js/web', 'antd', 'nanoid', 'lodash-es', 'classnames'],
   },
 ]
