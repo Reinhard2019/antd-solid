@@ -1,29 +1,28 @@
-import { Image as ImageAntd } from 'antd'
-import { type JSXElement, createMemo } from 'solid-js'
-import { mapValues } from 'lodash-es'
-import { reactToSolidComponent, replaceClassName } from '../utils/component'
-import { solidToReact } from '../utils/solid'
+import { type Component } from 'solid-js'
+import cs from 'classnames'
+import { type StyleProps } from '../types'
 
-const _Image = replaceClassName(
-  reactToSolidComponent(ImageAntd, () => (<div class="inline-flex" />) as any),
-)
-
-type ImageProps = Omit<Parameters<typeof _Image>[0], 'placeholder'> & {
-  placeholder?: JSXElement
+export interface ImageProps extends StyleProps {
+  width?: number
+  height?: number
+  src?: string
+  fallback?: string
 }
 
-function Image(_props: ImageProps) {
-  const props = createMemo(() =>
-    mapValues(_props, (value, key) => {
-      switch (key) {
-        case 'placeholder':
-          return solidToReact(value as Element)
-        default:
-          return value
-      }
-    }),
+const Image: Component<ImageProps> = props => {
+  return (
+    <div class={cs('inline-block')}>
+      <img
+        {...props}
+        src={props.src ? props.src : props.fallback}
+        onError={e => {
+          if (props.fallback) {
+            e.currentTarget.src = props.fallback
+          }
+        }}
+      />
+    </div>
   )
-  return <_Image {...(props() as any)} />
 }
 
 export default Image
