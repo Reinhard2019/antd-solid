@@ -43,10 +43,6 @@ class Color extends TinyColor {
         this.a = isHsva(color) ? color.a : 1
       }
     }
-
-    if (!this.isValid) {
-      this.a = 0
-    }
   }
 
   toHsv(): Numberify<HSVA> {

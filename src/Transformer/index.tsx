@@ -459,7 +459,7 @@ const Transformer: Component<TransformerProps> = _props => {
         <Show when={resizeDirection()}>
           <Portal>
             <ResizeSvg
-              class="absolute pointer-events-none"
+              class="absolute pointer-events-none text-24px"
               style={{
                 top: `${resizeSvgPosition().y}px`,
                 left: `${resizeSvgPosition().x}px`,

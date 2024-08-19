@@ -29,11 +29,8 @@ const ColorPicker: Component<ColorPickerProps> = props => {
     _setColor(new Color(colorStr()))
   })
   const setColor = (value: Color) => {
-    if (!color().isValid) {
-      value.setAlpha(1)
-    }
     _setColor(value)
-    props.onChange?.(value.toHex8String())
+    props.onChange?.(value.isValid ? value.toHex8String() : null)
   }
   const [open, setOpen] = createSignal(false)
 

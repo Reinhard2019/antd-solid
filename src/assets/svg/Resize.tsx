@@ -1,5 +1,4 @@
 import { type Component } from 'solid-js'
-import cs from 'classnames'
 import { type StyleProps } from '../../types'
 import { commonStyle } from './common'
 
@@ -8,7 +7,7 @@ const Resize: Component<StyleProps> = props => {
     <svg
       viewBox="0 0 1024 1024"
       xmlns="http://www.w3.org/2000/svg"
-      class={cs('text-24px', props.class)}
+      class={props.class}
       style={{
         ...commonStyle,
         ...props.style,

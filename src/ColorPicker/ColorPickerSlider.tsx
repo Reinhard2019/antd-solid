@@ -3,6 +3,7 @@ import cs from 'classnames'
 import ColorPickerContext from './context'
 import Slider from '../Slider'
 import Color from './color'
+import ColorPickUpSvg from '../assets/svg/ColorPickUp'
 
 const ColorPickerSlider: Component = () => {
   const context = useContext(ColorPickerContext)
@@ -80,6 +81,26 @@ const ColorPickerSlider: Component = () => {
           }}
         />
       </div>
+
+      {window.EyeDropper && (
+        <span
+          class="shrink-0 text-18px cursor-pointer"
+          onClick={() => {
+            if (!window.EyeDropper) return
+
+            const eyeDropper = new window.EyeDropper()
+
+            eyeDropper
+              .open()
+              .then(result => {
+                context?.setColor(new Color(result.sRGBHex as string))
+              })
+              .catch(console.error)
+          }}
+        >
+          <ColorPickUpSvg />
+        </span>
+      )}
     </div>
   )
 }
