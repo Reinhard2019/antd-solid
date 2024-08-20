@@ -18,6 +18,7 @@ export interface ColorPickerProps {
    */
   onChange?: (value: string | null) => void
   allowClear?: boolean
+  disabled?: boolean
 }
 
 const ColorPicker: Component<ColorPickerProps> = props => {
@@ -69,43 +70,49 @@ const ColorPicker: Component<ColorPickerProps> = props => {
     <Popover
       open={open()}
       onOpenChange={setOpen}
-      trigger={'click'}
+      trigger={props.disabled ? [] : ['click']}
       content={getPopoverContent}
       placement="bottomLeft"
     >
-      <Element
-        class={cs(
-          'p-[--ant-padding-xxs] inline-block border-1px border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer',
-          'hover:border-[--ant-color-primary-hover]',
-          open() && '!border-[--ant-color-primary-active]',
-        )}
-      >
-        <Show
-          when={color().isValid}
-          fallback={
-            <div class="w-24px h-24px rounded-[--ant-border-radius-sm] relative overflow-hidden border-1px border-solid border-[--ant-color-split]">
-              <div class="absolute top-1/2 left-1/2 -translate-1/2 w-200% h-2px bg-[--ant-color-error] rotate-135deg" />
-            </div>
-          }
+      <Element class={cs('inline-block', props.disabled && 'cursor-not-allowed')}>
+        <div
+          class={cs(
+            'p-[--ant-padding-xxs] border-1px border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer hover:border-[--ant-color-primary-hover]',
+            open() && '!border-[--ant-color-primary-active]',
+            props.disabled && 'pointer-events-none bg-[--ant-color-bg-container-disabled]',
+          )}
         >
-          <div
-            class="w-24px h-24px rounded-[--ant-border-radius-sm] overflow-hidden"
-            style={{
-              'box-shadow': 'inset 0 0 1px 0 var(--ant-color-text-quaternary)',
-              'background-image':
-                'conic-gradient(var(--ant-color-fill-secondary) 0 25%, transparent 0 50%, var(--ant-color-fill-secondary) 0 75%, transparent 0)',
-              'background-size': '50% 50%',
-            }}
+          <Show
+            when={color().isValid}
+            fallback={
+              <div
+                class={cs(
+                  'w-24px h-24px rounded-[--ant-border-radius-sm] relative overflow-hidden border-1px border-solid border-[--ant-color-split]',
+                )}
+              >
+                <div class="absolute top-1/2 left-1/2 -translate-1/2 w-200% h-2px bg-[--ant-color-error] rotate-135deg" />
+              </div>
+            }
           >
             <div
-              class="w-full h-full"
+              class={cs('w-24px h-24px rounded-[--ant-border-radius-sm] overflow-hidden')}
               style={{
-                'box-shadow': 'inset 0 0 0 var(--ant-line-width) var(--ant-color-fill-secondary)',
-                'background-color': color().toRgbString(),
+                'box-shadow': 'inset 0 0 1px 0 var(--ant-color-text-quaternary)',
+                'background-image':
+                  'conic-gradient(var(--ant-color-fill-secondary) 0 25%, transparent 0 50%, var(--ant-color-fill-secondary) 0 75%, transparent 0)',
+                'background-size': '50% 50%',
               }}
-            />
-          </div>
-        </Show>
+            >
+              <div
+                class="w-full h-full"
+                style={{
+                  'box-shadow': 'inset 0 0 0 var(--ant-line-width) var(--ant-color-fill-secondary)',
+                  'background-color': color().toRgbString(),
+                }}
+              />
+            </div>
+          </Show>
+        </div>
       </Element>
     </Popover>
   )
