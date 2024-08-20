@@ -169,7 +169,8 @@ const InputNumber: Component<InputNumberProps> = _props => {
       onChange={e => {
         const newValue = e.target.value
         setValue(newValue)
-        updateValidValue(newValue)
+        const success = updateValidValue(newValue)
+        if (success) props.onChange?.(validValue)
       }}
       onFocus={e => {
         dispatchEventHandlerUnion(props.onFocus, e)
