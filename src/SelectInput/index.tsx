@@ -98,15 +98,9 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
     <Element
       ref={select!}
       class={cs(
-        'p[.ant-input-addon]:my--1px p[.ant-input-addon]:mx--12px',
+        '!p[.ant-input-addon]:my--1px !p[.ant-input-addon]:mx--12px',
         'rounded-6px cursor-pointer inline-block text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-        [
-          Compact.compactItemClass,
-          Compact.compactItemRounded0Class,
-          'p[.ant-compact]:first:rounded-l-6px',
-          'p[.ant-compact]:last:rounded-r-6px',
-          Compact.compactItemZIndexClass,
-        ],
+        Compact.compactItemClass,
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}

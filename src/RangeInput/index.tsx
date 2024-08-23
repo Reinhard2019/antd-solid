@@ -153,13 +153,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     <Element
       class={cs(
         'rounded-6px',
-        [
-          Compact.compactItemClass,
-          Compact.compactItemRounded0Class,
-          'p[.ant-compact]:first:rounded-l-6px',
-          'p[.ant-compact]:last:rounded-r-6px',
-          Compact.compactItemZIndexClass,
-        ],
+        Compact.compactItemClass,
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
