@@ -8,7 +8,7 @@ const text = () => (
   </div>
 )
 
-const items: CollapseProps['each'] = [
+const items: CollapseProps['items'] = [
   {
     key: '1',
     label: 'This is panel header 1',
@@ -26,9 +26,7 @@ const items: CollapseProps['each'] = [
   },
 ]
 const App: Component = () => (
-  <Collapse each={items} type="card" defaultActiveItems={['1']}>
-    {item => <Collapse.Item label={item.label}>{item.children}</Collapse.Item>}
-  </Collapse>
+  <Collapse type="card" items={items} bordered={false} defaultActiveKey={['1']} />
 )
 
 export default App

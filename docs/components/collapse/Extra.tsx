@@ -32,11 +32,7 @@ const App: Component = () => {
       extra,
     },
   ]
-  return (
-    <Collapse each={items}>
-      {item => <Collapse.Item label={item.label}>{item.children}</Collapse.Item>}
-    </Collapse>
-  )
+  return <Collapse items={items} />
 }
 
 export default App
