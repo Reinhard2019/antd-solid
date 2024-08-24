@@ -1,16 +1,17 @@
-import { For, Show, createMemo, mergeProps, useContext, type Component, type JSX } from 'solid-js'
+import { For, Show, createMemo, mergeProps, useContext, type Component } from 'solid-js'
 import { isEmpty, omit } from 'lodash-es'
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
-import { type StyleProps } from '../types'
+import { type StringOrJSXElement, type StyleProps } from '../types'
 import Fragment from '../Fragment'
 import Popover, { type PopoverProps } from '../Popover'
 import DropdownContext from '../Dropdown/context'
 import Element from '../Element'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface MenuItemType {
   key: any
-  label: JSX.Element
+  label: StringOrJSXElement
   children?: MenuItem[]
 }
 
@@ -101,7 +102,7 @@ const InternalMenu: Component<InternalMenuProps> = props => {
                 }
               }}
             >
-              {item.label}
+              {unwrapStringOrJSXElement(item.label)}
 
               <Show when={!isEmpty(item.children)}>
                 <span class="i-ant-design:right-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
