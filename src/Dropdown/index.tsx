@@ -2,6 +2,7 @@ import { type Component, splitProps, mergeProps } from 'solid-js'
 import Popover, { type PopoverProps } from '../Popover'
 import Menu, { type MenuProps } from '../Menu'
 import Context from './context'
+import { useSize } from '../hooks'
 
 export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
   /**
@@ -13,9 +14,15 @@ export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
    * 默认 'bottomLeft'
    */
   placement?: 'top' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
+  /**
+   * 下拉菜单和选择器同宽
+   */
+  popupMatchWidth?: boolean
 }
 
 const Dropdown: Component<DropdownProps> = _props => {
+  let ref: HTMLSpanElement | undefined
+  const size = useSize(() => ref, 'offset')
   const props = mergeProps(
     {
       placement: 'bottomLeft' as const,
@@ -31,6 +38,10 @@ const Dropdown: Component<DropdownProps> = _props => {
         content={close => (
           <Menu
             {...props.menu}
+            style={{
+              ...props.menu.style,
+              width: size()?.width ? `${size()?.width}px` : undefined,
+            }}
             onClick={info => {
               close()
               props.menu?.onClick?.(info)
@@ -48,7 +59,7 @@ const Dropdown: Component<DropdownProps> = _props => {
         ]}
         {...popoverProps}
       >
-        {props.children}
+        <span ref={ref}>{props.children}</span>
       </Popover>
     </Context.Provider>
   )
