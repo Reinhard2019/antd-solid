@@ -37,6 +37,10 @@ export interface ButtonProps
    */
   danger?: boolean
   disabled?: boolean
+  /**
+   * 将按钮宽度调整为其父宽度的选项
+   */
+  block?: boolean
 }
 
 const sizeClassMap = {
@@ -118,6 +122,7 @@ const Button: Component<ButtonProps> = _props => {
         `ant-btn ant-btn-${props.type}`,
         'relative cursor-pointer [font-size:var(--ant-font-size)]',
         'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
+        props.block && 'block w-full',
         props.class,
         sizeClassMap[size()],
         props.disabled && 'cursor-not-allowed',
