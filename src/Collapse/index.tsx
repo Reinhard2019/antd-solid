@@ -11,12 +11,11 @@ import ConfigProviderContext from '../ConfigProvider/context'
 export interface CollapseItem extends StyleProps {
   key: Key
   label: StringOrJSXElement
-  children: StringOrJSXElement
+  children: StringOrJSXElement | false
   /**
    * 自定义渲染每个面板右上角的内容
    */
   extra?: StringOrJSXElement
-  disabledChildren?: boolean
 }
 
 export interface CollapseProps extends StyleProps {
@@ -112,7 +111,7 @@ const Collapse: Component<CollapseProps> = _props => {
                       'bg-[var(--ant-collapse-header-bg)] p-[--ant-collapse-header-padding]',
                   )}
                   onClick={() => {
-                    if (item.disabledChildren) return
+                    if (item.children === false) return
 
                     if (activeKey().includes(item.key)) {
                       setActiveKey(activeKey().filter(key => key !== item.key))
@@ -122,7 +121,7 @@ const Collapse: Component<CollapseProps> = _props => {
                   }}
                 >
                   <span>
-                    <Show when={!item.disabledChildren}>
+                    <Show when={item.children !== false}>
                       <span
                         class={cs(
                           'i-ant-design:right-outlined',
@@ -148,7 +147,7 @@ const Collapse: Component<CollapseProps> = _props => {
                     }).finished.finally(done)
                   }}
                 >
-                  <Show when={activeKey().includes(item.key) && !item.disabledChildren}>
+                  <Show when={activeKey().includes(item.key) && item.children !== false}>
                     <div class="overflow-hidden">
                       <div
                         class={cs(
@@ -156,7 +155,7 @@ const Collapse: Component<CollapseProps> = _props => {
                           type() === 'card' && '[border-top:1px_solid_var(--ant-color-border)]',
                         )}
                       >
-                        {unwrapStringOrJSXElement(item.children)}
+                        {unwrapStringOrJSXElement(item.children as StringOrJSXElement)}
                       </div>
                     </div>
                   </Show>
