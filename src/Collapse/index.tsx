@@ -1,4 +1,13 @@
-import { type Component, createMemo, For, type JSX, mergeProps, Show, useContext } from 'solid-js'
+import {
+  type Accessor,
+  type Component,
+  createMemo,
+  For,
+  type JSX,
+  mergeProps,
+  Show,
+  useContext,
+} from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
 import { isEmpty } from 'lodash-es'
@@ -38,6 +47,16 @@ export interface CollapseProps extends StyleProps {
   type?: 'line' | 'card'
   bordered?: boolean
   fallback?: JSX.Element
+  /**
+   * 自定义切换图标
+   * 为 false 代表不显示图标
+   */
+  expandIcon?: false | ((options: { isActive: Accessor<boolean> }) => JSX.Element)
+  /**
+   * 设置图标位置
+   * 默认 'start'
+   */
+  expandIconPosition?: 'start' | 'end'
 }
 
 const Collapse: Component<CollapseProps> = _props => {
@@ -45,6 +64,7 @@ const Collapse: Component<CollapseProps> = _props => {
   const props = mergeProps(
     {
       bordered: true,
+      expandIconPosition: 'start',
     } as const,
     _props,
   )
@@ -55,6 +75,31 @@ const Collapse: Component<CollapseProps> = _props => {
     valuePropName: 'activeKey',
     defaultValue: [],
   })
+
+  const getExpandIcon = (item: CollapseItem, position: 'start' | 'end') => {
+    const isActive = createMemo(() => activeKey().includes(item.key))
+    return (
+      <Show
+        when={
+          item.children !== false &&
+          props.expandIcon !== false &&
+          props.expandIconPosition === position
+        }
+      >
+        {typeof props.expandIcon === 'function' ? (
+          props.expandIcon({ isActive })
+        ) : (
+          <span
+            class={cs(
+              'i-ant-design:right-outlined',
+              'mr-[var(--ant-margin-sm)] duration-.3s',
+              activeKey().includes(item.key) && 'rotate-[90deg]',
+            )}
+          />
+        )}
+      </Show>
+    )
+  }
 
   return (
     <Show when={!isEmpty(props.items)} fallback={props.fallback}>
@@ -121,19 +166,14 @@ const Collapse: Component<CollapseProps> = _props => {
                   }}
                 >
                   <span class="inline-flex items-center">
-                    <Show when={item.children !== false}>
-                      <span
-                        class={cs(
-                          'i-ant-design:right-outlined',
-                          'mr-[var(--ant-margin-sm)] duration-.3s',
-                          activeKey().includes(item.key) && 'rotate-[90deg]',
-                        )}
-                      />
-                    </Show>
+                    {getExpandIcon(item, 'start')}
                     {unwrapStringOrJSXElement(item.label)}
                   </span>
 
-                  <span>{unwrapStringOrJSXElement(item.extra)}</span>
+                  <span class="inline-flex items-center">
+                    {unwrapStringOrJSXElement(item.extra)}
+                    {getExpandIcon(item, 'end')}
+                  </span>
                 </div>
                 <Transition
                   onEnter={(el, done) => {
