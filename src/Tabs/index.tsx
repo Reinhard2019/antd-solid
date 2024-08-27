@@ -23,7 +23,7 @@ import DelayShow from '../DelayShow'
 import Element from '../Element'
 import createControllableValue from '../hooks/createControllableValue'
 
-export interface Tab {
+export interface TabItem {
   key: string
   label: StringOrJSXElement
   children?: StringOrJSXElement
@@ -55,7 +55,7 @@ export interface TabsProps {
    * @returns
    */
   onChange?: (activeKey: string) => void
-  items: Tab[]
+  items: TabItem[]
   addonBefore?: JSX.Element
   addonAfter?: JSX.Element
   disabled?: boolean
