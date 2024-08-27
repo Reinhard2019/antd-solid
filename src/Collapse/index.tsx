@@ -120,7 +120,7 @@ const Collapse: Component<CollapseProps> = _props => {
                     setActiveKey([...activeKey(), item.key])
                   }}
                 >
-                  <span>
+                  <span class="inline-flex items-center">
                     <Show when={item.children !== false}>
                       <span
                         class={cs(
