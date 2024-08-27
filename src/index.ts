@@ -70,6 +70,7 @@ export { default as Element } from './Element'
 export type { ElementProps } from './Element'
 export { default as Cursor } from './Cursor'
 export type { CursorProps } from './Cursor'
+export { default as Space } from './Space'
 export { default as message } from './Message'
 
 export { default as ConfigProvider } from './ConfigProvider'
