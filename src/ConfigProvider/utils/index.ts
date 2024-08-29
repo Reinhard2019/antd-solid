@@ -108,6 +108,7 @@ export function createCssVariables(
     '--ant-color-bg-text-hover': aliasToken.colorBgTextHover,
     '--ant-color-bg-text-active': aliasToken.colorBgTextActive,
     '--ant-color-bg-container': mapToken.colorBgContainer,
+    '--ant-color-bg-elevated': mapToken.colorBgElevated,
     '--ant-color-bg-container-disabled': aliasToken.colorBgContainerDisabled,
     '--ant-color-bg-container-secondary': mapToken.colorBgContainerSecondary,
     '--ant-color-bg-container-tertiary': mapToken.colorBgContainerTertiary,

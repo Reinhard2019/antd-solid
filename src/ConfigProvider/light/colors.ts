@@ -39,8 +39,9 @@ export const generateNeutralColorPalettes: GenerateNeutralColorMap = (
     colorFillTertiary: getAlphaColor(colorTextBase, 0.04),
     colorFillQuaternary: getAlphaColor(colorTextBase, 0.02),
 
-    colorBgLayout: getSolidColor(colorBgBase, 4),
+    colorBgElevated: getSolidColor(colorBgBase, 0),
     colorBgContainer: getSolidColor(colorBgBase, 0),
+    colorBgLayout: getSolidColor(colorBgBase, 4),
     colorBgContainerSecondary: getSolidColor(colorBgBase, 0),
     colorBgContainerTertiary: getSolidColor(colorBgBase, 0),
     colorBgSpotlight: getAlphaColor(colorTextBase, 0.85),

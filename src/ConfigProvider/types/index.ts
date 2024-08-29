@@ -168,6 +168,13 @@ export interface ColorNeutralMapToken {
   colorBgContainer: string
 
   /**
+   * @nameZH 浮层容器背景色
+   * @desc 浮层容器背景色，在暗色模式下该 token 的色值会比 `colorBgContainer` 要亮一些。例如：模态框、弹出框、菜单等。
+   * @descEN Container background color of the popup layer, in dark mode the color value of this token will be a little brighter than `colorBgContainer`. E.g: modal, pop-up, menu, etc.
+   */
+  colorBgElevated: string
+
+  /**
    * @nameZH 二级容器背景色
    * @desc 二级容器背景色，在暗色模式下该 token 的色值会比 `colorBgContainer` 要亮一些。例如：弹出框、菜单等。
    * @descEN Secondary background color of the popup layer, in dark mode the color value of this token will be a little brighter than `colorBgContainer`. E.g: pop-up, menu, etc.
