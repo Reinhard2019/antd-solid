@@ -57,7 +57,11 @@ const ColorPickerInput: Component = () => {
             size="small"
             value={hexInputValue()}
             onChange={e => {
-              const value = setHexInputValue(e.target.value)
+              const value = e.target.value.replace(/[^a-zA-Z0-9]/g, '')
+
+              if (value.length > 6) return
+
+              setHexInputValue(value)
 
               if (value.length !== 6) return
 
@@ -69,7 +73,6 @@ const ColorPickerInput: Component = () => {
             onBlur={() => {
               setHexInputValue(color().toHex())
             }}
-            maxLength={6}
             prefix={() => <span class="text-[--ant-color-text-placeholder]">#</span>}
             rootStyle={{
               '--ant-input-font-size': '12px',
