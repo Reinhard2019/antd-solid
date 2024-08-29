@@ -92,7 +92,7 @@ const Collapse: Component<CollapseProps> = _props => {
           <span
             class={cs(
               'i-ant-design:right-outlined',
-              'mr-[var(--ant-margin-sm)] duration-.3s',
+              'duration-.3s',
               activeKey().includes(item.key) && 'rotate-[90deg]',
             )}
           />
@@ -165,12 +165,12 @@ const Collapse: Component<CollapseProps> = _props => {
                     setActiveKey([...activeKey(), item.key])
                   }}
                 >
-                  <span class="inline-flex items-center">
+                  <span class="inline-flex items-center gap-[--ant-margin-sm]">
                     {getExpandIcon(item, 'start')}
                     {unwrapStringOrJSXElement(item.label)}
                   </span>
 
-                  <span class="inline-flex items-center">
+                  <span class="inline-flex items-center gap-[--ant-margin-sm]">
                     {unwrapStringOrJSXElement(item.extra)}
                     {getExpandIcon(item, 'end')}
                   </span>
