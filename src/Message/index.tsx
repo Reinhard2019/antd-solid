@@ -1,6 +1,46 @@
-import { type JSXElement } from 'solid-js'
+import { type Component, onMount, type JSXElement, type ParentProps } from 'solid-js'
 import { render } from 'solid-js/web'
 import Element from '../Element'
+
+interface MessageProps extends ParentProps {
+  type: 'success' | 'error' | 'warning'
+}
+
+const Message: Component<MessageProps> = props => {
+  let ref: HTMLDivElement | undefined
+
+  onMount(() => {
+    if (!ref) return
+
+    window.requestAnimationFrame(() => {
+      ref.style.opacity = '1'
+      ref.style.transform = ''
+    })
+  })
+
+  return (
+    <Element
+      ref={ref}
+      class="fixed top-16px left-1/2 z-2010 [box-shadow:var(--ant-box-shadow)] p-[--ant-message-content-padding] rounded-[--ant-border-radius-lg] bg-[--ant-color-bg-container] flex gap-[--ant-margin-xs] items-center transition-property-[opacity_transform] transition-duration-500"
+      style={{
+        '--ant-message-content-padding': '9px 12px',
+        opacity: 0,
+        transform: 'translateY(-100%)',
+      }}
+    >
+      {props.type === 'success' && (
+        <span class="i-ant-design:check-circle-filled text-[--ant-color-success] text-18px" />
+      )}
+      {props.type === 'error' && (
+        <span class="i-ant-design:close-circle-filled text-[--ant-color-error] text-18px" />
+      )}
+      {props.type === 'warning' && (
+        <span class="i-ant-design:exclamation-circle-filled text-[--ant-color-warning] text-18px" />
+      )}
+      <div>{props.children}</div>
+    </Element>
+  )
+}
 
 /**
  * message 静态方法工厂
@@ -13,28 +53,7 @@ const createStaticFactory = (type: 'success' | 'error' | 'warning') => {
     const div = document.createElement('div')
     document.body.appendChild(div)
 
-    const dispose = render(
-      () => (
-        <Element
-          class="fixed top-16px left-1/2 z-2010 [box-shadow:var(--ant-box-shadow)] p-[--ant-message-content-padding] rounded-[--ant-border-radius-lg] bg-[--ant-color-bg-container] flex gap-[--ant-margin-xs] items-center"
-          style={{
-            '--ant-message-content-padding': '9px 12px',
-          }}
-        >
-          {type === 'success' && (
-            <span class="i-ant-design:check-circle-filled text-[--ant-color-success] text-18px" />
-          )}
-          {type === 'error' && (
-            <span class="i-ant-design:close-circle-filled text-[--ant-color-error] text-18px" />
-          )}
-          {type === 'warning' && (
-            <span class="i-ant-design:exclamation-circle-filled text-[--ant-color-warning] text-18px" />
-          )}
-          <div>{content}</div>
-        </Element>
-      ),
-      div,
-    )
+    const dispose = render(() => <Message type={type}>{content}</Message>, div)
 
     if (duration > 0) {
       setTimeout(() => {
