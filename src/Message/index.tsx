@@ -2,6 +2,8 @@ import { type JSXElement } from 'solid-js'
 import { render } from 'solid-js/web'
 import Message from './Message'
 import useMessage from './useMessage'
+import Element from '../Element'
+import './index.scss'
 
 /**
  * message 静态方法工厂
@@ -16,15 +18,17 @@ const createStaticFactory = (type: 'success' | 'error' | 'warning') => {
 
     const dispose = render(
       () => (
-        <Message
-          type={type}
-          content={content}
-          duration={duration}
-          onClose={() => {
-            dispose()
-            document.body.removeChild(div)
-          }}
-        />
+        <Element class="fixed top-16px left-0 right-0 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
+          <Message
+            type={type}
+            content={content}
+            duration={duration}
+            onClose={() => {
+              dispose()
+              document.body.removeChild(div)
+            }}
+          />
+        </Element>
       ),
       div,
     )

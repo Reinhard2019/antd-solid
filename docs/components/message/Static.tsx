@@ -2,7 +2,7 @@ import { type Component } from 'solid-js'
 import { Button, message } from 'antd-solid'
 
 const success = () => {
-  message.success('This is a success message')
+  message.success('This is a success message', 0)
 }
 
 const error = () => {
