@@ -118,89 +118,94 @@ const Slider: Component<SliderProps> = _props => {
         padding: 'calc((var(--ant-slider-handle-size) - var(--ant-slider-rail-size)) / 2) 0',
         ...props.style,
       }}
-      onClick={e => {
-        const handleWidth = handleRef?.offsetWidth ?? 0
-        const halfHandleWidth = handleWidth / 2
-        const offsetX = clamp(
-          e.offsetX - halfHandleWidth,
-          0,
-          containerRef!.offsetWidth - handleWidth,
-        )
-        setValue(props.min + (offsetX / (containerRef!.offsetWidth - handleWidth)) * gap())
-      }}
     >
-      {/* 背景轨道 */}
       <div
-        class={cs(
-          '[background:var(--ant-slider-rail-bg)] h-[--ant-slider-rail-size] rounded-[calc(var(--ant-slider-rail-size)/2)]',
-          !props.disabled && 'hover:[background:var(--ant-slider-rail-hover-bg)]',
-        )}
-        style={props.railBgStyle}
-      />
-      {/* track 轨道 */}
-      <div
-        class={cs(
-          'absolute left-0 top-1/2 -translate-y-1/2 h-[--ant-slider-rail-size] rounded-[calc(var(--ant-slider-rail-size)/2)]',
-          props.disabled
-            ? 'bg-[var(--ant-slider-track-bg-disabled)]'
-            : ['bg-[var(--ant-slider-track-bg)] hover:bg-[var(--ant-slider-track-hover-bg)]'],
-        )}
-        style={{
-          width: `${progress() * 100}%`,
+        class={cs(props.disabled && 'pointer-events-none')}
+        onClick={e => {
+          const handleWidth = handleRef?.offsetWidth ?? 0
+          const halfHandleWidth = handleWidth / 2
+          const offsetX = clamp(
+            e.offsetX - halfHandleWidth,
+            0,
+            containerRef!.offsetWidth - handleWidth,
+          )
+          setValue(props.min + (offsetX / (containerRef!.offsetWidth - handleWidth)) * gap())
         }}
-      />
-      {/* handle 轨道 */}
-      <div class="absolute left-[calc(var(--ant-slider-handle-size)/2)] right-[calc(var(--ant-slider-handle-size)/2)] top-1/2 -translate-y-1/2">
-        <Tooltip open={props.tooltip && (isHover() || isFocus() || isDragging())} content={value()}>
-          <div
-            ref={handleRef}
-            class="absolute top-1/2 -translate-1/2 w-[--ant-slider-handle-size] h-[--ant-slider-handle-size]"
-            style={{
-              left: `${progress() * 100}%`,
-            }}
-            onClick={e => {
-              e.stopPropagation()
-            }}
-            onMouseDown={e => {
-              if (props.disabled) return
-
-              const startX = e.clientX
-              const startValue = value()
-              setIsDragging(true)
-
-              const handleWidth = handleRef!.offsetWidth
-
-              const onMouseMove = (_e: MouseEvent) => {
-                const moveX = _e.clientX - startX
-                setValue(startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap())
-              }
-              window.addEventListener('mousemove', onMouseMove)
-
-              const onMouseUp = () => {
-                window.removeEventListener('mousemove', onMouseMove)
-                window.removeEventListener('mouseup', onMouseUp)
-                setIsDragging(false)
-              }
-              window.addEventListener('mouseup', onMouseUp)
-            }}
+      >
+        {/* 背景轨道 */}
+        <div
+          class={cs(
+            '[background:var(--ant-slider-rail-bg)] h-[--ant-slider-rail-size] rounded-[calc(var(--ant-slider-rail-size)/2)]',
+            !props.disabled && 'hover:[background:var(--ant-slider-rail-hover-bg)]',
+          )}
+          style={props.railBgStyle}
+        />
+        {/* track 轨道 */}
+        <div
+          class={cs(
+            'absolute left-0 top-1/2 -translate-y-1/2 h-[--ant-slider-rail-size] rounded-[calc(var(--ant-slider-rail-size)/2)]',
+            props.disabled
+              ? 'bg-[var(--ant-slider-track-bg-disabled)]'
+              : ['bg-[var(--ant-slider-track-bg)] hover:bg-[var(--ant-slider-track-hover-bg)]'],
+          )}
+          style={{
+            width: `${progress() * 100}%`,
+          }}
+        />
+        {/* handle 轨道 */}
+        <div class="absolute left-[calc(var(--ant-slider-handle-size)/2)] right-[calc(var(--ant-slider-handle-size)/2)] top-1/2 -translate-y-1/2">
+          <Tooltip
+            open={props.tooltip && (isHover() || isFocus() || isDragging())}
+            content={value()}
           >
-            <Show when={isNil(resolvedHandle())} fallback={resolvedHandle()}>
-              <div
-                class={cs(
-                  'box-border w-full h-full bg-[--ant-color-bg-container-secondary] rounded-1/2 border-solid border-2px cursor-pointer',
-                  props.disabled
-                    ? 'border-[var(--ant-slider-handle-color-disabled)]'
-                    : [
-                      'border-[var(--ant-slider-handle-color)]',
-                      'hover:border-[var(--ant-slider-handle-active-color)] hover:[outline:4px_solid_var(--ant-control-outline)]',
-                      'focus:border-[var(--ant-slider-handle-active-color)] focus:[outline:4px_solid_var(--ant-control-outline)]',
-                    ],
-                )}
-                tabIndex={props.disabled ? undefined : '0'}
-              />
-            </Show>
-          </div>
-        </Tooltip>
+            <div
+              ref={handleRef}
+              class="absolute top-1/2 -translate-1/2 w-[--ant-slider-handle-size] h-[--ant-slider-handle-size]"
+              style={{
+                left: `${progress() * 100}%`,
+              }}
+              onClick={e => {
+                e.stopPropagation()
+              }}
+              onMouseDown={e => {
+                const startX = e.clientX
+                const startValue = value()
+                setIsDragging(true)
+
+                const handleWidth = handleRef!.offsetWidth
+
+                const onMouseMove = (_e: MouseEvent) => {
+                  const moveX = _e.clientX - startX
+                  setValue(startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap())
+                }
+                window.addEventListener('mousemove', onMouseMove)
+
+                const onMouseUp = () => {
+                  window.removeEventListener('mousemove', onMouseMove)
+                  window.removeEventListener('mouseup', onMouseUp)
+                  setIsDragging(false)
+                }
+                window.addEventListener('mouseup', onMouseUp)
+              }}
+            >
+              <Show when={isNil(resolvedHandle())} fallback={resolvedHandle()}>
+                <div
+                  class={cs(
+                    'box-border w-full h-full bg-[--ant-color-bg-container-secondary] rounded-1/2 border-solid border-2px cursor-pointer',
+                    props.disabled
+                      ? 'border-[var(--ant-slider-handle-color-disabled)]'
+                      : [
+                        'border-[var(--ant-slider-handle-color)]',
+                        'hover:border-[var(--ant-slider-handle-active-color)] hover:[outline:4px_solid_var(--ant-control-outline)]',
+                        'focus:border-[var(--ant-slider-handle-active-color)] focus:[outline:4px_solid_var(--ant-control-outline)]',
+                      ],
+                  )}
+                  tabIndex={props.disabled ? undefined : '0'}
+                />
+              </Show>
+            </div>
+          </Tooltip>
+        </div>
       </div>
     </Element>
   )
