@@ -34,6 +34,10 @@ export interface TransformerProps {
    */
   onRotate?: (value: Pick<TransformValue, 'rotate'>) => void
   /**
+   * 转变结束时触发
+   */
+  onTransformEnd?: () => void
+  /**
    * 吸附功能
    */
   adsorb?: {
@@ -192,6 +196,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const onMouseUp = () => {
       document.body.style.userSelect = originUserSelect
+      props.onTransformEnd?.()
       setAdsorbLine({})
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
@@ -294,7 +299,7 @@ const Transformer: Component<TransformerProps> = _props => {
     const onMouseUp = () => {
       resizing = false
       setResizeDirection(false)
-
+      props.onTransformEnd?.()
       document.body.style.userSelect = originUserSelect
       document.body.style.cursor = originCursor
       window.removeEventListener('mousemove', onMouseMove)
@@ -351,6 +356,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const onMouseUp = () => {
       document.body.style.userSelect = originUserSelect
+      props.onTransformEnd?.()
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('mouseup', onMouseUp)
     }
