@@ -5,6 +5,8 @@ import {
   createMemo,
   type JSXElement,
   mergeProps,
+  Show,
+  type JSX,
 } from 'solid-js'
 import { get, isEmpty, pull } from 'lodash-es'
 import cs from 'classnames'
@@ -86,6 +88,7 @@ export interface TreeProps<T extends {} = TreeNode> extends StyleProps {
    * 默认 24
    */
   indentSize?: number
+  fallback?: JSX.Element
 }
 
 function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
@@ -258,28 +261,30 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
   }
 
   return (
-    <Element class={cs(props.class, 'text-[var(--ant-color-text)]')} style={props.style}>
-      <SingleLevelTree
-        {...props}
-        treeData={props.treeData}
-        indent={0}
-        selectedKeys={selectedKeys}
-        setSelectedKeys={setSelectedKeys}
-        draggableNode={draggableNode}
-        setDraggableNode={setDraggableNode}
-        draggableIndexes={draggableIndexes}
-        setDraggableIndexes={setDraggableIndexes}
-        isDraggable={isDraggable}
-        expandedKeys={expandedKeys}
-        setExpandedKeys={setExpandedKeys}
-        setCheckedKeys={setCheckedKeys}
-        getTitle={getTitle}
-        getKey={getKey}
-        getChildren={getChildren}
-        checkedMap={checkedMap}
-        getNodeByIndexes={indexes => getNodeByIndexes(indexes, props.treeData)}
-      />
-    </Element>
+    <Show when={!isEmpty(props.treeData)} fallback={props.fallback}>
+      <Element class={cs(props.class, 'text-[var(--ant-color-text)]')} style={props.style}>
+        <SingleLevelTree
+          {...props}
+          treeData={props.treeData}
+          indent={0}
+          selectedKeys={selectedKeys}
+          setSelectedKeys={setSelectedKeys}
+          draggableNode={draggableNode}
+          setDraggableNode={setDraggableNode}
+          draggableIndexes={draggableIndexes}
+          setDraggableIndexes={setDraggableIndexes}
+          isDraggable={isDraggable}
+          expandedKeys={expandedKeys}
+          setExpandedKeys={setExpandedKeys}
+          setCheckedKeys={setCheckedKeys}
+          getTitle={getTitle}
+          getKey={getKey}
+          getChildren={getChildren}
+          checkedMap={checkedMap}
+          getNodeByIndexes={indexes => getNodeByIndexes(indexes, props.treeData)}
+        />
+      </Element>
+    </Show>
   )
 }
 
