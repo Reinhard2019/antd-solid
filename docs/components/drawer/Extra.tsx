@@ -1,27 +1,27 @@
-import { type Component } from 'solid-js'
-import { Button, Drawer, type DrawerInstance } from 'antd-solid'
+import { createSignal, type Component } from 'solid-js'
+import { Button, Drawer } from 'antd-solid'
 
 const App: Component = () => {
-  let ref: DrawerInstance
+  const [open, setOpen] = createSignal(false)
+
+  const showDrawer = () => {
+    setOpen(true)
+  }
 
   const onClose = () => {
-    ref!.close()
+    setOpen(false)
   }
 
   return (
     <>
-      <Button
-        type="primary"
-        onClick={() => {
-          ref!.open()
-        }}
-      >
+      <Button type="primary" onClick={showDrawer}>
         Open
       </Button>
       <Drawer
-        ref={ref!}
         title="Basic Modal"
-        extra={
+        open={open()}
+        onClose={onClose}
+        extra={() => (
           <div
             style={{
               display: 'flex',
@@ -33,7 +33,7 @@ const App: Component = () => {
               OK
             </Button>
           </div>
-        }
+        )}
         destroyOnClose
       >
         <p>Some contents...</p>

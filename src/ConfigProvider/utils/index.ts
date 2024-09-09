@@ -215,7 +215,6 @@ export function createCssVariables(
       .toHexShortString(),
     '--ant-slider-track-bg-disabled': aliasToken.colorBgContainerDisabled,
 
-    '--ant-modal-content-bg': mapToken.colorBgContainerTertiary,
     '--ant-modal-title-color': aliasToken.colorTextHeading,
   }
 }

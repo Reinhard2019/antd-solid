@@ -34,6 +34,11 @@ export interface ModalProps {
    */
   centered?: boolean
   /**
+   * 是否展示遮罩
+   * 默认 true
+   */
+  mask?: boolean
+  /**
    * 点击蒙层是否允许关闭
    * 默认 true
    */
@@ -44,11 +49,6 @@ export interface ModalProps {
    */
   closeIcon?: boolean
   footer?: boolean | (() => JSXElement)
-  /**
-   * 是否支持键盘 esc 关闭
-   * 默认 true
-   */
-  keyboard?: boolean
   /**
    * 关闭时销毁 Modal 里的子元素
    * 默认 false
@@ -270,7 +270,7 @@ const Modal: Component<ModalProps> & {
     {
       width: '520px',
       footer: true,
-      keyboard: true,
+      mask: true,
       maskClosable: true,
       closeIcon: true,
       destroyOnClose: false,
@@ -352,21 +352,23 @@ const Modal: Component<ModalProps> & {
                 '--transition-duration': `${transitionDuration}s`,
               }}
             >
-              <div
-                class={cs('ant-modal-mask', 'fixed inset-0 bg-[var(--ant-color-bg-mask)] z-1000')}
-                aria-label="mask"
-                onClick={() => {
-                  if (props.maskClosable) {
-                    props.onCancel?.()
-                  }
-                }}
-              />
+              <Show when={props.mask}>
+                <div
+                  class={cs('ant-modal-mask', 'fixed inset-0 bg-[var(--ant-color-bg-mask)] z-1000')}
+                  aria-label="mask"
+                  onClick={() => {
+                    if (props.maskClosable) {
+                      props.onCancel?.()
+                    }
+                  }}
+                />
+              </Show>
 
               <div class="ant-modal-wrap z-1000 fixed inset-0 overflow-auto pointer-events-none">
                 <div
                   class={cs(
                     'ant-modal',
-                    'px-24px py-20px rounded-8px overflow-hidden bg-[var(--ant-modal-content-bg)] flex flex-col max-w-[calc(100vw-calc(var(--ant-margin)*2))] transform-origin-center pointer-events-initial',
+                    'px-24px py-20px rounded-8px overflow-hidden bg-[--ant-color-bg-container-secondary] flex flex-col max-w-[calc(100vw-calc(var(--ant-margin)*2))] transform-origin-center pointer-events-initial',
                   )}
                   style={{
                     '--translate-y': props.centered ? 'max(calc(50vh - 50%), 0px)' : '100px',

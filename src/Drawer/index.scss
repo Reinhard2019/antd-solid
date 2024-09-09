@@ -24,7 +24,9 @@
 
 .ant-drawer-fade-enter-active,
 .ant-drawer-fade-exit-active {
-  transition: opacity .3s;
+  .ant-drawer-mask {
+    transition: opacity .3s;
+  }
 
   .ant-drawer-content {
     transition: transform .3s;
@@ -33,7 +35,9 @@
 
 .ant-drawer-fade-enter,
 .ant-drawer-fade-exit-to {
-  opacity: 0;
+  .ant-drawer-mask {
+    opacity: 0;
+  }
 
   .ant-drawer-content-right {
     transform: translateX(100%);

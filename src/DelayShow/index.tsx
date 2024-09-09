@@ -9,12 +9,13 @@ import {
   untrack,
   createSignal,
   createRenderEffect,
+  on,
 } from 'solid-js'
 
 export interface DelayShowProps {
   when?: boolean
   /**
-   * 延迟显示的时间
+   * 延迟显示的时间，只在第一次显示时有效
    * 单位 ms
    */
   time?: number
@@ -24,13 +25,22 @@ export interface DelayShowProps {
 const DelayShow: Component<DelayShowProps> = props => {
   // 是否显示过一次
   const [showed, setShowed] = createSignal(untrack(() => props.when ?? false))
-  createRenderEffect(() => {
-    if (typeof props.time === 'number') {
-      setTimeout(() => {
-        setShowed(true)
-      }, props.time)
-    }
-  })
+  createRenderEffect(
+    on(
+      () => props.when,
+      () => {
+        if (!props.when && !showed()) return
+
+        if (typeof props.time === 'number') {
+          setTimeout(() => {
+            setShowed(true)
+          }, props.time)
+        } else {
+          setShowed(true)
+        }
+      },
+    ),
+  )
   return <Show when={showed() || props.when}>{props.children}</Show>
 }
 

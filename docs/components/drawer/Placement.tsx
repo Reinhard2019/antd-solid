@@ -1,9 +1,18 @@
 import { createSignal, type Component } from 'solid-js'
-import { Button, Drawer, Radio, type DrawerInstance, type DrawerProps } from 'antd-solid'
+import { Button, Drawer, Radio, type DrawerProps } from 'antd-solid'
 
 const App: Component = () => {
-  let ref: DrawerInstance | undefined
   const [placement, setPlacement] = createSignal<DrawerProps['placement']>('right')
+
+  const [open, setOpen] = createSignal(false)
+
+  const showDrawer = () => {
+    setOpen(true)
+  }
+
+  const onClose = () => {
+    setOpen(false)
+  }
 
   return (
     <>
@@ -26,12 +35,12 @@ const App: Component = () => {
             { label: 'left', value: 'left' },
           ]}
         />
-        <Button type="primary" onClick={ref?.open}>
+        <Button type="primary" onClick={showDrawer}>
           Open
         </Button>
       </div>
 
-      <Drawer ref={ref!} title="Basic Modal" placement={placement()}>
+      <Drawer title="Basic Modal" open={open()} onClose={onClose} placement={placement()}>
         <p>Some contents...</p>
         <p>Some contents...</p>
         <p>Some contents...</p>
