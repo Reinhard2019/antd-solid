@@ -561,7 +561,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               class={cs(
                 'px-8px py-6px box-content [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-hidden',
                 props.plain
-                  ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-secondary)]'
+                  ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                   : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
               )}
               style={props.contentStyle}
@@ -578,7 +578,7 @@ const Tooltip: Component<TooltipProps> = _props => {
                 class={cs('w-8px h-8px absolute border-solid border-4px border-transparent')}
                 style={{
                   '--color': props.plain
-                    ? 'var(--ant-color-bg-container-secondary)'
+                    ? 'var(--ant-color-bg-container-tertiary)'
                     : 'var(--ant-color-bg-spotlight)',
                   ...ARROW_STYLE_DICT[reversedPlacement()],
                 }}
