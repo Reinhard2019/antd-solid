@@ -1,22 +1,15 @@
-import {
-  type JSXElement,
-  type Component,
-  For,
-  createSelector,
-  createMemo,
-  splitProps,
-  Show,
-} from 'solid-js'
+import { type Component, For, createSelector, createMemo, splitProps, Show } from 'solid-js'
 import cs from 'classnames'
 import { isEmpty, keyBy } from 'lodash-es'
-import { type Key } from '../types'
+import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { toArray } from '../utils/array'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 interface SelectOption {
-  label: JSXElement
+  label: StringOrJSXElement
   value: Key
 }
 
@@ -64,7 +57,7 @@ const Select: Component<SelectProps> = props => {
   return (
     <SelectInput<Key>
       {...selectInputProps}
-      optionLabelRender={v => optionDict()[v]?.label ?? v}
+      optionLabelRender={v => unwrapStringOrJSXElement(optionDict()[v]?.label) ?? v}
       value={valueArr()}
       onChange={v => {
         setValue(props.multiple ? v : v[0])
@@ -76,7 +69,7 @@ const Select: Component<SelectProps> = props => {
               {item => (
                 <div
                   class={cs(
-                    'ellipsis box-content px-12px py-5px h-22px leading-22px hover:bg-[var(--ant-select-option-active-bg)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
+                    'ellipsis box-content px-12px py-5px min-h-22px leading-22px hover:bg-[var(--ant-select-option-active-bg)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
                     selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                   )}
                   onClick={() => {
@@ -93,7 +86,7 @@ const Select: Component<SelectProps> = props => {
                     }
                   }}
                 >
-                  {item.label}
+                  {unwrapStringOrJSXElement(item.label)}
                 </div>
               )}
             </For>
