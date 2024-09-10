@@ -41,8 +41,8 @@ const Switch: Component<SwitchProps> = _props => {
         checked() ? 'bg-[var(--ant-color-primary)]' : 'bg-[rgba(0,0,0,0.45)]',
         props.disabled && 'opacity-[--ant-opacity-loading] cursor-not-allowed',
       )}
+      disabled={props.disabled}
       onClick={() => {
-        if (props.disabled) return
         setChecked(c => !c)
       }}
     >
