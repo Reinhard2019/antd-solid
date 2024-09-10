@@ -40,7 +40,7 @@ const Dropdown: Component<DropdownProps> = _props => {
             {...props.menu}
             style={{
               ...props.menu.style,
-              width: size()?.width ? `${size()?.width}px` : undefined,
+              'min-width': size()?.width ? `${size()?.width}px` : undefined,
             }}
             onClick={info => {
               close()
@@ -59,7 +59,9 @@ const Dropdown: Component<DropdownProps> = _props => {
         ]}
         {...popoverProps}
       >
-        <span ref={ref}>{props.children}</span>
+        <span ref={ref} class="cursor-pointer">
+          {props.children}
+        </span>
       </Popover>
     </Context.Provider>
   )
