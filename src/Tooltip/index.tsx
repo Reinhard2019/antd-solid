@@ -559,7 +559,8 @@ const Tooltip: Component<TooltipProps> = _props => {
           >
             <div
               class={cs(
-                'px-8px py-6px box-content [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-hidden',
+                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)]',
+                'max-w-[calc(100vw-var(--translate-x))] max-h-[calc(100vh-var(--translate-y))] overflow-auto',
                 props.plain
                   ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                   : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
