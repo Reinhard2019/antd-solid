@@ -132,6 +132,12 @@ export function createCssVariables(
     '--ant-font-size-sm': '12px',
     '--ant-font-size': '14px',
     '--ant-font-size-lg': '16px',
+    '--ant-font-size-xl': '20px',
+    '--ant-font-size-heading-1': '38px',
+    '--ant-font-size-heading-2': '30px',
+    '--ant-font-size-heading-3': '24px',
+    '--ant-font-size-heading-4': '20px',
+    '--ant-font-size-heading-5': '16px',
 
     '--ant-line-height': '1.5714285714285714',
     '--ant-line-height-lg': '1.5',

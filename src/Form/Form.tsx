@@ -15,6 +15,7 @@ import cs from 'classnames'
 import Context from './context'
 import { setRef } from '../utils/solid'
 import Element from '../Element'
+import { type StyleProps } from '../types'
 
 export interface FormInstance<T extends {} = {}> {
   validateFields: () => Promise<T>
@@ -23,7 +24,7 @@ export interface FormInstance<T extends {} = {}> {
   removeFieldValue: (name: Parameters<typeof set>[1]) => void
 }
 
-export interface FormProps<T extends {} = {}> {
+export interface FormProps<T extends {} = {}> extends StyleProps {
   ref?: Ref<FormInstance<T>>
   /**
    * 表单布局
@@ -96,9 +97,11 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
     <Element<JSX.FormHTMLAttributes<HTMLFormElement>>
       tag="form"
       class={cs(
+        props.class,
         '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.layout === 'inline' ? 'inline-flex flex-wrap' : '',
       )}
+      style={props.style}
       onSubmit={e => {
         e.preventDefault()
       }}

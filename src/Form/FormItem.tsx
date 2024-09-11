@@ -15,14 +15,12 @@ import cs from 'classnames'
 import { type Schema } from 'yup'
 import { Dynamic } from 'solid-js/web'
 import Context from './context'
-import { type FormInstance } from './Form'
 import Element from '../Element'
 
-export interface FormItemComponentProps<T = any, F extends {} = {}> {
+export interface FormItemComponentProps<T = any> {
   value?: T | undefined
   status?: 'error' | 'warning'
   onChange: (value: T) => void
-  formInstance: FormInstance<F>
 }
 
 export interface FormItemProps {
@@ -97,9 +95,9 @@ const FormItem = (props: FormItemProps) => {
       <Element
         class={cs(
           props.class,
-          'mb-16px',
+          'mb-[--ant-margin-lg]',
           layout() === 'horizontal' && 'flex items-center',
-          layout() === 'inline' && 'inline-flex mr-16px',
+          layout() === 'inline' && 'inline-flex mr-[--ant-margin-lg]',
         )}
         style={props.style}
       >
@@ -123,7 +121,7 @@ const FormItem = (props: FormItemProps) => {
         </div>
 
         <div
-          class="flex flex-col"
+          class="flex flex-col relative"
           style={{
             width: layout() === 'horizontal' ? `calc(100% - ${maxItemWidth() ?? 0}px)` : undefined,
           }}
@@ -146,11 +144,10 @@ const FormItem = (props: FormItemProps) => {
                   })
               })
             }}
-            formInstance={formInstance}
           />
 
           <Show when={errMsg()}>
-            <div class="text-[var(--ant-color-error)]">{errMsg()}</div>
+            <div class="absolute top-[100%] text-[var(--ant-color-error)]">{errMsg()}</div>
           </Show>
         </div>
       </Element>
