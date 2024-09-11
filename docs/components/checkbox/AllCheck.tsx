@@ -3,7 +3,7 @@ import { Checkbox } from 'antd-solid'
 
 const options = ['Apple', 'Pear', 'Orange']
 
-const Index: Component = () => {
+const App: Component = () => {
   const [checkedList, setCheckedList] = createSignal<string[]>([])
 
   return (
@@ -29,4 +29,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App

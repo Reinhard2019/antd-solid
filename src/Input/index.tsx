@@ -107,6 +107,7 @@ export function CommonInput(
   return (
     <Compact
       block
+      class={props.rootClass}
       style={{
         '--ant-input-padding': {
           small: '0 7px',

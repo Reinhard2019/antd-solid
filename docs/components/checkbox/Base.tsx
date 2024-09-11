@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { Checkbox } from 'antd-solid'
 
-const Index: Component = () => {
+const App: Component = () => {
   return (
     <Checkbox
       onChange={e => {
@@ -13,4 +13,4 @@ const Index: Component = () => {
   )
 }
 
-export default Index
+export default App

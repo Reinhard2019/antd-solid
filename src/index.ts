@@ -71,6 +71,8 @@ export type { ElementProps } from './Element'
 export { default as Cursor } from './Cursor'
 export type { CursorProps } from './Cursor'
 export { default as Space } from './Space'
+export { default as CodeInput } from './CodeInput'
+export type { CodeInputProps } from './CodeInput'
 export { default as message } from './Message'
 
 export { default as ConfigProvider } from './ConfigProvider'
