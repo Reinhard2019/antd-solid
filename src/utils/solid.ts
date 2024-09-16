@@ -50,6 +50,10 @@ export function setRef<T>(props: { ref?: Ref<T> }, value: T | null) {
   })
 }
 
+export function unwrapFunction<T>(value: T | (() => T)): T {
+  return typeof value === 'function' ? (value as () => T)() : value
+}
+
 export function isEmptyJSXElement(element: JSXElement): boolean {
   return (
     element === undefined ||
