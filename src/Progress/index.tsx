@@ -62,7 +62,7 @@ const Progress: Component<ProgressProps> & {
       />
 
       <Show when={props.showInfo}>
-        <span class="shrink-0 min-w-40px ml-8px text-center">
+        <span class="shrink-0 ml-8px text-center">
           <Switch fallback={`${props.percent}%`}>
             <Match when={status() === 'success'}>
               <span class="i-ant-design:check-circle-filled text-[var(--ant-color-success)]" />

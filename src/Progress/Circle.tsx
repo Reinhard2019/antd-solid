@@ -91,7 +91,7 @@ const Circle: Component<CircleProps> = _props => {
       </svg>
 
       <Show when={props.showInfo}>
-        <span class="shrink-0 min-w-40px text-center text-1em absolute top-1/2 left-1/2 -translate-1/2">
+        <span class="shrink-0 text-center text-1em absolute top-1/2 left-1/2 -translate-1/2">
           <Switch fallback={`${props.percent}%`}>
             <Match when={status() === 'success'}>
               <span class="i-ant-design:check-outlined text-[var(--ant-color-success)] text-1.1667em" />
