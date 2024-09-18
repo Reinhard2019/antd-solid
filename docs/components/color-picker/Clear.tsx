@@ -1,7 +1,7 @@
 import { type Component } from 'solid-js'
 import { ColorPicker } from 'antd-solid'
 
-const Base: Component = () => {
+const App: Component = () => {
   return (
     <ColorPicker
       defaultValue="#1677ff"
@@ -13,4 +13,4 @@ const Base: Component = () => {
   )
 }
 
-export default Base
+export default App

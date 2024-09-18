@@ -1,5 +1,5 @@
 import cs from 'classnames'
-import { type Component, createRenderEffect, createSignal, Show } from 'solid-js'
+import { type Component, createMemo, createRenderEffect, createSignal, Show } from 'solid-js'
 import Color from './color'
 import Element from '../Element'
 import Popover from '../Popover'
@@ -19,6 +19,10 @@ export interface ColorPickerProps {
   onChange?: (value: string | null) => void
   allowClear?: boolean
   disabled?: boolean
+  /**
+   * 禁止透明度
+   */
+  disabledAlpha?: boolean
 }
 
 const ColorPicker: Component<ColorPickerProps> = props => {
@@ -29,9 +33,12 @@ const ColorPicker: Component<ColorPickerProps> = props => {
   createRenderEffect(() => {
     _setColor(new Color(colorStr()))
   })
+  const disabledAlpha = createMemo(() => !!props.disabledAlpha)
   const setColor = (value: Color) => {
     _setColor(value)
-    props.onChange?.(value.isValid ? value.toHex8String() : null)
+    props.onChange?.(
+      value.isValid ? (disabledAlpha() ? value.toHexString() : value.toHex8String()) : null,
+    )
   }
   const [open, setOpen] = createSignal(false)
 
@@ -40,6 +47,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
       value={{
         color,
         setColor,
+        disabledAlpha,
       }}
     >
       <Show when={props.allowClear}>

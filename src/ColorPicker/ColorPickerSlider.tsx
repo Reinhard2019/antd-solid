@@ -1,4 +1,4 @@
-import { createMemo, useContext, type Component } from 'solid-js'
+import { createMemo, Show, useContext, type Component } from 'solid-js'
 import cs from 'classnames'
 import ColorPickerContext from './context'
 import Slider from '../Slider'
@@ -35,34 +35,36 @@ const ColorPickerSlider: Component = () => {
           }}
         />
 
-        <Slider
-          value={color().a * 100}
-          onChange={v => {
-            context?.setColor(
-              color()
-                .clone()
-                .setAlpha(v / 100),
-            )
-          }}
-          min={0}
-          step={1}
-          tooltip={false}
-          handle={() => getSliderHandle(color().toRgbString())}
-          style={{
-            '--ant-slider-rail-size': '8px',
-            '--ant-slider-handle-size': '10px',
-            '--ant-slider-rail-bg': `linear-gradient(90deg, ${color().clone().setAlpha(0).toRgbString()} 0%, ${color().toHexString()} 100%)`,
-            '--ant-slider-rail-hover-bg': 'var(--ant-slider-rail-bg)',
-            '--ant-slider-track-bg': 'transparent',
-            '--ant-slider-track-hover-bg': 'transparent',
-            'background-image':
-              'conic-gradient(var(--ant-color-fill-secondary) 0 25%, transparent 0 50%, var(--ant-color-fill-secondary) 0 75%, transparent 0)',
-            'background-size': '8px 8px',
-          }}
-          railBgStyle={{
-            'box-shadow': 'inset 0 0 1px 0 var(--ant-color-text-quaternary)',
-          }}
-        />
+        <Show when={!context?.disabledAlpha()}>
+          <Slider
+            value={color().a * 100}
+            onChange={v => {
+              context?.setColor(
+                color()
+                  .clone()
+                  .setAlpha(v / 100),
+              )
+            }}
+            min={0}
+            step={1}
+            tooltip={false}
+            handle={() => getSliderHandle(color().toRgbString())}
+            style={{
+              '--ant-slider-rail-size': '8px',
+              '--ant-slider-handle-size': '10px',
+              '--ant-slider-rail-bg': `linear-gradient(90deg, ${color().clone().setAlpha(0).toRgbString()} 0%, ${color().toHexString()} 100%)`,
+              '--ant-slider-rail-hover-bg': 'var(--ant-slider-rail-bg)',
+              '--ant-slider-track-bg': 'transparent',
+              '--ant-slider-track-hover-bg': 'transparent',
+              'background-image':
+                'conic-gradient(var(--ant-color-fill-secondary) 0 25%, transparent 0 50%, var(--ant-color-fill-secondary) 0 75%, transparent 0)',
+              'background-size': '8px 8px',
+            }}
+            railBgStyle={{
+              'box-shadow': 'inset 0 0 1px 0 var(--ant-color-text-quaternary)',
+            }}
+          />
+        </Show>
       </div>
 
       <div

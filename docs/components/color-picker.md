@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="color-picker/Clear" />
 
+### 禁止透明度
+
+禁止透明度。
+
+<Code path="color-picker/DisabledAlpha" />
+
 ## API
 
 ### InputNumber

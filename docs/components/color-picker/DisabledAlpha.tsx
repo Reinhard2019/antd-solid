@@ -5,6 +5,8 @@ const App: Component = () => {
   return (
     <ColorPicker
       defaultValue="#1677ff"
+      allowClear
+      disabledAlpha
       onChange={value => {
         console.log('onChange', value)
       }}

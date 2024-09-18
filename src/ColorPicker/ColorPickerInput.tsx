@@ -6,6 +6,7 @@ import {
   Switch,
   Match,
   createRenderEffect,
+  Show,
 } from 'solid-js'
 import ColorPickerContext from './context'
 import Select from '../Select'
@@ -80,7 +81,7 @@ const ColorPickerInput: Component = () => {
           />
         </Match>
         <Match when={type() === 'HSV'}>
-          <div class="flex gap-[var(--ant-margin-xxs)]">
+          <div class="flex grow-1 gap-[var(--ant-margin-xxs)]">
             <InputNumber
               size="small"
               value={Math.round(color().toHsv().h)}
@@ -125,7 +126,7 @@ const ColorPickerInput: Component = () => {
           </div>
         </Match>
         <Match when={type() === 'RGB'}>
-          <div class="flex gap-[var(--ant-margin-xxs)]">
+          <div class="flex grow-1 gap-[var(--ant-margin-xxs)]">
             <InputNumber
               size="small"
               value={Math.round(color().r as number)}
@@ -168,25 +169,28 @@ const ColorPickerInput: Component = () => {
           </div>
         </Match>
       </Switch>
-      <InputNumber
-        value={Math.round(color().a * 100)}
-        onChange={value => {
-          context?.setColor(
-            color()
-              .clone()
-              .setAlpha((value ?? 0) / 100),
-          )
-        }}
-        size="small"
-        min={0}
-        max={100}
-        precision={0}
-        formatter={value => `${value || 0}%`}
-        rootStyle={{
-          ...InputNumberStyle,
-          'margin-left': 'var(--ant-margin-xxs)',
-        }}
-      />
+
+      <Show when={!context?.disabledAlpha()}>
+        <InputNumber
+          value={Math.round(color().a * 100)}
+          onChange={value => {
+            context?.setColor(
+              color()
+                .clone()
+                .setAlpha((value ?? 0) / 100),
+            )
+          }}
+          size="small"
+          min={0}
+          max={100}
+          precision={0}
+          formatter={value => `${value || 0}%`}
+          rootStyle={{
+            ...InputNumberStyle,
+            'margin-left': 'var(--ant-margin-xxs)',
+          }}
+        />
+      </Show>
     </div>
   )
 }
@@ -194,6 +198,7 @@ const ColorPickerInput: Component = () => {
 const InputNumberStyle = {
   width: '43px',
   'flex-shrink': 0,
+  'flex-grow': 1,
   '--ant-input-number-handle-width': '16px',
   '--ant-input-padding': '0 0 0 4px',
   '--ant-input-font-size': '12px',
