@@ -1,21 +1,21 @@
-import { type Component, For, createSelector, createMemo, splitProps, Show } from 'solid-js'
+import { For, createSelector, createMemo, splitProps, Show } from 'solid-js'
 import cs from 'classnames'
-import { isEmpty, keyBy } from 'lodash-es'
-import { type StringOrJSXElement, type Key } from '../types'
+import { isEmpty } from 'lodash-es'
+import { type Key, type StringOrJSXElement } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { toArray } from '../utils/array'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 
-interface SelectOption {
+interface SelectOption<T = Key> {
   label: StringOrJSXElement
-  value: Key
+  value: T
 }
 
-export interface SelectProps
+export interface SelectProps<T = Key>
   extends Pick<
-  SelectInputProps<Key>,
+  SelectInputProps<T>,
   | 'multiple'
   | 'allowClear'
   | 'class'
@@ -27,13 +27,13 @@ export interface SelectProps
   | 'variant'
   | 'getPopupContainer'
   > {
-  defaultValue?: Key | Key[] | null
-  value?: Key | Key[] | null
-  onChange?: (value: Key | Key[] | undefined) => void
-  options?: SelectOption[]
+  defaultValue?: T | T[] | null
+  value?: T | T[] | null
+  onChange?: (value: T | T[] | undefined) => void
+  options?: Array<SelectOption<T>>
 }
 
-const Select: Component<SelectProps> = props => {
+function Select<T = Key>(props: SelectProps<T>) {
   const [selectInputProps] = splitProps(props, [
     'multiple',
     'allowClear',
@@ -46,21 +46,21 @@ const Select: Component<SelectProps> = props => {
     'variant',
     'getPopupContainer',
   ])
-  const [value, setValue] = createControllableValue<Key | Key[] | undefined>(props)
-  const valueArr = createMemo(() => toArray(value(), false) as Key[])
-  const selectedValue = createSelector<Map<Key, true>, Key>(
+  const [value, setValue] = createControllableValue<T | T[] | undefined>(props)
+  const valueArr = createMemo(() => toArray(value(), false) as T[])
+  const selectedValue = createSelector<Map<T, true>, T>(
     () => new Map(valueArr().map(v => [v, true])),
     (a, b) => b.has(a),
   )
-  const optionDict = createMemo(() => keyBy(props.options, v => v.value))
+  const optionDict = createMemo(() => new Map(props.options?.map(o => [o.value, o])))
 
   return (
-    <SelectInput<Key>
+    <SelectInput<T>
       {...selectInputProps}
-      optionLabelRender={v => unwrapStringOrJSXElement(optionDict()[v]?.label) ?? v}
+      optionLabelRender={v => unwrapStringOrJSXElement(optionDict().get(v)?.label) ?? (v as string)}
       value={valueArr()}
       onChange={v => {
-        setValue(props.multiple ? v : v[0])
+        setValue(props.multiple ? v : (v[0] as any))
       }}
       content={close => (
         <Show when={!isEmpty(props.options)} fallback={<Empty.PRESENTED_IMAGE_SIMPLE />}>
@@ -74,7 +74,7 @@ const Select: Component<SelectProps> = props => {
                   )}
                   onClick={() => {
                     if (!props.multiple) {
-                      setValue(item.value)
+                      setValue(item.value as any)
                       close()
                       return
                     }
