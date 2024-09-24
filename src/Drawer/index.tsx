@@ -127,7 +127,20 @@ const Drawer: Component<DrawerProps> = _props => {
   const extra = createMemo(() => unwrapStringOrJSXElement(props.extra))
 
   const children = (
-    <Transition name="ant-drawer-fade">
+    <Transition
+      name="ant-drawer-fade"
+      appear
+      onEnter={(el, done) => {
+        el.animate([], {
+          duration: 300,
+        }).finished.finally(done)
+      }}
+      onExit={(el, done) => {
+        el.animate([], {
+          duration: 300,
+        }).finished.finally(done)
+      }}
+    >
       <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
         <Element
           ref={drawerRef}
