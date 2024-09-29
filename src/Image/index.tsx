@@ -3,8 +3,8 @@ import cs from 'classnames'
 import { type StyleProps } from '../types'
 
 export interface ImageProps extends StyleProps {
-  width?: number
-  height?: number
+  width?: string | number
+  height?: string | number
   src?: string
   fallback?: string
 }
