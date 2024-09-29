@@ -1,16 +1,11 @@
-import { For, Show, createMemo, mergeProps, useContext, type Component } from 'solid-js'
-import { isEmpty, omit } from 'lodash-es'
-import cs from 'classnames'
-import { Dynamic } from 'solid-js/web'
+import { createSignal, mergeProps } from 'solid-js'
 import { type StringOrJSXElement, type StyleProps } from '../types'
-import Fragment from '../Fragment'
-import Popover, { type PopoverProps } from '../Popover'
-import DropdownContext from '../Dropdown/context'
 import Element from '../Element'
-import { unwrapStringOrJSXElement } from '../utils/solid'
+import InternalMenu from './InternalMenu'
+import createControllableValue from '../hooks/createControllableValue'
 
-export interface MenuItemType {
-  key: any
+export interface MenuItemType<T = any> {
+  key: T
   label: StringOrJSXElement
   children?: MenuItem[]
 }
@@ -19,13 +14,9 @@ export interface MenuDividerType {
   type: 'divider'
 }
 
-export type MenuItem = MenuItemType | MenuDividerType
+export type MenuItem<T = any> = MenuItemType<T> | MenuDividerType
 
-function isMenuDividerType(value: MenuItem): value is MenuDividerType {
-  return (value as MenuDividerType).type === 'divider'
-}
-
-export interface MenuProps extends StyleProps {
+export interface MenuProps<T = any> extends StyleProps {
   /**
    * 菜单类型
    * 默认 'vertical'
@@ -34,88 +25,42 @@ export interface MenuProps extends StyleProps {
   /**
    * 菜单项
    */
-  items?: MenuItem[]
+  items?: Array<MenuItem<T>>
+  /**
+   * 点击 MenuItem 调用此函数
+   */
+  onClick?: (info: { key: T; keyPath: T[] }) => void
+  /**
+   * 初始展开的 SubMenu 菜单项 key 数组
+   */
+  defaultOpenKeys?: T[]
+  /**
+   * 当前展开的 SubMenu 菜单项 key 数组
+   */
+  openKeys?: T[]
+  /**
+   * SubMenu 展开/关闭的回调
+   */
+  onOpenChange?: (openKeys: T[]) => void
   /**
    * 是否允许选中
    */
   selectable?: boolean
   /**
-   * 点击 MenuItem 调用此函数
+   * 初始选中的菜单项 key 数组
    */
-  onClick?: (info: { key: any; keyPath: any[] }) => void
+  defaultSelectedKeys?: T[]
+  /**
+   * 当前选中的菜单项 key 数组
+   */
+  selectedKeys?: T[]
+  /**
+   * 选中/取消选中的回调
+   */
+  onSelectChange?: (selectedKeys: T[]) => void
 }
 
-interface InternalMenuProps extends MenuProps {
-  parents?: MenuItemType[]
-}
-
-const InternalMenu: Component<InternalMenuProps> = props => {
-  const { inDropdown } = useContext(DropdownContext)
-
-  return (
-    <For each={props.items}>
-      {item => {
-        if (isMenuDividerType(item))
-          return <div class="h-1px bg-[var(--ant-color-split)] my-[var(--ant-margin-xxs)]" />
-
-        const parents = createMemo(() => [...(props.parents ?? []), item])
-        return (
-          <Dynamic<Component<PopoverProps>>
-            component={isEmpty(item.children) ? (Fragment as any) : Popover}
-            trigger="click"
-            placement="rightTop"
-            arrow={false}
-            content={close => (
-              <InternalMenu
-                {...props}
-                items={item.children}
-                parents={parents()}
-                onClick={info => {
-                  close()
-                  props.onClick?.(info)
-                }}
-              />
-            )}
-            contentStyle={{
-              padding: inDropdown ? '4px' : 0,
-            }}
-            offset={[8, 0]}
-          >
-            <div
-              class={cs(
-                'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
-                'hover:bg-[var(--ant-color-bg-text-hover)]',
-                inDropdown ? 'leading-32px' : 'leading-40px m-4px',
-                isEmpty(item.children)
-                  ? [
-                    'px-[var(--ant-padding)]',
-                    props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
-                  ]
-                  : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
-              )}
-              onClick={() => {
-                if (isEmpty(item.children)) {
-                  props.onClick?.({
-                    key: item.key,
-                    keyPath: parents().map(v => v.key),
-                  })
-                }
-              }}
-            >
-              {unwrapStringOrJSXElement(item.label)}
-
-              <Show when={!isEmpty(item.children)}>
-                <span class="i-ant-design:right-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
-              </Show>
-            </div>
-          </Dynamic>
-        )
-      }}
-    </For>
-  )
-}
-
-const Menu: Component<MenuProps> = _props => {
+function Menu<T = any>(_props: MenuProps<T>) {
   const props = mergeProps(
     {
       mode: 'vertical',
@@ -124,9 +69,23 @@ const Menu: Component<MenuProps> = _props => {
     _props,
   )
 
+  const [openKeys, setOpenKeys] = createControllableValue(props, {
+    defaultValuePropName: 'defaultOpenKeys',
+    valuePropName: 'openKeys',
+    trigger: 'onOpenChange',
+  })
+
+  const [hoverKeys, setHoverKeys] = createSignal<T[]>([])
+
   return (
     <Element class={props.class} style={props.style}>
-      <InternalMenu {...omit(props, ['parents'])} />
+      <InternalMenu
+        {...props}
+        openKeys={openKeys()}
+        onOpenChange={setOpenKeys}
+        hoverKeys={hoverKeys()}
+        onHoverChange={setHoverKeys}
+      />
     </Element>
   )
 }
