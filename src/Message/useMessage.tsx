@@ -1,6 +1,5 @@
-import { createSignal, For, Show } from 'solid-js'
+import { createSignal, For } from 'solid-js'
 import { Portal } from 'solid-js/web'
-import { isEmpty } from 'lodash-es'
 import { TransitionGroup } from 'solid-transition-group'
 import Message, { type MessageProps } from './Message'
 import Element from '../Element'
@@ -10,28 +9,32 @@ function useMessage() {
   const messageApi = {
     open: (config: Omit<MessageProps, 'onClose'>) => {
       setMsgConfigList(prev => [...prev, config])
+
+      const destroy = () => {
+        setMsgConfigList(prev => prev.filter(item => item !== config))
+      }
+
+      return destroy
     },
   }
 
   const getContextHolder = () => (
-    <Show when={!isEmpty(msgConfigList())}>
-      <Portal>
-        <Element class="fixed top-16px left-1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
-          <TransitionGroup name="ant-message-fade" appear>
-            <For each={msgConfigList()}>
-              {config => (
-                <Message
-                  {...config}
-                  onClose={() => {
-                    setMsgConfigList(prev => prev.filter(item => item !== config))
-                  }}
-                />
-              )}
-            </For>
-          </TransitionGroup>
-        </Element>
-      </Portal>
-    </Show>
+    <Portal>
+      <Element class="fixed top-16px left-1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
+        <TransitionGroup name="ant-message-fade" appear>
+          <For each={msgConfigList()}>
+            {config => (
+              <Message
+                {...config}
+                onClose={() => {
+                  setMsgConfigList(prev => prev.filter(item => item !== config))
+                }}
+              />
+            )}
+          </For>
+        </TransitionGroup>
+      </Element>
+    </Portal>
   )
 
   return [messageApi, getContextHolder] as const

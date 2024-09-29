@@ -1,7 +1,5 @@
-.ant-message-fade-enter-active,
-.ant-message-fade-exit-active {
-  transition-property: opacity transform;
-  transition-duration: 500ms;
+.ant-message-fade {
+  transition: all .5s;
 }
 
 .ant-message-fade-enter,
