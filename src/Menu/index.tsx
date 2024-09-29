@@ -8,6 +8,7 @@ export interface MenuItemType<T = any> {
   key: T
   label: StringOrJSXElement
   children?: MenuItem[]
+  onClick?: (info: { key: T; keyPath: T[] }) => void
 }
 
 export interface MenuDividerType {

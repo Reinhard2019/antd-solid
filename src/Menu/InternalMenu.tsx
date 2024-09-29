@@ -64,10 +64,13 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
               options?.onClick?.()
 
               if (!hasChildren()) {
-                props.onClick?.({
+                const info = {
                   key: item.key,
                   keyPath: keyPath(),
-                })
+                }
+
+                item.onClick?.(info)
+                props.onClick?.(info)
               }
             }}
             style={{
@@ -161,14 +164,7 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                   })}
 
                   <Show when={expanded()}>
-                    <InternalMenu
-                      {...props}
-                      items={item.children}
-                      parentKeys={keyPath()}
-                      onClick={info => {
-                        props.onClick?.(info)
-                      }}
-                    />
+                    <InternalMenu {...props} items={item.children} parentKeys={keyPath()} />
                   </Show>
                 </div>
               </Match>
