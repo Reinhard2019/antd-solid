@@ -1,4 +1,4 @@
-import { createSignal, mergeProps } from 'solid-js'
+import { createMemo, createSignal, mergeProps } from 'solid-js'
 import { type StringOrJSXElement, type StyleProps } from '../types'
 import Element from '../Element'
 import InternalMenu from './InternalMenu'
@@ -19,9 +19,9 @@ export type MenuItem<T = any> = MenuItemType<T> | MenuDividerType
 export interface MenuProps<T = any> extends StyleProps {
   /**
    * 菜单类型
-   * 默认 'vertical'
+   * 默认 'vertical' | 'inline'
    */
-  mode?: 'vertical'
+  mode?: 'vertical' | 'inline'
   /**
    * 菜单项
    */
@@ -33,15 +33,15 @@ export interface MenuProps<T = any> extends StyleProps {
   /**
    * 初始展开的 SubMenu 菜单项 key 数组
    */
-  defaultOpenKeys?: T[]
+  defaultExpandedKeys?: T[]
   /**
    * 当前展开的 SubMenu 菜单项 key 数组
    */
-  openKeys?: T[]
+  expandedKeys?: T[]
   /**
    * SubMenu 展开/关闭的回调
    */
-  onOpenChange?: (openKeys: T[]) => void
+  onExpandedKeysChange?: (expandedKeys: T[]) => void
   /**
    * 是否允许选中
    */
@@ -69,22 +69,23 @@ function Menu<T = any>(_props: MenuProps<T>) {
     _props,
   )
 
-  const [openKeys, setOpenKeys] = createControllableValue(props, {
-    defaultValuePropName: 'defaultOpenKeys',
-    valuePropName: 'openKeys',
-    trigger: 'onOpenChange',
+  const [_expandedKeys, setExpandedKeys] = createControllableValue<T[] | undefined>(props, {
+    defaultValuePropName: 'defaultExpandedKeys',
+    valuePropName: 'expandedKeys',
+    trigger: 'onExpandedKeysChange',
   })
+  const expandedKeys = createMemo(() => _expandedKeys() ?? [])
 
-  const [hoverKeys, setHoverKeys] = createSignal<T[]>([])
+  const [hoverKeyPath, setHoverKeyPathChange] = createSignal<T[]>([])
 
   return (
     <Element class={props.class} style={props.style}>
       <InternalMenu
         {...props}
-        openKeys={openKeys()}
-        onOpenChange={setOpenKeys}
-        hoverKeys={hoverKeys()}
-        onHoverChange={setHoverKeys}
+        expandedKeys={expandedKeys()}
+        onExpandedKeysChange={setExpandedKeys}
+        hoverKeyPath={hoverKeyPath()}
+        onHoverKeyPathChange={setHoverKeyPathChange}
       />
     </Element>
   )

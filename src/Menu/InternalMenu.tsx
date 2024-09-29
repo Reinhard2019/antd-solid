@@ -1,9 +1,7 @@
-import { For, Show, createMemo, useContext, type Component } from 'solid-js'
+import { For, type JSXElement, Match, Show, Switch, createMemo, useContext } from 'solid-js'
 import { isEmpty, last } from 'lodash-es'
 import cs from 'classnames'
-import { Dynamic } from 'solid-js/web'
-import Fragment from '../Fragment'
-import Popover, { type PopoverProps } from '../Popover'
+import Popover from '../Popover'
 import DropdownContext from '../Dropdown/context'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import { type MenuItem, type MenuDividerType, type MenuProps } from '.'
@@ -13,17 +11,26 @@ function isMenuDividerType(value: MenuItem): value is MenuDividerType {
 }
 
 interface InternalMenuProps<T = any>
-  extends Pick<MenuProps<T>, 'items' | 'selectable' | 'onClick'> {
+  extends Pick<MenuProps<T>, 'mode' | 'items' | 'selectable' | 'onClick'> {
   /**
    * 当前展开的 SubMenu 菜单项 key 数组
    */
-  openKeys: T[]
+  expandedKeys: T[]
   /**
    * SubMenu 展开/关闭的回调
    */
-  onOpenChange: (openKeys: T[]) => void
-  hoverKeys: T[]
-  onHoverChange: (hoverKeys: T[]) => void
+  onExpandedKeysChange: (expandedKeys: T[]) => void
+  /**
+   * 当前 hover 的 key 的路径
+   */
+  hoverKeyPath: T[]
+  /**
+   * hoverKeyPath 变化的回调
+   */
+  onHoverKeyPathChange: (hoverKeyPath: T[]) => void
+  /**
+   * 父级 keys
+   */
   parentKeys?: T[]
 }
 
@@ -37,79 +44,136 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
           return <div class="h-1px bg-[var(--ant-color-split)] my-[var(--ant-margin-xxs)]" />
 
         const keyPath = createMemo(() => [...(props.parentKeys ?? []), item.key])
-        const open = createMemo(() => props.openKeys?.includes(item.key))
+        const expanded = createMemo(() => props.expandedKeys?.includes(item.key))
+        const hasChildren = createMemo(() => !isEmpty(item.children))
+
+        const getLabel = (options?: { onClick?: () => void; expandIcon?: JSXElement }) => (
+          <div
+            class={cs(
+              'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
+              'hover:bg-[var(--ant-color-bg-text-hover)]',
+              inDropdown ? 'leading-32px' : 'leading-40px m-4px',
+              !hasChildren()
+                ? [
+                  'px-[var(--ant-padding)]',
+                  props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
+                ]
+                : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
+            )}
+            onClick={() => {
+              options?.onClick?.()
+
+              if (!hasChildren()) {
+                props.onClick?.({
+                  key: item.key,
+                  keyPath: keyPath(),
+                })
+              }
+            }}
+            style={{
+              'padding-left':
+                props.mode === 'inline'
+                  ? `calc(${keyPath().length} * var(--ant-padding))`
+                  : undefined,
+            }}
+          >
+            {unwrapStringOrJSXElement(item.label)}
+
+            <Show when={hasChildren()}>{options?.expandIcon}</Show>
+          </div>
+        )
 
         return (
-          <Dynamic<Component<PopoverProps>>
-            component={isEmpty(item.children) ? (Fragment as any) : Popover}
-            trigger="hover"
-            open={open()}
-            onOpenChange={value => {
-              if (value) {
-                props.onOpenChange(keyPath())
-                return
-              }
+          <Show when={hasChildren()} fallback={getLabel()}>
+            <Switch>
+              <Match when={props.mode === 'vertical'}>
+                <Popover
+                  trigger="hover"
+                  open={expanded()}
+                  onOpenChange={value => {
+                    if (value) {
+                      props.onExpandedKeysChange(keyPath())
+                      return
+                    }
 
-              const lastKey = last(props.openKeys)
-              if (item.key === lastKey) {
-                props.onOpenChange(props.hoverKeys)
-              }
-            }}
-            placement="rightTop"
-            arrow={false}
-            content={() => (
-              <div
-                onMouseEnter={() => {
-                  props.onHoverChange(keyPath())
-                }}
-                onMouseLeave={() => {
-                  props.onHoverChange([])
-                }}
-              >
-                <InternalMenu
-                  {...props}
-                  items={item.children}
-                  parentKeys={keyPath()}
-                  onClick={info => {
-                    props.onOpenChange([])
-                    props.onClick?.(info)
+                    const lastKey = last(props.expandedKeys)
+                    if (item.key === lastKey) {
+                      props.onExpandedKeysChange(props.hoverKeyPath)
+                    }
                   }}
-                />
-              </div>
-            )}
-            contentStyle={{
-              padding: inDropdown ? '4px' : 0,
-            }}
-            offset={[8, 0]}
-          >
-            <div
-              class={cs(
-                'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
-                'hover:bg-[var(--ant-color-bg-text-hover)]',
-                inDropdown ? 'leading-32px' : 'leading-40px m-4px',
-                isEmpty(item.children)
-                  ? [
-                    'px-[var(--ant-padding)]',
-                    props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
-                  ]
-                  : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
-              )}
-              onClick={() => {
-                if (isEmpty(item.children)) {
-                  props.onClick?.({
-                    key: item.key,
-                    keyPath: keyPath(),
-                  })
-                }
-              }}
-            >
-              {unwrapStringOrJSXElement(item.label)}
+                  placement="rightTop"
+                  arrow={false}
+                  content={() => (
+                    <div
+                      onMouseEnter={() => {
+                        props.onHoverKeyPathChange(keyPath())
+                      }}
+                      onMouseLeave={() => {
+                        props.onHoverKeyPathChange([])
+                      }}
+                    >
+                      <InternalMenu
+                        {...props}
+                        items={item.children}
+                        parentKeys={keyPath()}
+                        onClick={info => {
+                          props.onExpandedKeysChange([])
+                          props.onClick?.(info)
+                        }}
+                      />
+                    </div>
+                  )}
+                  contentStyle={{
+                    padding: inDropdown ? '4px' : 0,
+                  }}
+                  offset={[8, 0]}
+                >
+                  {getLabel({
+                    expandIcon: (
+                      <span class="i-ant-design:right-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
+                    ),
+                  })}
+                </Popover>
+              </Match>
 
-              <Show when={!isEmpty(item.children)}>
-                <span class="i-ant-design:right-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
-              </Show>
-            </div>
-          </Dynamic>
+              <Match when={props.mode === 'inline'}>
+                <div>
+                  {getLabel({
+                    onClick() {
+                      if (hasChildren()) {
+                        if (expanded()) {
+                          props.onExpandedKeysChange(props.expandedKeys.filter(k => k !== item.key))
+                        } else {
+                          props.onExpandedKeysChange([...props.expandedKeys, item.key])
+                        }
+                      }
+                    },
+                    expandIcon: (
+                      <Show
+                        when={expanded()}
+                        fallback={
+                          <span class="i-ant-design:down-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
+                        }
+                      >
+                        <span class="i-ant-design:up-outlined w-0.7em absolute top-1/2 right-[var(--ant-padding)] translate-y--1/2" />
+                      </Show>
+                    ),
+                  })}
+
+                  <Show when={expanded()}>
+                    <InternalMenu
+                      {...props}
+                      items={item.children}
+                      parentKeys={keyPath()}
+                      onClick={info => {
+                        props.onClick?.(info)
+                      }}
+                    />
+                  </Show>
+                </div>
+              </Match>
+            </Switch>
+          </Show>
         )
       }}
     </For>

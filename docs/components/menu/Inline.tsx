@@ -55,7 +55,7 @@ const items: MenuItem[] = [
 ]
 
 const App: Component = () => {
-  return <Menu mode="vertical" items={items} style={{ width: '256px' }} onClick={console.log} />
+  return <Menu mode="inline" items={items} style={{ width: '256px' }} onClick={console.log} />
 }
 
 export default App
