@@ -41,6 +41,7 @@ const Dropdown: Component<DropdownProps> = _props => {
             style={{
               ...props.menu.style,
               'min-width': size()?.width ? `${size()?.width}px` : undefined,
+              padding: '4px',
             }}
             onClick={info => {
               close()
@@ -48,7 +49,7 @@ const Dropdown: Component<DropdownProps> = _props => {
             }}
           />
         )}
-        contentStyle={{ padding: '4px' }}
+        contentStyle={{ padding: 0 }}
         offset={[
           0,
           props.placement === 'top' ||
