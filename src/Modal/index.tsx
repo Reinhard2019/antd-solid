@@ -4,15 +4,12 @@ import {
   createSignal,
   mergeProps,
   type Component,
-  type Accessor,
-  createContext,
-  useContext,
   createEffect,
   onCleanup,
   on,
   createRenderEffect,
 } from 'solid-js'
-import { Dynamic, Portal, render } from 'solid-js/web'
+import { Dynamic, Portal } from 'solid-js/web'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
 import Button from '../Button'
@@ -21,6 +18,10 @@ import DelayShow from '../DelayShow'
 import './index.scss'
 import createTransition from '../hooks/createTransition'
 import Element from '../Element'
+import useModal from './useModal'
+import createModal from './createModal'
+import useModalProps from './useModalProps'
+import warning from './warning'
 
 export interface ModalProps {
   title?: JSXElement
@@ -69,192 +70,6 @@ export interface ModalProps {
    * Modal 打开动画结束事件
    */
   onAfterEnter?: () => void
-}
-
-export interface MethodProps extends Pick<ModalProps, 'title' | 'children' | 'onOk' | 'onCancel'> {}
-
-const ModalContext = createContext({
-  open: (() => false) as Accessor<boolean>,
-  // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-  onOk: (() => {}) as (value: void | PromiseLike<void>) => Promise<unknown> | void,
-  onCancel: () => {},
-})
-
-function warning(props: MethodProps) {
-  const div = document.createElement('div')
-  document.body.appendChild(div)
-  const dispose = render(
-    () => (
-      <Modal
-        width="416px"
-        maskClosable={false}
-        closeIcon={false}
-        {...props}
-        title={
-          <div class="flex items-center gap-12px">
-            <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
-            {props.title}
-          </div>
-        }
-        children={<div class="ml-34px">{props.children}</div>}
-        defaultOpen
-        onOk={() => {
-          document.body.removeChild(div)
-          dispose()
-          props.onOk?.()
-        }}
-        onCancel={() => {
-          document.body.removeChild(div)
-          dispose()
-          props.onCancel?.()
-        }}
-      />
-    ),
-    div,
-  )
-}
-
-function useModalProps<T = void>() {
-  const { open, onOk, onCancel } = useContext(ModalContext)
-  return {
-    open,
-    // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-    onOk: onOk as (value: T | PromiseLike<T>) => Promise<unknown> | void,
-    onCancel,
-    getProps: () => {
-      return {
-        open: open(),
-        onOk,
-        onCancel,
-      }
-    },
-  }
-}
-
-/**
- * createModal
- * @param component
- * @param contextHolder 如果为 true，则会返回 getContextHolder
- */
-function createModal<P extends {} = {}, T = void>(
-  component: Component<P>,
-): {
-  show: (props?: P) => Promise<T>
-}
-function createModal<P extends {} = {}, T = void>(
-  component: Component<P>,
-  contextHolder: true,
-): {
-  show: (props?: P) => Promise<T>
-  getContextHolder: () => JSXElement
-}
-function createModal<P extends {} = {}, T = void>(
-  component: Component<P>,
-  contextHolder?: true,
-):
-  | {
-    show: (props?: P) => Promise<T>
-  }
-  | {
-    show: (props?: P) => Promise<T>
-    getContextHolder: () => JSXElement
-  } {
-  const [open, setOpen] = createSignal(false)
-  const [props, setProps] = createSignal<P>({} as P)
-  let resolve: (value: T | PromiseLike<T>) => void
-  let reject: (reason?: any) => void
-  let dispose: (() => void) | undefined
-
-  const hide = () => {
-    setOpen(false)
-    dispose?.()
-  }
-  const onOk = (value?: T | PromiseLike<T>) => {
-    hide()
-    resolve(value!)
-  }
-  const onCancel = () => {
-    hide()
-    // eslint-disable-next-line prefer-promise-reject-errors
-    reject()
-  }
-  const getContextHolder = () => (
-    <ModalContext.Provider
-      value={{
-        open,
-        // eslint-disable-next-line @typescript-eslint/no-invalid-void-type
-        onOk: onOk as (value: void | PromiseLike<void>) => Promise<unknown> | void,
-        onCancel,
-      }}
-    >
-      <Dynamic component={component} {...props()!} />
-    </ModalContext.Provider>
-  )
-
-  if (contextHolder) {
-    return {
-      async show(_props?: P) {
-        setProps((_props as any) ?? {})
-        setOpen(true)
-        return await new Promise<T>((_resolve, _reject) => {
-          resolve = _resolve
-          reject = _reject
-        })
-      },
-      getContextHolder,
-    }
-  }
-
-  return {
-    async show(_props?: P) {
-      if (_props) setProps(_props as any)
-      setOpen(true)
-      return await new Promise<T>((_resolve, _reject) => {
-        const div = document.createElement('div')
-        document.body.appendChild(div)
-        dispose = render(getContextHolder, div)
-
-        resolve = _resolve
-        reject = _reject
-      })
-    },
-  }
-}
-
-function useModal() {
-  const [open, setOpen] = createSignal(false)
-  const [modalProps, setModalProps] = createSignal<ModalProps>({})
-  const modal = {
-    warning: (props: ModalProps) => {
-      setModalProps(props)
-      setOpen(true)
-    },
-  }
-  const getContextHolder = () => (
-    <Modal
-      width="416px"
-      maskClosable={false}
-      closeIcon={false}
-      {...modalProps()}
-      title={
-        <div class="flex items-center gap-12px">
-          <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
-          {modalProps().title}
-        </div>
-      }
-      children={<div class="ml-34px">{modalProps().children}</div>}
-      open={open()}
-      onOk={() => {
-        setOpen(false)
-        modalProps().onOk?.()
-      }}
-      onCancel={() => {
-        setOpen(false)
-        modalProps().onCancel?.()
-      }}
-    />
-  )
-  return [modal, getContextHolder] as const
 }
 
 // 单位 s
