@@ -12,7 +12,7 @@ import {
 import { Dynamic, Portal } from 'solid-js/web'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
-import Button from '../Button'
+import Button, { type ButtonProps } from '../Button'
 import createControllableValue from '../hooks/createControllableValue'
 import DelayShow from '../DelayShow'
 import './index.scss'
@@ -60,6 +60,14 @@ export interface ModalProps {
    * 默认 true
    */
   closeOnEsc?: boolean
+  /**
+   * ok 按钮 props
+   */
+  okButtonProps?: Partial<ButtonProps>
+  /**
+   * cancel 按钮 props
+   */
+  cancelButtonProps?: Partial<ButtonProps>
   /**
    * 返回 true，会自动关闭 modal
    */
@@ -227,16 +235,17 @@ const Modal: Component<ModalProps> & {
                             onClick={() => {
                               props.onCancel?.()
                             }}
-                          >
-                            取消
-                          </Button>
+                            children="取消"
+                            {...props.cancelButtonProps}
+                          />
                           <Button
                             type="primary"
+                            loading="auto"
                             // eslint-disable-next-line solid/reactivity
                             onClick={async () => await props.onOk?.()}
-                          >
-                            确定
-                          </Button>
+                            children="确定"
+                            {...props.okButtonProps}
+                          />
                         </div>
                       </Show>
                     </div>
