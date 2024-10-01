@@ -56,9 +56,13 @@ export interface MenuProps<T = any> extends StyleProps {
    */
   selectedKeys?: T[]
   /**
-   * 选中/取消选中的回调
+   * 被选中时调用
    */
-  onSelectChange?: (selectedKeys: T[]) => void
+  onSelect?: (info: { key: T; keyPath: T[]; selectedKeys: T[] }) => void
+  /**
+   * 取消选中时调用，仅在 multiple 生效
+   */
+  onDeselect?: (info: { key: T; keyPath: T[]; selectedKeys: T[] }) => void
 }
 
 function Menu<T = any>(_props: MenuProps<T>) {
@@ -69,6 +73,13 @@ function Menu<T = any>(_props: MenuProps<T>) {
     } as const,
     _props,
   )
+
+  const [_selectedKeys, setSelectedKeys] = createControllableValue<T[] | undefined>(props, {
+    defaultValuePropName: 'defaultSelectedKeys',
+    valuePropName: 'selectedKeys',
+    trigger: null,
+  })
+  const selectedKeys = createMemo(() => _selectedKeys() ?? [])
 
   const [_expandedKeys, setExpandedKeys] = createControllableValue<T[] | undefined>(props, {
     defaultValuePropName: 'defaultExpandedKeys',
@@ -89,6 +100,15 @@ function Menu<T = any>(_props: MenuProps<T>) {
     >
       <InternalMenu
         {...props}
+        selectedKeys={selectedKeys()}
+        onSelect={info => {
+          props.onSelect?.(info)
+          setSelectedKeys(info.selectedKeys)
+        }}
+        onDeselect={info => {
+          props.onDeselect?.(info)
+          setSelectedKeys(info.selectedKeys)
+        }}
         expandedKeys={expandedKeys()}
         onExpandedKeysChange={setExpandedKeys}
         hoverKeyPath={hoverKeyPath()}

@@ -12,7 +12,14 @@ function isMenuDividerType(value: MenuItem): value is MenuDividerType {
 }
 
 interface InternalMenuProps<T = any>
-  extends Pick<MenuProps<T>, 'mode' | 'items' | 'selectable' | 'onClick'> {
+  extends Pick<
+  MenuProps<T>,
+  'mode' | 'items' | 'selectable' | 'onClick' | 'onSelect' | 'onDeselect'
+  > {
+  /**
+   * 当前选中的菜单项 key 数组
+   */
+  selectedKeys: T[]
   /**
    * 当前展开的 SubMenu 菜单项 key 数组
    */
@@ -51,9 +58,11 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
         const getLabel = (options?: { onClick?: () => void; expandIcon?: JSXElement }) => (
           <div
             class={cs(
-              'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer flex items-center',
-              'hover:bg-[var(--ant-color-bg-text-hover)]',
+              'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center',
               inDropdown ? 'min-h-32px' : 'min-h-40px m-[--ant-menu-item-margin]',
+              props.selectedKeys.includes(item.key)
+                ? 'bg-[--ant-control-item-bg-active] text-[--ant-color-primary]'
+                : 'text-[--ant-color-text] hover:bg-[var(--ant-color-bg-text-hover)]',
               !hasChildren()
                 ? [
                   'px-[var(--ant-padding)]',
@@ -72,6 +81,13 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
 
                 item.onClick?.(info)
                 props.onClick?.(info)
+
+                if (props.selectable) {
+                  props.onSelect?.({
+                    ...info,
+                    selectedKeys: [item.key],
+                  })
+                }
               }
             }}
             style={{
