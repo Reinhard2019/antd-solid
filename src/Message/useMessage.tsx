@@ -4,10 +4,14 @@ import { TransitionGroup } from 'solid-transition-group'
 import Message, { type MessageProps } from './Message'
 import Element from '../Element'
 
+export interface MessageApi {
+  open: (config: Omit<MessageProps, 'onClose'>) => () => void
+}
+
 function useMessage() {
   const [msgConfigList, setMsgConfigList] = createSignal<Array<Omit<MessageProps, 'onClose'>>>([])
-  const messageApi = {
-    open: (config: Omit<MessageProps, 'onClose'>) => {
+  const messageApi: MessageApi = {
+    open: config => {
       setMsgConfigList(prev => [...prev, config])
 
       const destroy = () => {

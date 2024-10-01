@@ -88,4 +88,6 @@ const message = {
   useMessage,
 } as const
 
+export type { MessageApi } from './useMessage'
+
 export default message
