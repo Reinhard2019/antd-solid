@@ -1,8 +1,8 @@
 import { type Component } from 'solid-js'
 import cs from 'classnames'
-import { type StyleProps } from '../types'
+import { type RootStyleProps, type StyleProps } from '../types'
 
-export interface ImageProps extends StyleProps {
+export interface ImageProps extends RootStyleProps, StyleProps {
   width?: string | number
   height?: string | number
   src?: string
@@ -11,7 +11,14 @@ export interface ImageProps extends StyleProps {
 
 const Image: Component<ImageProps> = props => {
   return (
-    <div class={cs('inline-block')}>
+    <div
+      class={cs(props.rootClass, 'inline-block')}
+      style={{
+        width: typeof props.width === 'string' ? props.width : undefined,
+        height: typeof props.height === 'string' ? props.height : undefined,
+        ...props.rootStyle,
+      }}
+    >
       <img
         {...props}
         src={props.src ? props.src : props.fallback}
