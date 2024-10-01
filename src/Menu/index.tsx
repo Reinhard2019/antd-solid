@@ -80,7 +80,13 @@ function Menu<T = any>(_props: MenuProps<T>) {
   const [hoverKeyPath, setHoverKeyPathChange] = createSignal<T[]>([])
 
   return (
-    <Element class={props.class} style={props.style}>
+    <Element
+      class={props.class}
+      style={{
+        '--ant-menu-item-margin': 'var(--ant-margin-xxs)',
+        ...props.style,
+      }}
+    >
       <InternalMenu
         {...props}
         expandedKeys={expandedKeys()}

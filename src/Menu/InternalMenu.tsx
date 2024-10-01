@@ -5,6 +5,7 @@ import Popover from '../Popover'
 import DropdownContext from '../Dropdown/context'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import { type MenuItem, type MenuDividerType, type MenuProps } from '.'
+import DelayShow from '../DelayShow'
 
 function isMenuDividerType(value: MenuItem): value is MenuDividerType {
   return (value as MenuDividerType).type === 'divider'
@@ -50,9 +51,9 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
         const getLabel = (options?: { onClick?: () => void; expandIcon?: JSXElement }) => (
           <div
             class={cs(
-              'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer',
+              'relative rounded-[var(--ant-border-radius-lg)] text-[var(--ant-color-text)] cursor-pointer flex items-center',
               'hover:bg-[var(--ant-color-bg-text-hover)]',
-              inDropdown ? 'leading-32px' : 'leading-40px m-4px',
+              inDropdown ? 'min-h-32px' : 'min-h-40px m-[--ant-menu-item-margin]',
               !hasChildren()
                 ? [
                   'px-[var(--ant-padding)]',
@@ -163,9 +164,11 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                     ),
                   })}
 
-                  <Show when={expanded()}>
-                    <InternalMenu {...props} items={item.children} parentKeys={keyPath()} />
-                  </Show>
+                  <DelayShow when={expanded()}>
+                    <div style={{ display: expanded() ? 'block' : 'none' }}>
+                      <InternalMenu {...props} items={item.children} parentKeys={keyPath()} />
+                    </div>
+                  </DelayShow>
                 </div>
               </Match>
             </Switch>
