@@ -17,11 +17,12 @@ import {
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import Segmented from '../Segmented'
-import { type StringOrJSXElement } from '../types'
+import { type StyleProps, type StringOrJSXElement, type ComponentSize } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import DelayShow from '../DelayShow'
 import Element from '../Element'
 import createControllableValue from '../hooks/createControllableValue'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface TabItem {
   key: string
@@ -29,7 +30,7 @@ export interface TabItem {
   children?: StringOrJSXElement
 }
 
-export interface TabsProps {
+export interface TabsProps extends StyleProps {
   /**
    * 默认 'line'
    */
@@ -39,8 +40,11 @@ export interface TabsProps {
    * 对于 'segment' 类型不生效
    */
   placement?: 'top' | 'bottom' | 'left' | 'right'
-  class?: string
-  style?: JSX.CSSProperties
+  /**
+   * 大小，提供 large middle 和 small 三种大小
+   * 默认 'middle'
+   */
+  size?: ComponentSize
   navClass?: string
   navItemClass?: string
   contentClass?: string
@@ -75,6 +79,7 @@ const Tabs: Component<TabsProps> = _props => {
     _props,
   )
 
+  const size = useComponentSize(() => props.size)
   const [activeKey, setActiveKey] = createControllableValue<string>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
@@ -135,22 +140,31 @@ const Tabs: Component<TabsProps> = _props => {
         props.placement === 'bottom' && 'flex-col-reverse',
         props.placement === 'right' && 'flex-row-reverse',
       )}
-      style={props.style}
+      style={{
+        // nav 和 content 之间的间隔
+        '--ant-tabs-gap': 'var(--ant-margin)',
+        ...props.style,
+      }}
     >
       <div
         class={cs(
           'shrink-0 flex items-center gap-16px',
           props.navClass,
           props.type === 'segment'
-            ? 'mb-16px'
+            ? 'mb-[--ant-tabs-gap]'
             : [
               'border-solid border-[var(--ant-color-border-secondary)] border-0',
-              props.placement === 'top' && '!border-b-1px mb-16px',
-              props.placement === 'bottom' && '!border-t-1px mt-16px',
-              props.placement === 'left' && '!border-r-1px mr-16px',
-              props.placement === 'right' && '!border-l-1px ml-16px',
+              props.placement === 'top' && '!border-b-1px mb-[--ant-tabs-gap]',
+              props.placement === 'bottom' && '!border-t-1px mt-[--ant-tabs-gap]',
+              props.placement === 'left' && '!border-r-1px mr-[--ant-tabs-gap]',
+              props.placement === 'right' && '!border-l-1px ml-[--ant-tabs-gap]',
               (props.placement === 'left' || props.placement === 'right') && 'flex-col',
             ],
+          {
+            small: '[font-size:var(--ant-font-size)]',
+            middle: '[font-size:var(--ant-font-size)]',
+            large: '[font-size:var(--ant-font-size-lg)]',
+          }[size()],
         )}
       >
         <Show when={resolvedAddonBefore()}>
@@ -176,7 +190,12 @@ const Tabs: Component<TabsProps> = _props => {
                       'hover:text-[var(--ant-color-primary)]',
                       props.navItemClass,
                       isSelectedItem(item.key) && 'text-[var(--ant-color-primary)]',
-                      (props.placement === 'top' || props.placement === 'bottom') && 'py-12px',
+                      (props.placement === 'top' || props.placement === 'bottom') &&
+                        {
+                          small: 'py-[--ant-padding-xs]',
+                          middle: 'py-[--ant-padding-sm]',
+                          large: 'py-[--ant-padding]',
+                        }[size()],
                       (props.placement === 'left' || props.placement === 'right') &&
                         'px-24px py-8px',
                     )}
@@ -210,6 +229,7 @@ const Tabs: Component<TabsProps> = _props => {
             <Segmented
               class="grow"
               block
+              size={size()}
               disabled={props.disabled}
               value={activeKey()}
               onChange={key => {
@@ -233,7 +253,12 @@ const Tabs: Component<TabsProps> = _props => {
                 {item => (
                   <div
                     class={cs(
-                      'px-16px py-8px cursor-pointer border-solid border-[var(--ant-color-border-secondary)] border-1px relative',
+                      {
+                        small: 'py-6px',
+                        middle: 'py-8px',
+                        large: 'py-8px',
+                      }[size()],
+                      'px-16px cursor-pointer border-solid border-[var(--ant-color-border-secondary)] border-1px relative',
                       'hover:text-[var(--ant-color-primary)]',
                       props.placement === 'top' &&
                         'rounded-t-[var(--ant-border-radius-lg)] !border-b-0px',

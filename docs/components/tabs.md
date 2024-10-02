@@ -38,6 +38,12 @@ outline: deep
 
 <Code path="tabs/Addon" />
 
+### 大小
+
+大号页签用在页头区域，小号用在弹出框等较狭窄的容器内。
+
+<Code path="tabs/Size" />
+
 ## API
 
 ### Tabs
