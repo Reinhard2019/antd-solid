@@ -1,11 +1,12 @@
-import { type Component, For, createSelector, type JSX, Show } from 'solid-js'
+import { type Component, For, createSelector, Show } from 'solid-js'
 import cs from 'classnames'
-import { type StringOrJSXElement, type Key } from '../types'
+import { type StringOrJSXElement, type Key, type ComponentSize, type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
+import useComponentSize from '../hooks/useComponentSize'
 
-export interface SegmentedProps {
+export interface SegmentedProps extends StyleProps {
   block?: boolean
   disabled?: boolean
   options: Array<
@@ -25,8 +26,11 @@ export interface SegmentedProps {
   >
   value?: Key
   onChange?: (value: Key) => void
-  class?: string
-  style?: JSX.CSSProperties
+  /**
+   * 大小，提供 large middle 和 small 三种大小
+   * 默认 'middle'
+   */
+  size?: ComponentSize
 }
 
 const unWarpValue = (value: SegmentedProps['options'][0]) =>
@@ -37,6 +41,7 @@ const Segmented: Component<SegmentedProps> = props => {
     defaultValue: unWarpValue(props.options[0]),
   })
   const isSelected = createSelector(value)
+  const size = useComponentSize(() => props.size)
 
   const isDisabledValue = (v: SegmentedProps['options'][0]) => {
     if (props.disabled) return true
@@ -46,9 +51,14 @@ const Segmented: Component<SegmentedProps> = props => {
   return (
     <Element
       class={cs(
-        'bg-[var(--ant-color-bg-layout)] rounded-[var(--ant-border-radius)] p-2px [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+        'bg-[var(--ant-color-bg-layout)] rounded-[var(--ant-border-radius)] p-2px text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
         props.block ? 'flex' : 'inline-flex',
         props.class,
+        {
+          small: '[font-size:var(--ant-font-size)]',
+          middle: '[font-size:var(--ant-font-size)]',
+          large: '[font-size:var(--ant-font-size-lg)]',
+        }[size()],
       )}
       style={props.style}
     >
@@ -62,13 +72,19 @@ const Segmented: Component<SegmentedProps> = props => {
           >
             <div
               class={cs(
-                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] cursor-pointer leading-28px',
-                isSelected(unWarpValue(item))
-                  ? 'bg-[var(--ant-segmented-item-selected-bg)] shadow-[var(--ant-box-shadow-tertiary)] text-[var(--ant-segmented-item-selected-color)]'
-                  : 'text-[var(--ant-segmented-item-color)] hover:text-[var(--ant-segmented-item-hover-color)] hover:bg-[var(--ant-segmented-item-hover-bg)] active:bg-[var(--ant-segmented-item-active-bg)]',
+                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] cursor-pointer',
+                isSelected(unWarpValue(item)) && 'bg-[var(--ant-segmented-item-selected-bg)]',
+                isDisabledValue(item)
+                  ? '[pointer-events:none] text-[var(--ant-color-text-disabled)]'
+                  : isSelected(unWarpValue(item))
+                    ? 'shadow-[var(--ant-box-shadow-tertiary)] text-[var(--ant-segmented-item-selected-color)]'
+                    : 'text-[var(--ant-segmented-item-color)] hover:text-[var(--ant-segmented-item-hover-color)] hover:bg-[var(--ant-segmented-item-hover-bg)] active:bg-[var(--ant-segmented-item-active-bg)]',
                 props.block && 'flex justify-center',
-                isDisabledValue(item) &&
-                  '[pointer-events:none] text-[var(--ant-color-text-disabled)]',
+                {
+                  small: 'leading-20px',
+                  middle: 'leading-28px',
+                  large: 'leading-36px',
+                }[size()],
               )}
               onClick={e => {
                 setValue(unWarpValue(item))

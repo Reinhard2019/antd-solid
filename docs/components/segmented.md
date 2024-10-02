@@ -26,6 +26,12 @@ Segmented 不可用。
 
 <Code path="segmented/Disabled" />
 
+### 三种大小
+
+我们为 `<Segmented />` 组件定义了三种尺寸（大、默认、小），高度分别为 `40px`、`32px` 和 `24px`。
+
+<Code path="segmented/Size" />
+
 ## API
 
 ### Segmented

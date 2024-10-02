@@ -13,3 +13,5 @@ export interface RootStyleProps {
   rootClass?: string
   rootStyle?: JSX.CSSProperties
 }
+
+export type ComponentSize = 'small' | 'middle' | 'large'
