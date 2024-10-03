@@ -6,8 +6,8 @@ const Index: Component = () => {
     message.success('Click on Yes')
   }
   const cancel = () => {
-    message.error('Click on No');
-  };
+    message.error('Click on No')
+  }
 
   return (
     <Popconfirm
