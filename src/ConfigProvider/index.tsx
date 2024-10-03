@@ -3,6 +3,8 @@ import ConfigProviderContext from './context'
 import { type SeedToken } from './types'
 import { createCssVariables, getCssVariablesClass } from './utils'
 import { darkSeedToken, lightSeedToken } from './seed'
+import { type Locale } from '../locale'
+import zh_CN from '../locale/zh_CN'
 
 interface ConfigProviderProps extends ParentProps {
   /**
@@ -16,6 +18,7 @@ interface ConfigProviderProps extends ParentProps {
    * 默认 'middle'
    */
   componentSize?: 'small' | 'middle' | 'large'
+  locale?: Locale
 }
 
 function useConfig() {
@@ -37,6 +40,7 @@ const ConfigProvider: Component<ConfigProviderProps> & {
     ...props.token,
   }))
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
+  const locale = createMemo(() => props.locale ?? zh_CN)
 
   return (
     <ConfigProviderContext.Provider
@@ -45,6 +49,7 @@ const ConfigProvider: Component<ConfigProviderProps> & {
         cssVariablesClass: getCssVariablesClass(),
         cssVariables,
         componentSize: () => props.componentSize,
+        locale,
       }}
     >
       {props.children}

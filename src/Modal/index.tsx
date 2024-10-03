@@ -22,6 +22,7 @@ import useModal from './useModal'
 import createModal from './createModal'
 import useModalProps from './useModalProps'
 import warning from './warning'
+import useLocale from '../hooks/useLocale'
 
 export interface ModalProps {
   title?: JSXElement
@@ -78,6 +79,11 @@ export interface ModalProps {
    * Modal 打开动画结束事件
    */
   onAfterEnter?: () => void
+}
+
+export interface ModalLocale {
+  okText: string
+  cancelText: string
 }
 
 // 单位 s
@@ -146,6 +152,8 @@ const Modal: Component<ModalProps> & {
 
   let modalRootRef: HTMLDivElement | undefined
   createTransition(() => modalRootRef, open, 'ant-modal-fade')
+
+  const locale = useLocale()
 
   return (
     <DelayShow when={open()}>
@@ -235,7 +243,7 @@ const Modal: Component<ModalProps> & {
                             onClick={() => {
                               props.onCancel?.()
                             }}
-                            children="取消"
+                            children={locale().Modal?.cancelText}
                             {...props.cancelButtonProps}
                           />
                           <Button
@@ -243,7 +251,7 @@ const Modal: Component<ModalProps> & {
                             loading="auto"
                             // eslint-disable-next-line solid/reactivity
                             onClick={async () => await props.onOk?.()}
-                            children="确定"
+                            children={locale().Modal?.okText}
                             {...props.okButtonProps}
                           />
                         </div>
