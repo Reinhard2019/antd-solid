@@ -90,3 +90,6 @@ export { default as useVirtualList } from './hooks/useVirtualList'
 export { default as useCounter } from './hooks/useCounter'
 
 export type { ComponentSize } from './types'
+
+export { default as enUS } from './locale/en_US'
+export { default as zhCN } from './locale/zh_CN'
