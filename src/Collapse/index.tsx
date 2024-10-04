@@ -2,6 +2,7 @@ import {
   type Accessor,
   type Component,
   createMemo,
+  createSelector,
   For,
   type JSX,
   mergeProps,
@@ -54,9 +55,9 @@ export interface CollapseProps extends StyleProps {
   expandIcon?: false | ((options: { isActive: Accessor<boolean> }) => JSX.Element)
   /**
    * 设置图标位置
-   * 默认 'start'
+   * 默认 'left'
    */
-  expandIconPosition?: 'start' | 'end'
+  expandIconPosition?: 'left' | 'right' | 'end'
 }
 
 const Collapse: Component<CollapseProps> = _props => {
@@ -64,7 +65,7 @@ const Collapse: Component<CollapseProps> = _props => {
   const props = mergeProps(
     {
       bordered: true,
-      expandIconPosition: 'start',
+      expandIconPosition: 'left',
     } as const,
     _props,
   )
@@ -76,8 +77,11 @@ const Collapse: Component<CollapseProps> = _props => {
     defaultValue: [],
   })
 
-  const getExpandIcon = (item: CollapseItem, position: 'start' | 'end') => {
-    const isActive = createMemo(() => activeKey().includes(item.key))
+  const isActive = createSelector<Key[], Key>(activeKey, (a, b) => b.includes(a))
+  const getExpandIcon = (
+    item: CollapseItem,
+    position: Required<CollapseProps>['expandIconPosition'],
+  ) => {
     return (
       <Show
         when={
@@ -87,13 +91,13 @@ const Collapse: Component<CollapseProps> = _props => {
         }
       >
         {typeof props.expandIcon === 'function' ? (
-          props.expandIcon({ isActive })
+          props.expandIcon({ isActive: () => isActive(item.key) })
         ) : (
           <span
             class={cs(
               'i-ant-design:right-outlined',
               'duration-.3s',
-              activeKey().includes(item.key) && 'rotate-[90deg]',
+              isActive(item.key) && 'rotate-[90deg]',
             )}
           />
         )}
@@ -166,8 +170,9 @@ const Collapse: Component<CollapseProps> = _props => {
                   }}
                 >
                   <span class="inline-flex items-center gap-[--ant-margin-sm]">
-                    {getExpandIcon(item, 'start')}
+                    {getExpandIcon(item, 'left')}
                     {unwrapStringOrJSXElement(item.label)}
+                    {getExpandIcon(item, 'right')}
                   </span>
 
                   <span class="inline-flex items-center gap-[--ant-margin-sm]">
