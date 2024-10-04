@@ -17,3 +17,7 @@
 body {
   font-size: 14px;
 }
+
+.demos-page > :not(.VPContent) {
+  display: none;
+}
