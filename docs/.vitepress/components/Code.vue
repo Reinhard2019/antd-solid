@@ -52,12 +52,12 @@ let code = ref('')
 let app = ref<HTMLDivElement>()
 
 // @ts-ignore
-const codeModules = import.meta.glob('../../examples/*/**.tsx', { as: 'raw' })
+const codeModules = import.meta.glob('../../demos/*/**.tsx', { as: 'raw' })
 
 const { isDark, localeIndex } = useData()
 
 onMounted(() => {
-  codeModules[`../../examples/${props.path}.tsx`]().then(value => {
+  codeModules[`../../demos/${props.path}.tsx`]().then(value => {
     codeHtml.value = Prism.highlight(value, Prism.languages.typescript, 'typescript')
     code.value = value
 
@@ -66,8 +66,8 @@ onMounted(() => {
     // @ts-ignore
     if (import.meta.env.MODE !== 'production') {
       // @ts-ignore
-      const modules = import.meta.glob('../../examples/*/**.tsx')
-      modules[`../../examples/${props.path}.tsx`]().then(module => {
+      const modules = import.meta.glob('../../demos/*/**.tsx')
+      modules[`../../demos/${props.path}.tsx`]().then(module => {
         const App = module.default
         import('solid-js/web').then(({ render, createComponent }) => {
           render(() => createComponent(ConfigProvider, {
