@@ -15,7 +15,7 @@ import {
   createRenderEffect,
   useContext,
 } from 'solid-js'
-import { Portal } from 'solid-js/web'
+import { Dynamic, Portal } from 'solid-js/web'
 import cs from 'classnames'
 import { nanoid } from 'nanoid'
 import createControllableValue from '../hooks/createControllableValue'
@@ -87,6 +87,10 @@ export interface TooltipProps {
    * 默认 true
    */
   autoAdjustOverflow?: boolean
+  /**
+   * 关闭时销毁 Tooltip 里的子元素
+   */
+  destroyOnClose?: boolean
 }
 
 /**
@@ -541,7 +545,7 @@ const Tooltip: Component<TooltipProps> = _props => {
     <TooltipContext.Provider value={context}>
       {resolvedChildren()}
 
-      <DelayShow when={open()}>
+      <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
         <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <Element
@@ -587,7 +591,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             </Show>
           </Element>
         </Portal>
-      </DelayShow>
+      </Dynamic>
     </TooltipContext.Provider>
   )
 }
