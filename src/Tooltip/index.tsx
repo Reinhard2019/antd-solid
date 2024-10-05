@@ -473,6 +473,22 @@ const Tooltip: Component<TooltipProps> = _props => {
 
     contentRef.style.setProperty('--translate-x', `${translateX}px`)
     contentRef.style.setProperty('--translate-y', `${translateY}px`)
+
+    // placement 为 top 和 bottom 时，tooltip 超出可视区域时对 content 进行偏移矫正
+    if (props.placement === 'top' || props.placement === 'bottom') {
+      let innerTranslateX = 0
+      const maxInnerTranslateX = contentRef.clientWidth / 2 - 20
+      if (translateX < 0) {
+        innerTranslateX = Math.min(-translateX, maxInnerTranslateX)
+      }
+      if (translateX + contentRef.clientWidth > window.innerWidth) {
+        innerTranslateX = Math.max(
+          window.innerWidth - (translateX + contentRef.clientWidth),
+          -maxInnerTranslateX,
+        )
+      }
+      contentRef.style.setProperty('--inner-translate-x', `${innerTranslateX}px`)
+    }
   }
   createEffect(
     on(open, () => {
@@ -563,13 +579,19 @@ const Tooltip: Component<TooltipProps> = _props => {
           >
             <div
               class={cs(
-                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)]',
-                'max-w-[calc(100vw-var(--translate-x))] max-h-[calc(100vh-var(--translate-y))] overflow-auto',
+                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto',
+                props.placement === 'top' || props.placement === 'bottom'
+                  ? 'max-w-100vw'
+                  : 'max-w-[calc(100vw-var(--translate-x))]',
+                'max-h-[calc(100vh-var(--translate-y))]',
                 props.plain
                   ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                   : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
               )}
-              style={props.contentStyle}
+              style={{
+                transform: 'translateX(var(--inner-translate-x))',
+                ...props.contentStyle,
+              }}
             >
               {(() => {
                 const resolvedContent = unwrapContent(props.content, () => setOpen(false))
