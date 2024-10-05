@@ -91,6 +91,11 @@ export interface TooltipProps {
    * 关闭时销毁 Tooltip 里的子元素
    */
   destroyOnClose?: boolean
+  /**
+   * 是否在 trigger 为 hover 的时候，悬浮在 popover 时保持 popover 显示
+   * 默认为 true
+   */
+  keepAliveOnHover?: boolean
 }
 
 /**
@@ -221,6 +226,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       mouseLeaveDelay: 0.1,
       plain: false,
       autoAdjustOverflow: true,
+      keepAliveOnHover: true,
     } as const,
     _props,
   )
@@ -259,13 +265,16 @@ const Tooltip: Component<TooltipProps> = _props => {
   const childrenHovering = useHover(() =>
     toArray(props.trigger).includes('hover') ? (resolvedChildren() as HTMLElement) : undefined,
   )
+  const hovering = createMemo(() =>
+    props.keepAliveOnHover ? childrenHovering() || contentHovering() : childrenHovering(),
+  )
   createEffect(() => {
     if (toArray(props.trigger).includes('hover')) {
-      if (contentHovering() || childrenHovering()) {
+      if (hovering()) {
         show()
       } else {
         setTimeout(() => {
-          if (!contentHovering() && !childrenHovering()) {
+          if (!hovering()) {
             hide()
           }
         }, props.mouseLeaveDelay * 1000)
