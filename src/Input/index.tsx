@@ -3,11 +3,12 @@ import { Show, createMemo, onMount, splitProps } from 'solid-js'
 import type { JSX, Component } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
-import Compact from '../Compact'
 import { setRef, unwrapStringOrJSXElement } from '../utils/solid'
 import { type RootStyleProps, type StringOrJSXElement } from '../types'
+import Element from '../Element'
 import TextArea from './TextArea'
 import useComponentSize from '../hooks/useComponentSize'
+import './index.scss'
 
 type CommonInputProps = JSX.CustomAttributes<HTMLInputElement> &
 RootStyleProps & {
@@ -104,9 +105,9 @@ export function CommonInput(
   const actions = createMemo(() => unwrapStringOrJSXElement(props.actions))
 
   return (
-    <Compact
+    <Element
       block
-      class={props.rootClass}
+      class={cs(props.rootClass, 'flex', 'ant-input-group', 'p[.ant-compact>]:not-first:ml--1px')}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -118,6 +119,11 @@ export function CommonInput(
           middle: 'var(--ant-font-size)',
           large: 'var(--ant-font-size-lg)',
         }[size()],
+        '--ant-input-border-radius': {
+          small: 'var(--ant-border-radius-sm)',
+          middle: 'var(--ant-border-radius)',
+          large: 'var(--ant-border-radius-lg)',
+        }[size()],
         ...props.rootStyle,
       }}
     >
@@ -125,8 +131,7 @@ export function CommonInput(
         <div
           class={cs(
             'ant-input-addon',
-            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0 rounded-l-6px',
-            Compact.compactItemClass,
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0',
           )}
         >
           {addonBefore()}
@@ -135,21 +140,16 @@ export function CommonInput(
 
       <div
         class={cs(
+          'ant-input-affix-wrapper',
           'flex items-center w-full relative p:hover-child[input]:border-[var(--ant-color-primary)]',
           ['[--actions-display:none]', !inputProps.disabled && 'hover:[--actions-display:block]'],
           'p-[--ant-input-padding]',
-          {
-            small: 'rounded-[var(--ant-border-radius-sm)]',
-            middle: 'rounded-[var(--ant-border-radius)]',
-            large: 'rounded-[var(--ant-border-radius-lg)]',
-          }[size()],
           {
             small: 'h-24px',
             middle: 'h-32px',
             large: 'h-40px',
           }[size()],
           statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
-          Compact.compactItemClass,
         )}
       >
         <Show when={!isNil(prefix())}>
@@ -220,14 +220,13 @@ export function CommonInput(
         <div
           class={cs(
             'ant-input-addon',
-            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0 rounded-r-6px',
-            Compact.compactItemClass,
+            'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0',
           )}
         >
           {addonAfter()}
         </div>
       </Show>
-    </Compact>
+    </Element>
   )
 }
 

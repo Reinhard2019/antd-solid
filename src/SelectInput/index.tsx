@@ -8,11 +8,10 @@ import {
   mergeProps,
 } from 'solid-js'
 import cs from 'classnames'
-import { compact, pick } from 'lodash-es'
+import { compact, isUndefined, pick } from 'lodash-es'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
-import Compact from '../Compact'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 
@@ -41,6 +40,7 @@ export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContain
    * 默认 'outlined'
    */
   variant?: 'outlined' | 'borderless' | 'filled'
+  suffixIcon?: JSXElement
 }
 
 function SelectInput<T>(_props: SelectInputProps<T>) {
@@ -98,7 +98,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
       class={cs(
         '!p[.ant-input-addon]:my--1px !p[.ant-input-addon]:mx--12px',
         'rounded-6px cursor-pointer inline-block text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-        Compact.compactItemClass,
+        'ant-compact-item',
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
@@ -227,17 +227,19 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
 
           <div
             class={cs(
-              'shrink-0 flex justify-end items-center p-[--ant-select-input-addon-after-padding]',
+              'shrink-0 flex justify-end items-center p-[--ant-select-input-addon-after-padding] empty:hidden',
             )}
           >
             <Show
               when={showClearBtn()}
               fallback={
-                <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
+                <Show when={isUndefined(props.suffixIcon)} fallback={props.suffixIcon}>
+                  <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
+                </Show>
               }
             >
               <span
-                class="i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)] active:text-[var(--ant-color-text)]"
+                class="right-[--ant-select-input-padding-right] i-ant-design:close-circle-filled cursor-pointer text-[var(--ant-color-text-quaternary)] hover:text-[var(--ant-color-text-tertiary)] active:text-[var(--ant-color-text)]"
                 onClick={e => {
                   e.stopPropagation()
                   setValue([])

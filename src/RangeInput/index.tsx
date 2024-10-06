@@ -13,7 +13,6 @@ import { compact, isNil } from 'lodash-es'
 import Tooltip from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
-import Compact from '../Compact'
 import Element from '../Element'
 
 export interface RangeInputProps<T> {
@@ -153,7 +152,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     <Element
       class={cs(
         'rounded-6px',
-        Compact.compactItemClass,
+        'ant-compact-item',
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}

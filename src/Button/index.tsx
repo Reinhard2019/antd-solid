@@ -43,9 +43,9 @@ export interface ButtonProps
 }
 
 const sizeClassMap = {
-  large: 'px-15px py-7px h-40px leading-24px rounded-[var(--ant-border-radius-lg)]',
-  middle: 'px-15px py-4px h-32px leading-22px rounded-[var(--ant-border-radius)]',
-  small: 'px-7px h-24px leading-22px rounded-[var(--ant-border-radius-sm)]',
+  large: 'px-15px py-7px h-40px leading-24px',
+  middle: 'px-15px py-4px h-32px leading-22px',
+  small: 'px-7px h-24px leading-22px',
 } as const
 
 // 有边框按钮的 disabled 样式
@@ -118,7 +118,7 @@ const Button: Component<ButtonProps> = _props => {
       ref={props.ref}
       class={cs(
         `ant-btn ant-btn-${props.type}`,
-        'relative cursor-pointer [font-size:var(--ant-font-size)]',
+        'relative cursor-pointer [font-size:var(--ant-font-size)] rounded-[--ant-button-border-radius]',
         'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
         props.block && 'block w-full',
         props.class,
@@ -128,6 +128,11 @@ const Button: Component<ButtonProps> = _props => {
         loading() && 'opacity-65',
       )}
       style={{
+        '--ant-button-border-radius': {
+          small: 'var(--ant-border-radius-sm)',
+          middle: 'var(--ant-border-radius)',
+          large: 'var(--ant-border-radius-lg)',
+        }[size()],
         ...props.style,
       }}
       disabled={props.disabled}

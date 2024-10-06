@@ -1,61 +1,71 @@
 .ant-compact-horizontal {
   .ant-btn {
     border-radius: 0;
-
-    &:first-child {
-      border-top-left-radius: 6px;
-      border-bottom-left-radius: 6px;
-    }
-
-    &:last-child {
-      border-top-right-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-
-    &:hover {
-      z-index: 1;
-    }
-  }
-  .ant-btn + .ant-btn {
-    margin-left: -1px;
   }
 
-  .ant-btn-primary:not(:first-child) {
-    border-left: 1px solid white;
+  & > :first-child {
+    &.ant-btn,
+    & .ant-btn {
+      border-top-left-radius: var(--ant-button-border-radius);
+      border-bottom-left-radius: var(--ant-button-border-radius);
+    }
   }
-  .ant-btn-primary:not(:last-child) {
-    border-right: 1px solid white;
+
+  & > :last-child {
+    &.ant-btn,
+    & .ant-btn {
+      border-top-right-radius: var(--ant-button-border-radius);
+      border-bottom-right-radius: var(--ant-button-border-radius);
+    }
+  }
+
+  & > :not(:first-child) {
+    &.ant-btn-primary,
+    & .ant-btn-primary {
+      border-left: 1px solid white;
+    }
+  }
+
+  & > :not(:last-child) {
+    &.ant-btn-primary,
+    & .ant-btn-primary {
+      border-right: 1px solid white;
+    }
   }
 }
 
 .ant-compact-vertical {
-  flex-direction: column;
-
   .ant-btn {
     border-radius: 0;
-
-    &:first-child {
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-    }
-
-    &:last-child {
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
-    }
-
-    &:hover {
-      z-index: 1;
-    }
-  }
-  .ant-btn + .ant-btn {
-    margin-top: -1px;
   }
 
-  .ant-btn-primary:not(:first-child) {
-    border-top: 1px solid white;
+  & > :first-child {
+    &.ant-btn,
+    & .ant-btn {
+      border-top-left-radius: var(--ant-button-border-radius);
+      border-top-right-radius: var(--ant-button-border-radius);
+    }
   }
-  .ant-btn-primary:not(:last-child) {
-    border-bottom: 1px solid white;
+
+  & > :last-child {
+    &.ant-btn,
+    & .ant-btn {
+      border-bottom-left-radius: var(--ant-button-border-radius);
+      border-bottom-right-radius: var(--ant-button-border-radius);
+    }
+  }
+
+  & > :not(:first-child) {
+    &.ant-btn-primary,
+    & .ant-btn-primary {
+      border-top: 1px solid white;
+    }
+  }
+
+  & > :not(:last-child) {
+    &.ant-btn-primary,
+    & .ant-btn-primary {
+      border-bottom: 1px solid white;
+    }
   }
 }

@@ -1,5 +1,5 @@
 import { type Component } from 'solid-js'
-import { Button, Compact, Input, InputNumber } from 'antd-solid'
+import { Button, Compact, Input, InputNumber, Select } from 'antd-solid'
 
 const Index: Component = () => {
   return (
@@ -37,6 +37,23 @@ const Index: Component = () => {
       <Compact>
         <Input rootStyle={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
         <Input rootStyle={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
+      </Compact>
+      <Compact>
+        <Select
+          defaultValue="Zhejiang"
+          allowClear
+          options={[
+            {
+              label: 'Zhejiang',
+              value: 'Zhejiang',
+            },
+            {
+              label: 'Jiangsu',
+              value: 'Jiangsu',
+            },
+          ]}
+        />
+        <Input rootStyle={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" />
       </Compact>
     </div>
   )

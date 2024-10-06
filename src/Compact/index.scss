@@ -1,0 +1,39 @@
+.ant-compact {
+  &:not(.ant-compact-vertical) {
+    & > *:not(:first-child) {
+      margin-left: -1px;
+    }
+  }
+
+  &.ant-compact-vertical {
+    flex-direction: column;
+
+    & > *:not(:first-child) {
+      margin-top: -1px;
+    }
+  }
+}
+
+.ant-compact {
+  :hover,
+  :focus,
+  :focus-within {
+    z-index: 10;
+  }
+
+  & > :not(:first-child) {
+    &.ant-compact-item,
+    & .ant-compact-item {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+
+  & > :not(:last-child) {
+    &.ant-compact-item,
+    & .ant-compact-item {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
