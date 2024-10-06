@@ -1,8 +1,8 @@
-import { type JSXElement, For, Show, type Accessor, useContext, createMemo } from 'solid-js'
+import { type JSXElement, For, Show, type Accessor } from 'solid-js'
 import cs from 'classnames'
 import Empty from '../Empty'
 import Element from '../Element'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface TableColumn<R extends {}> {
   title: JSXElement
@@ -25,8 +25,7 @@ const sizeClassDict = {
 }
 
 const Table = <R extends {}>(props: TableProps<R>) => {
-  const { componentSize } = useContext(ConfigProviderContext)
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
 
   return (
     <Element class="[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]">

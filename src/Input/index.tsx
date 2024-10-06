@@ -1,13 +1,13 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, onMount, splitProps, useContext } from 'solid-js'
+import { Show, createMemo, onMount, splitProps } from 'solid-js'
 import type { JSX, Component } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Compact from '../Compact'
 import { setRef, unwrapStringOrJSXElement } from '../utils/solid'
-import ConfigProviderContext from '../ConfigProvider/context'
 import { type RootStyleProps, type StringOrJSXElement } from '../types'
 import TextArea from './TextArea'
+import useComponentSize from '../hooks/useComponentSize'
 
 type CommonInputProps = JSX.CustomAttributes<HTMLInputElement> &
 RootStyleProps & {
@@ -67,8 +67,7 @@ export function CommonInput(
   > &
   CommonInputProps,
 ) {
-  const { componentSize } = useContext(ConfigProviderContext)
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
   const [{ onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
     'defaultValue',
     'value',

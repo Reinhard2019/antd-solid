@@ -5,7 +5,6 @@ import {
   createSignal,
   Show,
   createMemo,
-  useContext,
   mergeProps,
 } from 'solid-js'
 import cs from 'classnames'
@@ -15,7 +14,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Compact from '../Compact'
 import Element from '../Element'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContainer'> {
   multiple?: boolean
@@ -54,8 +53,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
     } as const,
     _props,
   )
-  const { componentSize } = useContext(ConfigProviderContext)
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
   const [value, setValue] = createControllableValue<T[] | undefined>(props, {
     defaultValue: [],
   })

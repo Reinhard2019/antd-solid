@@ -7,13 +7,12 @@ import {
   createSignal,
   createMemo,
   splitProps,
-  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
 import { wave } from '../utils/animation'
 import Element from '../Element'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface ButtonProps
   extends ParentProps,
@@ -104,9 +103,8 @@ const typeClassMap = {
 } as const
 
 const Button: Component<ButtonProps> = _props => {
-  const { componentSize } = useContext(ConfigProviderContext)
   const props = mergeProps({ type: 'default', danger: false, disabled: false } as const, _props)
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
   const [, buttonElementProps] = splitProps(props, ['type', 'size', 'loading', 'danger'])
   const [innerLoading, setLoading] = createSignal(false)
   const loading = createMemo(() =>

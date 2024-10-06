@@ -7,7 +7,6 @@ import {
   type JSX,
   mergeProps,
   Show,
-  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import { Transition } from 'solid-transition-group'
@@ -16,7 +15,7 @@ import { type StringOrJSXElement, type Key, type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface CollapseItem extends StyleProps {
   key: Key
@@ -61,7 +60,6 @@ export interface CollapseProps extends StyleProps {
 }
 
 const Collapse: Component<CollapseProps> = _props => {
-  const { componentSize } = useContext(ConfigProviderContext)
   const props = mergeProps(
     {
       bordered: true,
@@ -70,7 +68,7 @@ const Collapse: Component<CollapseProps> = _props => {
     _props,
   )
   const type = createMemo(() => props.type ?? 'line')
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',

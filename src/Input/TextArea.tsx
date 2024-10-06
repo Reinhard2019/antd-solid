@@ -1,9 +1,9 @@
-import { type JSX, type Component, onMount, useContext, createMemo } from 'solid-js'
+import { type JSX, type Component, onMount } from 'solid-js'
 import cs from 'classnames'
 import Element from '../Element'
 import { type RootStyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface TextAreaProps
   extends Omit<
@@ -31,8 +31,7 @@ export interface TextAreaProps
 }
 
 const TextArea: Component<TextAreaProps> = props => {
-  const { componentSize } = useContext(ConfigProviderContext)
-  const size = createMemo(() => props.size ?? componentSize())
+  const size = useComponentSize(() => props.size)
 
   let input: HTMLTextAreaElement | undefined
   onMount(() => {

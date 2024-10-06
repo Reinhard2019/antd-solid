@@ -1,8 +1,8 @@
-import { createMemo, mergeProps, useContext, type Component, type JSX } from 'solid-js'
+import { mergeProps, type Component, type JSX } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Element from '../Element'
-import ConfigProviderContext from '../ConfigProvider/context'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface SwitchProps {
   defaultChecked?: boolean
@@ -20,9 +20,8 @@ export interface SwitchProps {
 }
 
 const Switch: Component<SwitchProps> = _props => {
-  const { componentSize } = useContext(ConfigProviderContext)
   const props = mergeProps({ size: 'middle' } as const, _props)
-  const size = createMemo(() => componentSize() ?? props.size)
+  const size = useComponentSize(() => props.size)
   const [checked, setChecked] = createControllableValue<boolean>(props, {
     defaultValuePropName: 'defaultChecked',
     valuePropName: 'checked',
