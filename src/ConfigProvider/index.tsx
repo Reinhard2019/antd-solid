@@ -1,10 +1,16 @@
-import { type ParentProps, type Component, createMemo, mergeProps, useContext } from 'solid-js'
+import {
+  type ParentProps,
+  type Component,
+  createMemo,
+  mergeProps,
+  useContext,
+  untrack,
+} from 'solid-js'
 import ConfigProviderContext from './context'
 import { type SeedToken } from './types'
 import { createCssVariables, getCssVariablesClass } from './utils'
 import { darkSeedToken, lightSeedToken } from './seed'
 import { type Locale } from '../locale'
-import zh_CN from '../locale/zh_CN'
 
 interface ConfigProviderProps extends ParentProps {
   /**
@@ -28,9 +34,11 @@ function useConfig() {
 const ConfigProvider: Component<ConfigProviderProps> & {
   useConfig: typeof useConfig
 } = _props => {
+  const config = useConfig()
   const props = mergeProps(
     {
-      theme: 'light',
+      theme: untrack(config.theme),
+      locale: untrack(config.locale),
       componentSize: 'middle',
     } as const,
     _props,
@@ -40,7 +48,7 @@ const ConfigProvider: Component<ConfigProviderProps> & {
     ...props.token,
   }))
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
-  const locale = createMemo(() => props.locale ?? zh_CN)
+  const locale = createMemo(() => props.locale)
 
   return (
     <ConfigProviderContext.Provider
