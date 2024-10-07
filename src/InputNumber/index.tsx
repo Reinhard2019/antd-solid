@@ -37,6 +37,11 @@ export interface InputNumberProps
    * 指定输入框展示值的格式
    */
   formatter?: (value: number | string) => string
+  /**
+   * 是否显示增减按钮
+   * 默认 true
+   */
+  controls?: boolean
 }
 
 const isEmptyValue = (value: number | string | null | undefined) => isNil(value) || value === ''
@@ -50,6 +55,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
       min: -Infinity,
       max: Infinity,
       step: 1,
+      controls: true,
     },
     _props,
   )
@@ -141,19 +147,21 @@ const InputNumber: Component<InputNumberProps> = _props => {
         '--ant-input-number-handle-width': '22px',
         ...props.rootStyle,
       }}
-      actions={() => (
-        <div class="flex flex-col h-full w-[--ant-input-number-handle-width] [border-left:1px_solid_var(--ant-color-border)] bg-[--ant-color-bg-container]">
-          <div class={actionBtnClass} onClick={up}>
-            <div class="i-ant-design:up-outlined" />
+      actions={() =>
+        props.controls ? (
+          <div class="flex flex-col h-full w-[--ant-input-number-handle-width] [border-left:1px_solid_var(--ant-color-border)] bg-[--ant-color-bg-container]">
+            <div class={actionBtnClass} onClick={up}>
+              <div class="i-ant-design:up-outlined" />
+            </div>
+            <div
+              class={`[border-top:1px_solid_var(--ant-color-border)] ${actionBtnClass}`}
+              onClick={down}
+            >
+              <div class="i-ant-design:down-outlined" />
+            </div>
           </div>
-          <div
-            class={`[border-top:1px_solid_var(--ant-color-border)] ${actionBtnClass}`}
-            onClick={down}
-          >
-            <div class="i-ant-design:down-outlined" />
-          </div>
-        </div>
-      )}
+        ) : null
+      }
       value={`${(focusing() ? value() : displayValue()) ?? ''}`}
       onKeyDown={e => {
         switch (e.key) {
