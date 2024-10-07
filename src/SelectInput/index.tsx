@@ -40,7 +40,15 @@ export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContain
    * 默认 'outlined'
    */
   variant?: 'outlined' | 'borderless' | 'filled'
+  /**
+   * 自定义的选择框后缀图标
+   */
   suffixIcon?: JSXElement
+  /**
+   * 选择框弹出的位置
+   * 默认 'bottomLeft'
+   */
+  placement?: 'bottomLeft' | 'bottom' | 'bottomRight' | 'topLeft' | 'top' | 'topRight'
 }
 
 function SelectInput<T>(_props: SelectInputProps<T>) {
@@ -50,6 +58,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
   const props = mergeProps(
     {
       variant: 'outlined',
+      placement: 'bottomLeft',
     } as const,
     _props,
   )
@@ -109,7 +118,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         open={open()}
         onOpenChange={setOpen}
         trigger={[]}
-        placement="bottomLeft"
+        placement={props.placement}
         arrow={false}
         contentStyle={{
           padding: 0,

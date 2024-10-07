@@ -26,6 +26,7 @@ export interface SelectProps<T = Key>
   | 'size'
   | 'variant'
   | 'suffixIcon'
+  | 'placement'
   | 'getPopupContainer'
   > {
   defaultValue?: T | T[] | null
@@ -46,6 +47,7 @@ function Select<T = Key>(props: SelectProps<T>) {
     'size',
     'variant',
     'suffixIcon',
+    'placement',
     'getPopupContainer',
   ])
   const [value, setValue] = createControllableValue<T | T[] | undefined>(props)
