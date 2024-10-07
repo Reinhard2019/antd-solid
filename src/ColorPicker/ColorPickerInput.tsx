@@ -74,7 +74,7 @@ const ColorPickerInput: Component = () => {
             onBlur={() => {
               setHexInputValue(color().toHex())
             }}
-            prefix={() => <span class="text-[--ant-color-text-placeholder]">#</span>}
+            prefix={<span class="text-[--ant-color-text-placeholder]">#</span>}
             rootStyle={{
               '--ant-input-font-size': '12px',
             }}

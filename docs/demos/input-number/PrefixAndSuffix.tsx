@@ -1,48 +1,48 @@
 import { type Component } from 'solid-js'
 import { InputNumber, Select } from 'antd-solid'
 
-const selectBefore = () => (
-  <Select
-    defaultValue="add"
-    options={[
-      {
-        label: '+',
-        value: 'add',
-      },
-      {
-        label: '-',
-        value: 'minus',
-      },
-    ]}
-    style={{ width: '60px' }}
-  />
-)
-const selectAfter = () => (
-  <Select
-    defaultValue="USD"
-    options={[
-      {
-        label: '$',
-        value: 'USD',
-      },
-      {
-        label: '€',
-        value: 'EUR',
-      },
-      {
-        label: '£',
-        value: 'GBP',
-      },
-      {
-        label: '¥',
-        value: 'CNY',
-      },
-    ]}
-    style={{ width: '60px' }}
-  />
-)
-
 const AddonBeforeAndAfter: Component = () => {
+  const selectBefore = (
+    <Select
+      defaultValue="add"
+      options={[
+        {
+          label: '+',
+          value: 'add',
+        },
+        {
+          label: '-',
+          value: 'minus',
+        },
+      ]}
+      style={{ width: '60px' }}
+    />
+  )
+  const selectAfter = (
+    <Select
+      defaultValue="USD"
+      options={[
+        {
+          label: '$',
+          value: 'USD',
+        },
+        {
+          label: '€',
+          value: 'EUR',
+        },
+        {
+          label: '£',
+          value: 'GBP',
+        },
+        {
+          label: '¥',
+          value: 'CNY',
+        },
+      ]}
+      style={{ width: '60px' }}
+    />
+  )
+
   return (
     <div
       style={{

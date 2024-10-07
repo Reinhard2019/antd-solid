@@ -147,7 +147,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
         '--ant-input-number-handle-width': '22px',
         ...props.rootStyle,
       }}
-      actions={() =>
+      actions={
         props.controls ? (
           <div class="flex flex-col h-full w-[--ant-input-number-handle-width] [border-left:1px_solid_var(--ant-color-border)] bg-[--ant-color-bg-container]">
             <div class={actionBtnClass} onClick={up}>
@@ -160,7 +160,7 @@ const InputNumber: Component<InputNumberProps> = _props => {
               <div class="i-ant-design:down-outlined" />
             </div>
           </div>
-        ) : null
+        ) : undefined
       }
       value={`${(focusing() ? value() : displayValue()) ?? ''}`}
       onKeyDown={e => {

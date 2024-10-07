@@ -1,10 +1,10 @@
 import { isNil, omit } from 'lodash-es'
 import { Show, createMemo, onMount, splitProps } from 'solid-js'
-import type { JSX, Component } from 'solid-js'
+import type { JSX, Component, JSXElement } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
-import { setRef, unwrapStringOrJSXElement } from '../utils/solid'
-import { type RootStyleProps, type StringOrJSXElement } from '../types'
+import { setRef } from '../utils/solid'
+import { type RootStyleProps } from '../types'
 import Element from '../Element'
 import TextArea from './TextArea'
 import useComponentSize from '../hooks/useComponentSize'
@@ -14,15 +14,15 @@ type CommonInputProps = JSX.CustomAttributes<HTMLInputElement> &
 RootStyleProps & {
   defaultValue?: string | null | undefined
   value?: string | null | undefined
-  addonBefore?: StringOrJSXElement
-  addonAfter?: StringOrJSXElement
-  prefix?: StringOrJSXElement
-  suffix?: StringOrJSXElement
+  addonBefore?: JSXElement
+  addonAfter?: JSXElement
+  prefix?: JSXElement
+  suffix?: JSXElement
   placeholder?: string
   /**
      * 仅供 InputNumber 使用
      */
-  actions?: StringOrJSXElement
+  actions?: JSXElement
   /**
      * 设置校验状态
      */
@@ -98,11 +98,11 @@ export function CommonInput(
   })
   const showClearBtn = createMemo(() => !props.disabled && props.allowClear && value())
 
-  const addonBefore = createMemo(() => unwrapStringOrJSXElement(props.addonBefore))
-  const addonAfter = createMemo(() => unwrapStringOrJSXElement(props.addonAfter))
-  const prefix = createMemo(() => unwrapStringOrJSXElement(props.prefix))
-  const suffix = createMemo(() => unwrapStringOrJSXElement(props.suffix))
-  const actions = createMemo(() => unwrapStringOrJSXElement(props.actions))
+  const addonBefore = createMemo(() => props.addonBefore)
+  const addonAfter = createMemo(() => props.addonAfter)
+  const prefix = createMemo(() => props.prefix)
+  const suffix = createMemo(() => props.suffix)
+  const actions = createMemo(() => props.actions)
 
   return (
     <Element
