@@ -4,8 +4,13 @@ import createControllableValue from '../hooks/createControllableValue'
 import { type RadioProps } from '.'
 import { wave } from '../utils/animation'
 import Element from '../Element'
+import { type ComponentSize } from '../types'
 
-const Button: Component<RadioProps> = props => {
+const Button: Component<
+RadioProps & {
+  size: ComponentSize
+}
+> = props => {
   let input: HTMLInputElement | undefined
 
   const [checked, setChecked] = createControllableValue(props, {
@@ -19,7 +24,7 @@ const Button: Component<RadioProps> = props => {
     <Element<JSX.LabelHTMLAttributes<HTMLLabelElement>>
       tag="label"
       class={cs(
-        'relative px-15px h-32px [border:1px_solid_var(--ant-color-border)] first:rounded-l-6px last:rounded-r-6px cursor-pointer flex-grow not[:first-child]:-ml-1px flex justify-center items-center',
+        'relative px-[--ant-radio-button-padding] h-[--ant-radio-button-height] [border:1px_solid_var(--ant-color-border)] first:rounded-l-[--ant-radio-button-border-radius] last:rounded-r-[--ant-radio-button-border-radius] cursor-pointer flex-grow not[:first-child]:-ml-1px flex justify-center items-center [font-size:var(--ant-radio-button-font-size)]',
         checked() &&
           cs(
             props.disabled
@@ -33,6 +38,28 @@ const Button: Component<RadioProps> = props => {
       onClick={e => {
         if (e.target === input) return
         wave(e.currentTarget, 'var(--ant-color-primary)')
+      }}
+      style={{
+        '--ant-radio-button-padding': {
+          small: '7px',
+          middle: '15px',
+          large: '15px',
+        }[props.size],
+        '--ant-radio-button-height': {
+          small: '24px',
+          middle: '32px',
+          large: '40px',
+        }[props.size],
+        '--ant-radio-button-font-size': {
+          small: 'var(--ant-font-size)',
+          middle: 'var(--ant-font-size)',
+          large: 'var(--ant-font-size-lg)',
+        }[props.size],
+        '--ant-radio-button-border-radius': {
+          small: 'var(--ant-border-radius-sm)',
+          middle: 'var(--ant-border-radius)',
+          large: 'var(--ant-border-radius-lg)',
+        }[props.size],
       }}
     >
       <input

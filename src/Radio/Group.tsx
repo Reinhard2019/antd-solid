@@ -2,10 +2,11 @@ import { type Component, type JSX, For, mergeProps, createSelector } from 'solid
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
-import { type StyleProps, type StringOrJSXElement } from '../types'
+import { type StyleProps, type StringOrJSXElement, type ComponentSize } from '../types'
 import Radio from '.'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface RadioGroupProps extends StyleProps {
   defaultValue?: string
@@ -15,6 +16,7 @@ export interface RadioGroupProps extends StyleProps {
   options: Array<{ label: StringOrJSXElement; value: string; disabled?: boolean }>
   block?: boolean
   disabled?: boolean
+  size?: ComponentSize
 }
 
 const Group: Component<RadioGroupProps> = _props => {
@@ -28,6 +30,7 @@ const Group: Component<RadioGroupProps> = _props => {
     trigger: null,
   })
   const isChecked = createSelector(value)
+  const size = useComponentSize(() => props.size)
 
   return (
     <Element
@@ -51,6 +54,7 @@ const Group: Component<RadioGroupProps> = _props => {
                 props.onChange?.(e)
               }) as JSX.ChangeEventHandler<HTMLInputElement, Event>
             }
+            size={size()}
           >
             {unwrapStringOrJSXElement(option.label)}
           </Dynamic>

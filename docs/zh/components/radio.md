@@ -32,6 +32,12 @@ Radio 不可用。
 
 <Code path="radio/Button" />
 
+### 大小
+
+大中小三种组合，可以和表单输入框进行对应配合。
+
+<Code path="radio/Size" />
+
 ## API
 
 ### Radio
