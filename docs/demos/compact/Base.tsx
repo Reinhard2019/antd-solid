@@ -26,17 +26,17 @@ const Index: Component = () => {
         <Button style={{ width: '33.3%' }}>有</Button>
       </Compact>
       <Compact>
-        <Input rootStyle={{ width: '20%' }} />
-        <InputNumber rootStyle={{ width: '30%' }} />
-        <Input rootStyle={{ width: '20%' }} />
+        <Input style={{ width: '20%' }} />
+        <InputNumber style={{ width: '30%' }} />
+        <Input style={{ width: '20%' }} />
       </Compact>
       <Compact>
-        <Input rootStyle={{ width: '50%' }} prefix="$" suffix=".00" />
-        <Input rootStyle={{ width: '50%' }} prefix="$" suffix=".00" />
+        <Input style={{ width: '50%' }} prefix="$" suffix=".00" />
+        <Input style={{ width: '50%' }} prefix="$" suffix=".00" />
       </Compact>
       <Compact>
-        <Input rootStyle={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
-        <Input rootStyle={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
+        <Input style={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
+        <Input style={{ width: '50%' }} addonBefore="$" addonAfter=".00" />
       </Compact>
       <Compact>
         <Select
@@ -53,7 +53,7 @@ const Index: Component = () => {
             },
           ]}
         />
-        <Input rootStyle={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" />
+        <Input style={{ width: '50%' }} defaultValue="Xihu District, Hangzhou" />
       </Compact>
     </div>
   )

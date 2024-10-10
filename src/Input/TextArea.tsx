@@ -1,17 +1,17 @@
 import { type JSX, type Component, onMount } from 'solid-js'
 import cs from 'classnames'
 import Element from '../Element'
-import { type RootStyleProps } from '../types'
+import { type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import useComponentSize from '../hooks/useComponentSize'
 
 export interface TextAreaProps
   extends Omit<
   JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  'value' | 'onChange' | 'onPressEnter' | 'onKeyDown'
+  'value' | 'onChange' | 'onPressEnter' | 'onKeyDown' | 'style'
   >,
   JSX.CustomAttributes<HTMLTextAreaElement>,
-  RootStyleProps {
+  StyleProps {
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   autoFocus?: boolean
@@ -59,7 +59,7 @@ const TextArea: Component<TextAreaProps> = props => {
           middle: 'var(--ant-font-size)',
           large: 'var(--ant-font-size-lg)',
         }[size()],
-        ...props.rootStyle,
+        ...props.style,
       }}
     >
       <textarea

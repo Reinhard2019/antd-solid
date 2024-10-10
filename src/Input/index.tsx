@@ -4,14 +4,14 @@ import type { JSX, Component, JSXElement } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { setRef } from '../utils/solid'
-import { type RootStyleProps } from '../types'
 import Element from '../Element'
 import TextArea from './TextArea'
 import useComponentSize from '../hooks/useComponentSize'
 import './index.scss'
+import { type StyleProps } from '../types'
 
-type CommonInputProps = JSX.CustomAttributes<HTMLInputElement> &
-RootStyleProps & {
+type CommonInputProps = Omit<JSX.CustomAttributes<HTMLInputElement>, 'style'> &
+StyleProps & {
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   addonBefore?: JSXElement
@@ -64,7 +64,7 @@ const statusClassDict = {
 export function CommonInput(
   props: Omit<
   JSX.InputHTMLAttributes<HTMLInputElement>,
-  'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix'
+  'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix' | 'style'
   > &
   CommonInputProps,
 ) {
@@ -73,6 +73,7 @@ export function CommonInput(
     'defaultValue',
     'value',
     'class',
+    'style',
     'addonBefore',
     'addonAfter',
     'suffix',
@@ -80,8 +81,6 @@ export function CommonInput(
     'onPressEnter',
     'onKeyDown',
     'actions',
-    'rootClass',
-    'rootStyle',
   ])
 
   let input: HTMLInputElement | undefined
@@ -107,7 +106,7 @@ export function CommonInput(
   return (
     <Element
       block
-      class={cs(props.rootClass, 'flex', 'ant-input-group', 'p[.ant-compact>]:not-first:ml--1px')}
+      class={cs(props.class, 'flex', 'ant-input-group', 'p[.ant-compact>]:not-first:ml--1px')}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -124,7 +123,7 @@ export function CommonInput(
           middle: 'var(--ant-border-radius)',
           large: 'var(--ant-border-radius-lg)',
         }[size()],
-        ...props.rootStyle,
+        ...props.style,
       }}
     >
       <Show when={!isNil(addonBefore())}>
@@ -165,7 +164,6 @@ export function CommonInput(
           class={cs(
             'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
             inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
-            props.class,
           )}
           value={value() ?? ''}
           onInput={e => {
@@ -232,7 +230,7 @@ export function CommonInput(
 
 export type InputProps = Omit<
 JSX.InputHTMLAttributes<HTMLInputElement>,
-'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix'
+'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix' | 'style'
 > &
 Omit<CommonInputProps, 'actions' | 'textarea'>
 
