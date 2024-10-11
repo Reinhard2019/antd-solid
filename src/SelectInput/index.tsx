@@ -20,7 +20,7 @@ export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContain
   defaultValue?: T[] | null
   value?: T[] | null
   onChange?: (value: T[]) => void
-  optionLabelRender?: (v: T) => JSXElement
+  labelRender?: (value: T) => JSXElement
   placeholder?: string
   allowClear?: boolean
   disabled?: boolean
@@ -78,8 +78,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
   const [hover, setHover] = createSignal(false)
   const showClearBtn = createMemo(() => props.allowClear && hover() && valueArr().length > 0)
 
-  const optionLabelRender = (v: T) =>
-    props.optionLabelRender ? props.optionLabelRender(v) : String(v)
+  const optionLabelRender = (v: T) => (props.labelRender ? props.labelRender(v) : String(v))
 
   const style = createMemo(() => ({
     '--ant-select-font-size': {

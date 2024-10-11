@@ -1,15 +1,14 @@
-import { For, createSelector, createMemo, splitProps, Show } from 'solid-js'
+import { For, createSelector, createMemo, splitProps, Show, type JSXElement } from 'solid-js'
 import cs from 'classnames'
 import { isEmpty } from 'lodash-es'
-import { type Key, type StringOrJSXElement } from '../types'
+import { type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { toArray } from '../utils/array'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
-import { unwrapStringOrJSXElement } from '../utils/solid'
 
 interface SelectOption<T = Key> {
-  label: StringOrJSXElement
+  label: JSXElement
   value: T
 }
 
@@ -33,6 +32,7 @@ export interface SelectProps<T = Key>
   value?: T | T[] | null
   onChange?: (value: T | T[] | undefined) => void
   options?: Array<SelectOption<T>>
+  labelRender?: (options: SelectOption<T> | undefined) => JSXElement
 }
 
 function Select<T = Key>(props: SelectProps<T>) {
@@ -61,7 +61,11 @@ function Select<T = Key>(props: SelectProps<T>) {
   return (
     <SelectInput<T>
       {...selectInputProps}
-      optionLabelRender={v => unwrapStringOrJSXElement(optionDict().get(v)?.label) ?? (v as string)}
+      labelRender={v =>
+        props.labelRender
+          ? props.labelRender(optionDict().get(v))
+          : optionDict().get(v)?.label ?? (v as string)
+      }
       value={valueArr()}
       onChange={v => {
         setValue(props.multiple ? v : (v[0] as any))
@@ -90,7 +94,7 @@ function Select<T = Key>(props: SelectProps<T>) {
                     }
                   }}
                 >
-                  {unwrapStringOrJSXElement(item.label)}
+                  {item.label}
                 </div>
               )}
             </For>

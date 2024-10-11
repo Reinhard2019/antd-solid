@@ -7,40 +7,34 @@ import SelectInput, { type SelectInputProps } from '../SelectInput'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import Empty from '../Empty'
 
-export interface TreeSelectNode {
-  value: Key
+export interface TreeSelectNode<T = Key> {
+  value: T
   label: JSXElement
   children?: TreeSelectNode[] | undefined
 }
 
-export interface TreeSelectProps<T extends {} = TreeSelectNode>
+export interface TreeSelectProps<T = Key>
   extends Pick<
   SelectInputProps<Key>,
-  | 'multiple'
-  | 'allowClear'
-  | 'class'
-  | 'disabled'
-  | 'placeholder'
-  | 'status'
-  | 'size'
-  | 'optionLabelRender'
+  'multiple' | 'allowClear' | 'class' | 'disabled' | 'placeholder' | 'status' | 'size'
   >,
-  Pick<TreeProps<T>, 'treeData' | 'checkable' | 'checkStrategy'> {
-  defaultValue?: Key | Key[] | undefined
-  value?: Key | Key[] | undefined
-  onChange?: (value: Key | Key[] | undefined) => void
+  Pick<TreeProps<TreeSelectNode<T>>, 'treeData' | 'checkable' | 'checkStrategy'> {
+  defaultValue?: T | T[] | undefined
+  value?: T | T[] | undefined
+  onChange?: (value: T | T[] | undefined) => void
   /**
    * 自定义节点 label、value、children 的字段
    * 默认 { label: 'label', value: 'value', children: 'children' }
    */
   fieldNames?: {
-    label?: string | ((node: T) => JSXElement)
-    value?: string | ((node: T) => Key)
-    children?: string | ((node: T) => T[] | undefined)
+    label?: string | ((node: TreeSelectNode<T>) => JSXElement)
+    value?: string | ((node: TreeSelectNode<T>) => T)
+    children?: string | ((node: TreeSelectNode<T>) => Array<TreeSelectNode<T>> | undefined)
   }
+  labelRender?: (options: TreeSelectNode<T> | undefined) => JSXElement
 }
 
-const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) => {
+const TreeSelect = <T = Key>(props: TreeSelectProps<T>) => {
   const [selectInputProps] = splitProps(props, [
     'multiple',
     'allowClear',
@@ -49,29 +43,30 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
     'placeholder',
     'status',
     'size',
-    'optionLabelRender',
   ])
   const [treeProps] = splitProps(props, ['treeData', 'checkable', 'checkStrategy'])
 
   const fieldNames = Object.assign(
     {
-      label: 'label' as string | ((node: T) => JSXElement),
-      value: 'value' as string | ((node: T) => Key),
-      children: 'children' as string | ((node: T) => T[] | undefined),
+      label: 'label' as string | ((node: TreeSelectNode<T>) => JSXElement),
+      value: 'value' as string | ((node: TreeSelectNode<T>) => Key),
+      children: 'children' as
+        | string
+        | ((node: TreeSelectNode<T>) => Array<TreeSelectNode<T>> | undefined),
     },
     untrack(() => props.fieldNames),
   )
-  const getLabel = (node: T): JSXElement => {
+  const getLabel = (node: TreeSelectNode<T>): JSXElement => {
     const labelFieldName = fieldNames.label
     return typeof labelFieldName === 'function'
       ? labelFieldName(node)
       : unwrapStringOrJSXElement(get(node, labelFieldName) as StringOrJSXElement)
   }
-  const getValue = (node: T): Key => {
+  const getValue = (node: TreeSelectNode<T>): Key => {
     const valueFieldName = fieldNames.value
     return typeof valueFieldName === 'function' ? valueFieldName(node) : get(node, valueFieldName)
   }
-  const getChildren = (node: T): T[] | undefined => {
+  const getChildren = (node: TreeSelectNode<T>): Array<TreeSelectNode<T>> | undefined => {
     const childrenFieldName = fieldNames.children
     return typeof childrenFieldName === 'function'
       ? childrenFieldName(node)
@@ -79,9 +74,9 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
   }
 
   const optionMap = createMemo(() => {
-    const map = new Map<Key, T>()
+    const map = new Map<Key, TreeSelectNode<T>>()
 
-    const treeForEach = (list: T[] | undefined) => {
+    const treeForEach = (list: Array<TreeSelectNode<T>> | undefined) => {
       list?.forEach(item => {
         const key = getValue(item)
         map.set(key, item)
@@ -112,8 +107,10 @@ const TreeSelect = <T extends {} = TreeSelectNode>(props: TreeSelectProps<T>) =>
   return (
     <SelectInput
       {...selectInputProps}
-      optionLabelRender={v =>
-        props.optionLabelRender ? props.optionLabelRender(v) : getLabel(optionMap().get(v)!) ?? v
+      labelRender={v =>
+        props.labelRender
+          ? props.labelRender(optionMap().get(v))
+          : getLabel(optionMap().get(v)!) ?? v
       }
       value={valueArr()}
       onChange={setValueArr}
