@@ -18,6 +18,10 @@ body {
   font-size: 14px;
 }
 
+img, video {
+  max-width: initial;
+}
+
 .demos-page > :not(.VPContent) {
   display: none;
 }

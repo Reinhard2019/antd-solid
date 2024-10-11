@@ -57,6 +57,6 @@ export function distance(p1: [number, number], p2: [number, number]) {
  * @param matrix
  * @returns
  */
-export function getRotationAngleOfMatrix(matrix: DOMMatrix) {
+export function getRotationRadOfMatrix(matrix: DOMMatrix) {
   return Math.atan2(matrix.b, matrix.a)
 }

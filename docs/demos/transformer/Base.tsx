@@ -33,11 +33,18 @@ const App: Component = () => {
         style={{
           width: `${transformValue().width}px`,
           height: `${transformValue().height}px`,
-          transform: `translate(${transformValue().x}px, ${transformValue().y}px) rotate(${transformValue().rotate}deg)`,
+          transform: `translate(${transformValue().x}px, ${transformValue().y}px) rotate(${transformValue().rotate}deg) skew(30deg, 30deg)`,
+          'transform-origin': '25% 25%',
           position: 'absolute',
         }}
       />
-      <Transformer value={transformValue()} onChange={setTransformValue} />
+      <Transformer
+        value={transformValue()}
+        onChange={setTransformValue}
+        skewX={30}
+        skewY={30}
+        transformOrigin={['25%', '25%']}
+      />
     </div>
   )
 }
