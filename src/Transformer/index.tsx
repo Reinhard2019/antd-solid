@@ -147,8 +147,8 @@ const Transformer: Component<TransformerProps> = _props => {
     if (radians === 0) return point
 
     // 计算旋转后的新坐标
-    const x = Math.cos(radians) * -point[0] - Math.sin(radians) * -point[1]
-    const y = Math.sin(radians) * -point[0] + Math.cos(radians) * -point[1]
+    const x = Math.cos(radians) * point[0] + Math.sin(radians) * point[1]
+    const y = Math.sin(radians) * -point[0] + Math.cos(radians) * point[1]
 
     return [x, y]
   }
