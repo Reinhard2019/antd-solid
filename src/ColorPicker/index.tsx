@@ -8,6 +8,8 @@ import ColorPickerSelect from './ColorPickerSelect'
 import ColorPickerContext from './context'
 import ColorPickerSlider from './ColorPickerSlider'
 import ColorPickerInput from './ColorPickerInput'
+import { type ComponentSize } from '../types'
+import useComponentSize from '../hooks/useComponentSize'
 
 export interface ColorPickerProps {
   defaultValue?: string | null
@@ -23,6 +25,11 @@ export interface ColorPickerProps {
    * 禁止透明度
    */
   disabledAlpha?: boolean
+  /**
+   * 大小，提供 large middle 和 small 三种大小
+   * 默认 'middle'
+   */
+  size?: ComponentSize
 }
 
 const ColorPicker: Component<ColorPickerProps> = props => {
@@ -41,6 +48,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
     )
   }
   const [open, setOpen] = createSignal(false)
+  const size = useComponentSize(() => props.size)
 
   const getPopoverContent = (close: () => void) => (
     <ColorPickerContext.Provider
@@ -85,17 +93,25 @@ const ColorPicker: Component<ColorPickerProps> = props => {
       <Element class={cs('inline-block', props.disabled && 'cursor-not-allowed')}>
         <div
           class={cs(
-            'p-[--ant-padding-xxs] border-1px border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer hover:border-[--ant-color-primary-hover]',
+            'p-[calc(var(--ant-padding-xxs)-var(--border-width))] border-width-[--border-width] border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer hover:border-[--ant-color-primary-hover]',
             open() && '!border-[--ant-color-primary-active]',
             props.disabled && 'pointer-events-none bg-[--ant-color-bg-container-disabled]',
           )}
+          style={{
+            '--border-width': '1px',
+            '--inner-size': {
+              small: '16px',
+              middle: '24px',
+              large: '32px',
+            }[size()],
+          }}
         >
           <Show
             when={color().isValid}
             fallback={
               <div
                 class={cs(
-                  'w-24px h-24px rounded-[--ant-border-radius-sm] relative overflow-hidden border-1px border-solid border-[--ant-color-split]',
+                  'w-[--inner-size] h-[--inner-size] rounded-[--ant-border-radius-sm] relative overflow-hidden border-1px border-solid border-[--ant-color-split]',
                 )}
               >
                 <div class="absolute top-1/2 left-1/2 -translate-1/2 w-200% h-2px bg-[--ant-color-error] rotate-135deg" />
@@ -103,7 +119,9 @@ const ColorPicker: Component<ColorPickerProps> = props => {
             }
           >
             <div
-              class={cs('w-24px h-24px rounded-[--ant-border-radius-sm] overflow-hidden')}
+              class={cs(
+                'w-[--inner-size] h-[--inner-size] rounded-[--ant-border-radius-sm] overflow-hidden',
+              )}
               style={{
                 'box-shadow': 'inset 0 0 1px 0 var(--ant-color-text-quaternary)',
                 'background-image':
