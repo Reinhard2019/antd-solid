@@ -93,6 +93,11 @@ function Select<T = Key>(props: SelectProps<T>) {
                       setValue([...valueArr(), item.value])
                     }
                   }}
+                  title={
+                    typeof item.label === 'string' || typeof item.label === 'number'
+                      ? item.label.toString()
+                      : undefined
+                  }
                 >
                   {item.label}
                 </div>
