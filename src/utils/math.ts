@@ -53,10 +53,11 @@ export function distance(p1: [number, number], p2: [number, number]) {
 }
 
 /**
- * 根据 DOMMatrix 获取旋转角度
- * @param matrix
+ * 根据 skewX、skewY 创建 DOMMatrix
+ * @param sx
+ * @param sy
  * @returns
  */
-export function getRotationRadOfMatrix(matrix: DOMMatrix) {
-  return Math.atan2(matrix.b, matrix.a)
+export function createSkewDOMMatrix(sx: number, sy: number) {
+  return new DOMMatrix([1, Math.tan(degToRad(sy)), Math.tan(degToRad(sx)), 1, 0, 0])
 }

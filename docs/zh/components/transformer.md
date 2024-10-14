@@ -20,6 +20,12 @@ outline: deep
 
 <Code path="transformer/Adsorb" />
 
+### 父级变形
+
+在父级变形的情况下，保证 Transformer 组件正常。
+
+<Code path="transformer/Parent" />
+
 ## API
 
 ### Transformer 变形器
