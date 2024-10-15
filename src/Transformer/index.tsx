@@ -529,13 +529,47 @@ const Transformer: Component<TransformerProps> = _props => {
     return _rotateDirection ? directionRotateDict()[_rotateDirection] + 45 : 0
   })
 
-  const borderClass = `
-    cursor-none rounded-3px w-[--width] h-[--border-width] absolute
+  const edgeClass = `
+    cursor-none rounded-3px w-[--width] h-[--edge-width] absolute
     after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:h-1px after:bg-[--ant-color-primary]
   `
 
-  const vertexClass =
-    'w-[--vertex-size] h-[--vertex-size] border-1px border-solid border-[--ant-color-primary] absolute pointer-events-none'
+  const getVertex = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
+    const point = {
+      topLeft: topLeftPoint,
+      bottomRight: bottomRightPoint,
+      topRight: topRightPoint,
+      bottomLeft: bottomLeftPoint,
+    }[direction]
+    return (
+      <div
+        class="w-[--vertex-size] h-[--vertex-size] absolute"
+        style={{
+          top: `calc(${point().y}px - var(--vertex-size) / 2`,
+          left: `calc(${point().x}px - var(--vertex-size) / 2`,
+          transform: inverseParentTransformMatrix()
+            .multiply(new DOMMatrix().rotate(xAxisRotate()))
+            .toString(),
+        }}
+      >
+        <div class="w-[--vertex-inner-size] h-[--vertex-inner-size] border-1px border-solid border-[--ant-color-primary] absolute top-1/2 left-1/2 -translate-1/2 pointer-events-none" />
+        <div
+          class="w-[--vertex-size] h-[--vertex-size] cursor-none absolute"
+          {...getRotateHandlerProps(direction)}
+        />
+        <div
+          class={cs(
+            'w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute',
+            direction === 'topLeft' && 'right-0 bottom-0',
+            direction === 'topRight' && 'left-0 bottom-0',
+            direction === 'bottomLeft' && 'right-0 top-0',
+            direction === 'bottomRight' && 'left-0 top-0',
+          )}
+          {...getResizeHandlerProps(direction)}
+        />
+      </div>
+    )
+  }
 
   return (
     <Element class="relative">
@@ -545,12 +579,13 @@ const Transformer: Component<TransformerProps> = _props => {
         style={{
           '--ant-transformer-box-shadow':
             '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
-          '--vertex-size': '8px',
-          '--vertex-rotate-handler-size': '16px',
-          '--vertex-resize-handler-size': 'calc(16px + var(--vertex-size) / 2)',
-          '--width': `calc(${transformedSize().width}px - var(--vertex-size))`,
-          '--height': `calc(${transformedSize().height}px - var(--vertex-size))`,
-          '--border-width': '8px',
+          '--vertex-size': '32px',
+          '--vertex-inner-size': '8px',
+          '--vertex-resize-handler-size':
+            'calc(var(--vertex-size) / 2 + var(--vertex-inner-size) / 2)',
+          '--width': `calc(${transformedSize().width}px - var(--vertex-inner-size))`,
+          '--height': `calc(${transformedSize().height}px - var(--vertex-inner-size))`,
+          '--edge-width': '8px',
           width: `${value().width}px`,
           height: `${value().height}px`,
           transform: `translate(${value().x}px, ${value().y}px)`,
@@ -560,10 +595,10 @@ const Transformer: Component<TransformerProps> = _props => {
       >
         {/* 边框 */}
         <div
-          class={borderClass}
+          class={edgeClass}
           {...getResizeHandlerProps('top')}
           style={{
-            top: `calc(${topPoint().y}px - var(--border-width) / 2)`,
+            top: `calc(${topPoint().y}px - var(--edge-width) / 2)`,
             left: `calc(${topPoint().x}px - var(--width) / 2)`,
             transform: inverseParentTransformMatrix()
               .multiply(new DOMMatrix().rotate(xAxisRotate()))
@@ -571,10 +606,10 @@ const Transformer: Component<TransformerProps> = _props => {
           }}
         />
         <div
-          class={borderClass}
+          class={edgeClass}
           {...getResizeHandlerProps('bottom')}
           style={{
-            top: `calc(${bottomPoint().y}px - var(--border-width) / 2)`,
+            top: `calc(${bottomPoint().y}px - var(--edge-width) / 2)`,
             left: `calc(${bottomPoint().x}px - var(--width) / 2)`,
             transform: inverseParentTransformMatrix()
               .multiply(new DOMMatrix().rotate(xAxisRotate()))
@@ -582,11 +617,11 @@ const Transformer: Component<TransformerProps> = _props => {
           }}
         />
         <div
-          class={borderClass}
+          class={edgeClass}
           {...getResizeHandlerProps('left')}
           style={{
             '--width': 'var(--height)',
-            top: `calc(${leftPoint().y}px - var(--border-width) / 2)`,
+            top: `calc(${leftPoint().y}px - var(--edge-width) / 2)`,
             left: `calc(${leftPoint().x}px - var(--height) / 2)`,
             transform: inverseParentTransformMatrix()
               .multiply(new DOMMatrix().rotate(yAxisRotate()))
@@ -594,11 +629,11 @@ const Transformer: Component<TransformerProps> = _props => {
           }}
         />
         <div
-          class={borderClass}
+          class={edgeClass}
           {...getResizeHandlerProps('right')}
           style={{
             '--width': 'var(--height)',
-            top: `calc(${rightPoint().y}px - var(--border-width) / 2)`,
+            top: `calc(${rightPoint().y}px - var(--edge-width) / 2)`,
             left: `calc(${rightPoint().x}px - var(--height) / 2)`,
             transform: inverseParentTransformMatrix()
               .multiply(new DOMMatrix().rotate(yAxisRotate()))
@@ -607,102 +642,10 @@ const Transformer: Component<TransformerProps> = _props => {
         />
 
         {/* 顶点 */}
-        <div
-          class={vertexClass}
-          style={{
-            top: `calc(${topLeftPoint().y}px - var(--vertex-size) / 2`,
-            left: `calc(${topLeftPoint().x}px - var(--vertex-size) / 2`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={vertexClass}
-          style={{
-            top: `calc(${topRightPoint().y}px - var(--vertex-size) / 2)`,
-            left: `calc(${topRightPoint().x}px - var(--vertex-size) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={vertexClass}
-          style={{
-            top: `calc(${bottomLeftPoint().y}px - var(--vertex-size) / 2)`,
-            left: `calc(${bottomLeftPoint().x}px - var(--vertex-size) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={vertexClass}
-          style={{
-            top: `calc(${bottomRightPoint().y}px - var(--vertex-size) / 2)`,
-            left: `calc(${bottomRightPoint().x}px - var(--vertex-size) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-
-        <div
-          class="absolute inset-0 box-content"
-          style={{
-            transform: `rotate(${value().rotate}deg) scale(${props.scaleX}, ${props.scaleY}) skew(${props.skewX}deg, ${props.skewY}deg)`,
-            'transform-origin': 'inherit',
-          }}
-        >
-          <div
-            class="w-[--vertex-rotate-handler-size] h-[--vertex-rotate-handler-size] cursor-none absolute -translate-full"
-            {...getRotateHandlerProps('topLeft')}
-          />
-          <div
-            class="w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute"
-            {...getResizeHandlerProps('topLeft')}
-            style={{
-              transform: 'translate(calc(var(--vertex-size) / -2), calc(var(--vertex-size) / -2))',
-            }}
-          />
-
-          <div
-            class="w-[--vertex-rotate-handler-size] h-[--vertex-rotate-handler-size] cursor-none absolute left-full -translate-y-full"
-            {...getRotateHandlerProps('topRight')}
-          />
-          <div
-            class="w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute right-0"
-            {...getResizeHandlerProps('topRight')}
-            style={{
-              transform: 'translate(calc(var(--vertex-size) / 2), calc(var(--vertex-size) / -2))',
-            }}
-          />
-
-          <div
-            class="w-[--vertex-rotate-handler-size] h-[--vertex-rotate-handler-size] cursor-none absolute top-full -translate-x-full"
-            {...getRotateHandlerProps('bottomLeft')}
-          />
-          <div
-            class="w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute bottom-0"
-            {...getResizeHandlerProps('bottomLeft')}
-            style={{
-              transform: 'translate(calc(var(--vertex-size) / -2), calc(var(--vertex-size) / 2))',
-            }}
-          />
-
-          <div
-            class="w-[--vertex-rotate-handler-size] h-[--vertex-rotate-handler-size] cursor-none absolute left-full top-full"
-            {...getRotateHandlerProps('bottomRight')}
-          />
-          <div
-            class="w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute right-0 bottom-0"
-            {...getResizeHandlerProps('bottomRight')}
-            style={{
-              transform: 'translate(calc(var(--vertex-size) / 2), calc(var(--vertex-size) / 2))',
-            }}
-          />
-        </div>
+        {getVertex('topLeft')}
+        {getVertex('topRight')}
+        {getVertex('bottomLeft')}
+        {getVertex('bottomRight')}
 
         <CrosshairSvg
           ref={transformOriginRef}
