@@ -529,10 +529,36 @@ const Transformer: Component<TransformerProps> = _props => {
     return _rotateDirection ? directionRotateDict()[_rotateDirection] + 45 : 0
   })
 
-  const edgeClass = `
-    cursor-none rounded-3px w-[--width] h-[--edge-width] absolute
-    after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:h-1px after:bg-[--ant-color-primary]
-  `
+  const getEdge = (direction: 'top' | 'bottom' | 'right' | 'left') => {
+    const point = {
+      top: topPoint,
+      bottom: bottomPoint,
+      right: rightPoint,
+      left: leftPoint,
+    }[direction]
+    return (
+      <div
+        class={cs(
+          'w-[--edge-length] h-[--edge-width] cursor-none rounded-3px absolute pointer-events-initial',
+          'after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:h-1px after:bg-[--ant-color-primary]',
+        )}
+        {...getResizeHandlerProps(direction)}
+        style={{
+          '--edge-length':
+            direction === 'top' || direction === 'bottom' ? 'var(--width)' : 'var(--height)',
+          top: `calc(${point().y}px - var(--edge-width) / 2)`,
+          left: `calc(${point().x}px - var(--edge-length) / 2)`,
+          transform: inverseParentTransformMatrix()
+            .multiply(
+              new DOMMatrix().rotate(
+                direction === 'top' || direction === 'bottom' ? xAxisRotate() : yAxisRotate(),
+              ),
+            )
+            .toString(),
+        }}
+      />
+    )
+  }
 
   const getVertex = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
     const point = {
@@ -543,7 +569,7 @@ const Transformer: Component<TransformerProps> = _props => {
     }[direction]
     return (
       <div
-        class="w-[--vertex-size] h-[--vertex-size] absolute"
+        class="w-[--vertex-size] h-[--vertex-size] absolute pointer-events-initial"
         style={{
           top: `calc(${point().y}px - var(--vertex-size) / 2`,
           left: `calc(${point().x}px - var(--vertex-size) / 2`,
@@ -572,7 +598,7 @@ const Transformer: Component<TransformerProps> = _props => {
   }
 
   return (
-    <Element class="relative">
+    <Element class="relative pointer-events-none">
       <div
         ref={containerRef}
         class={cs('absolute')}
@@ -594,52 +620,10 @@ const Transformer: Component<TransformerProps> = _props => {
         onMouseDown={onMoveMouseDown}
       >
         {/* 边框 */}
-        <div
-          class={edgeClass}
-          {...getResizeHandlerProps('top')}
-          style={{
-            top: `calc(${topPoint().y}px - var(--edge-width) / 2)`,
-            left: `calc(${topPoint().x}px - var(--width) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={edgeClass}
-          {...getResizeHandlerProps('bottom')}
-          style={{
-            top: `calc(${bottomPoint().y}px - var(--edge-width) / 2)`,
-            left: `calc(${bottomPoint().x}px - var(--width) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(xAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={edgeClass}
-          {...getResizeHandlerProps('left')}
-          style={{
-            '--width': 'var(--height)',
-            top: `calc(${leftPoint().y}px - var(--edge-width) / 2)`,
-            left: `calc(${leftPoint().x}px - var(--height) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(yAxisRotate()))
-              .toString(),
-          }}
-        />
-        <div
-          class={edgeClass}
-          {...getResizeHandlerProps('right')}
-          style={{
-            '--width': 'var(--height)',
-            top: `calc(${rightPoint().y}px - var(--edge-width) / 2)`,
-            left: `calc(${rightPoint().x}px - var(--height) / 2)`,
-            transform: inverseParentTransformMatrix()
-              .multiply(new DOMMatrix().rotate(yAxisRotate()))
-              .toString(),
-          }}
-        />
+        {getEdge('top')}
+        {getEdge('bottom')}
+        {getEdge('left')}
+        {getEdge('right')}
 
         {/* 顶点 */}
         {getVertex('topLeft')}

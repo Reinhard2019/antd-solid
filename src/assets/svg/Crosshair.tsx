@@ -16,9 +16,6 @@ StyleProps & Pick<JSX.SvgSVGAttributes<SVGSVGElement>, 'ref'>
         ...commonStyle,
         ...props.style,
       }}
-      onMouseDown={e => {
-        console.log('mousedown', e.clientX, e.clientY)
-      }}
     >
       <circle cx="50%" cy="50%" r="13.5%" />
       <line x1="50%" x2="50%" y2="100%" stroke-width="1" stroke="currentColor" />
