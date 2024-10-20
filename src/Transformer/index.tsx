@@ -221,16 +221,17 @@ const Transformer: Component<TransformerProps> = _props => {
       })
       props.onMove?.(changedValue)
     }
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', onMouseMove, true)
 
     const onMouseUp = () => {
       document.body.style.userSelect = originUserSelect
       props.onTransformEnd?.()
       setAdsorbLine({})
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('mousemove', onMouseMove, true)
     }
-    window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('mouseup', onMouseUp, {
+      once: true,
+    })
   }
 
   let resizing = false
@@ -323,7 +324,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
       updateResizeArrowPosition(_e)
     }
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', onMouseMove, true)
 
     resizing = true
     const onMouseUp = () => {
@@ -332,10 +333,11 @@ const Transformer: Component<TransformerProps> = _props => {
       props.onTransformEnd?.()
       document.body.style.userSelect = originUserSelect
       document.body.style.cursor = originCursor
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('mousemove', onMouseMove, true)
     }
-    window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('mouseup', onMouseUp, {
+      once: true,
+    })
   }
   const getResizeHandlerProps = (
     direction: ResizeDirection,
@@ -393,7 +395,7 @@ const Transformer: Component<TransformerProps> = _props => {
 
       updateRotateArrowPosition(_e)
     }
-    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mousemove', onMouseMove, true)
 
     const onMouseUp = () => {
       rotating = false
@@ -401,10 +403,11 @@ const Transformer: Component<TransformerProps> = _props => {
       document.body.style.userSelect = originUserSelect
       document.body.style.cursor = originCursor
       props.onTransformEnd?.()
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseup', onMouseUp)
+      window.removeEventListener('mousemove', onMouseMove, true)
     }
-    window.addEventListener('mouseup', onMouseUp)
+    window.addEventListener('mouseup', onMouseUp, {
+      once: true,
+    })
   }
   const getRotateHandlerProps = (
     direction: ResizeDirection,
@@ -598,7 +601,7 @@ const Transformer: Component<TransformerProps> = _props => {
   }
 
   return (
-    <Element class="relative pointer-events-none">
+    <Element class="relative">
       <div
         ref={containerRef}
         class={cs('absolute')}
