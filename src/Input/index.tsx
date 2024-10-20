@@ -1,6 +1,6 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, onMount, splitProps } from 'solid-js'
-import type { JSX, Component, JSXElement } from 'solid-js'
+import { Show, createMemo, onMount } from 'solid-js'
+import type { JSX, Component, JSXElement, Ref } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import { setRef } from '../utils/solid'
@@ -10,8 +10,8 @@ import useComponentSize from '../hooks/useComponentSize'
 import './index.scss'
 import { type StyleProps } from '../types'
 
-type CommonInputProps = Omit<JSX.CustomAttributes<HTMLInputElement>, 'style'> &
-StyleProps & {
+type CommonInputProps = StyleProps & {
+  ref?: Ref<HTMLInputElement>
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   addonBefore?: JSXElement
@@ -20,24 +20,32 @@ StyleProps & {
   suffix?: JSXElement
   placeholder?: string
   /**
-     * 仅供 InputNumber 使用
-     */
+   * 仅供 InputNumber 使用
+   */
   actions?: JSXElement
   /**
-     * 设置校验状态
-     */
+   * 设置校验状态
+   */
   status?: 'error' | 'warning'
   /**
-     * 设置尺寸
-     * 默认 'middle'
-     * 高度分别为 40px、32px 和 24px
-     */
+   * 设置尺寸
+   * 默认 'middle'
+   * 高度分别为 40px、32px 和 24px
+   */
   size?: 'small' | 'middle' | 'large'
   autoFocus?: boolean
   allowClear?: boolean
   onChange?: JSX.InputEventHandler<HTMLInputElement, InputEvent>
   onPressEnter?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
   onKeyDown?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
+  onFocus?: JSX.EventHandler<HTMLInputElement, FocusEvent>
+  onBlur?: JSX.EventHandler<HTMLInputElement, FocusEvent>
+  disabled?: boolean
+  /**
+   * 声明 input 类型，同原生 input 标签的 type 属性
+   */
+  type?: string
+  maxLength?: number
 }
 
 const statusClassDict = {
@@ -61,27 +69,8 @@ const statusClassDict = {
     ),
 }
 
-export function CommonInput(
-  props: Omit<
-  JSX.InputHTMLAttributes<HTMLInputElement>,
-  'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix' | 'style'
-  > &
-  CommonInputProps,
-) {
+export function CommonInput(props: CommonInputProps) {
   const size = useComponentSize(() => props.size)
-  const [{ onChange, onPressEnter, onKeyDown }, inputProps] = splitProps(props, [
-    'defaultValue',
-    'value',
-    'class',
-    'style',
-    'addonBefore',
-    'addonAfter',
-    'suffix',
-    'onChange',
-    'onPressEnter',
-    'onKeyDown',
-    'actions',
-  ])
 
   let input: HTMLInputElement | undefined
   onMount(() => {
@@ -141,14 +130,14 @@ export function CommonInput(
         class={cs(
           'ant-input-affix-wrapper',
           'flex items-center w-full relative p:hover-child[input]:border-[var(--ant-color-primary)]',
-          ['[--actions-display:none]', !inputProps.disabled && 'hover:[--actions-display:block]'],
+          ['[--actions-display:none]', !props.disabled && 'hover:[--actions-display:block]'],
           'p-[--ant-input-padding]',
           {
             small: 'h-24px',
             middle: 'h-32px',
             large: 'h-40px',
           }[size()],
-          statusClassDict[props.status ?? 'default'](!!inputProps.disabled),
+          statusClassDict[props.status ?? 'default'](!!props.disabled),
         )}
       >
         <Show when={!isNil(prefix())}>
@@ -156,21 +145,20 @@ export function CommonInput(
         </Show>
 
         <input
-          {...(inputProps as JSX.InputHTMLAttributes<HTMLInputElement>)}
           ref={el => {
-            setRef(inputProps, el)
+            setRef(props, el)
             input = el
           }}
           class={cs(
             'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
-            inputProps.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
+            props.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
           )}
+          type={props.type}
           value={value() ?? ''}
           onInput={e => {
             setValue(e.target.value)
             try {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              onChange?.(e as any)
+              props.onChange?.(e)
             } finally {
               if (isControlled() && e.target.value !== props.value) {
                 e.target.value = props.value ?? ''
@@ -179,13 +167,14 @@ export function CommonInput(
           }}
           onKeyDown={e => {
             if (e.key === 'Enter') {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-              onPressEnter?.(e as any)
+              props.onPressEnter?.(e)
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            onKeyDown?.(e as any)
+            props.onKeyDown?.(e)
           }}
+          onFocus={e => props.onFocus?.(e)}
+          onBlur={e => props.onBlur?.(e)}
+          maxLength={props.maxLength}
         />
 
         <Show when={showClearBtn()}>
@@ -228,11 +217,7 @@ export function CommonInput(
   )
 }
 
-export type InputProps = Omit<
-JSX.InputHTMLAttributes<HTMLInputElement>,
-'onChange' | 'onInput' | 'onKeyDown' | 'prefix' | 'suffix' | 'style'
-> &
-Omit<CommonInputProps, 'actions' | 'textarea'>
+export type InputProps = Omit<CommonInputProps, 'actions' | 'textarea'>
 
 const Input: Component<InputProps> & {
   TextArea: typeof TextArea

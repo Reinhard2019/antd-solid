@@ -5,13 +5,7 @@ import { type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import useComponentSize from '../hooks/useComponentSize'
 
-export interface TextAreaProps
-  extends Omit<
-  JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
-  'value' | 'onChange' | 'onPressEnter' | 'onKeyDown' | 'style'
-  >,
-  JSX.CustomAttributes<HTMLTextAreaElement>,
-  StyleProps {
+export interface TextAreaProps extends StyleProps {
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   autoFocus?: boolean
@@ -28,6 +22,9 @@ export interface TextAreaProps
   onChange?: JSX.InputEventHandler<HTMLTextAreaElement, InputEvent>
   onPressEnter?: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent>
   onKeyDown?: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent>
+  disabled?: boolean
+  placeholder?: string
+  rows?: number
 }
 
 const TextArea: Component<TextAreaProps> = props => {
@@ -48,6 +45,7 @@ const TextArea: Component<TextAreaProps> = props => {
 
   return (
     <Element
+      class={props.class}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -63,9 +61,7 @@ const TextArea: Component<TextAreaProps> = props => {
       }}
     >
       <textarea
-        {...(props as JSX.InputHTMLAttributes<HTMLTextAreaElement>)}
         class={cs(
-          props.class,
           'p-[--ant-input-padding] border-1px border-solid border-[--ant-color-border]',
           'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
           props.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
@@ -79,8 +75,7 @@ const TextArea: Component<TextAreaProps> = props => {
         onInput={e => {
           setValue(e.target.value)
           try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            props.onChange?.(e as any)
+            props.onChange?.(e)
           } finally {
             if (isControlled() && e.target.value !== props.value) {
               e.target.value = props.value ?? ''
@@ -89,13 +84,13 @@ const TextArea: Component<TextAreaProps> = props => {
         }}
         onKeyDown={e => {
           if (e.key === 'Enter') {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-            props.onPressEnter?.(e as any)
+            props.onPressEnter?.(e)
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-          props.onKeyDown?.(e as any)
+          props.onKeyDown?.(e)
         }}
+        rows={props.rows}
+        disabled={props.disabled}
       />
     </Element>
   )
