@@ -16,8 +16,6 @@ export interface TransformValue {
   width: number
   height: number
   rotate: number
-  /** 为空时，默认为 [50%, 50%] */
-  transformOrigin?: [x: number, y: number]
 }
 
 export interface TransformerProps {
@@ -168,51 +166,49 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const startClientX = e.clientX
     const startClientY = e.clientY
-    const { x: startTranslateX, y: startTranslateY } = value()
+    const startValue = value()
 
     const onMouseMove = (_e: MouseEvent) => {
-      const clientX = _e.clientX
-      const clientY = _e.clientY
-      const offsetX = clientX - startClientX
-      const offsetY = clientY - startClientY
+      const offsetX = _e.clientX - startClientX
+      const offsetY = _e.clientY - startClientY
       const m = parentTransformMatrix().inverse().translate(offsetX, offsetY)
       const transformedOffsetX = m.e
       const transformedOffsetY = m.f
       const changedValue = {
-        x: startTranslateX + transformedOffsetX,
-        y: startTranslateY + transformedOffsetY,
+        x: startValue.x + transformedOffsetX,
+        y: startValue.y + transformedOffsetY,
       }
       if (props.adsorb) {
         const _adsorbLine: AdsorbLine = {}
 
-        const right = NP.minus(props.adsorb.width, value().width)
+        // x 轴
+        const right = props.adsorb.width - value().width
         const centerX = right / 2
-        const bottom = NP.minus(props.adsorb.height, value().height)
-        const centerY = bottom / 2
-        if (inRange(changedValue.x, -adsorbGap(), adsorbGap())) {
-          changedValue.x = 0
-          _adsorbLine.left = true
-        }
-        if (inRange(changedValue.x, right - adsorbGap(), right + adsorbGap())) {
-          changedValue.x = right
-          _adsorbLine.right = true
-        }
         if (inRange(changedValue.x, centerX - adsorbGap(), centerX + adsorbGap())) {
           changedValue.x = centerX
           _adsorbLine.centerX = true
+        } else if (inRange(changedValue.x, -adsorbGap(), adsorbGap())) {
+          changedValue.x = 0
+          _adsorbLine.left = true
+        } else if (inRange(changedValue.x, right - adsorbGap(), right + adsorbGap())) {
+          changedValue.x = right
+          _adsorbLine.right = true
         }
-        if (inRange(changedValue.y, -adsorbGap(), adsorbGap())) {
-          changedValue.y = 0
-          _adsorbLine.top = true
-        }
-        if (inRange(changedValue.y, bottom - adsorbGap(), bottom + adsorbGap())) {
-          changedValue.y = bottom
-          _adsorbLine.bottom = true
-        }
+
+        // y 轴
+        const bottom = props.adsorb.height - value().height
+        const centerY = bottom / 2
         if (inRange(changedValue.y, centerY - adsorbGap(), centerY + adsorbGap())) {
           changedValue.y = centerY
           _adsorbLine.centerY = true
+        } else if (inRange(changedValue.y, -adsorbGap(), adsorbGap())) {
+          changedValue.y = 0
+          _adsorbLine.top = true
+        } else if (inRange(changedValue.y, bottom - adsorbGap(), bottom + adsorbGap())) {
+          changedValue.y = bottom
+          _adsorbLine.bottom = true
         }
+
         setAdsorbLine(_adsorbLine)
       }
       setValue({
@@ -245,14 +241,21 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
+    const startClientX = e.clientX
+    const startClientY = e.clientY
+    const startValue = value()
+    const startTransformOrigin = parseTransformOrigin(startValue.width, startValue.height)
+
     const onMouseMove = (_e: MouseEvent) => {
       const changedValue: Partial<TransformValue> = {}
-      const m = parentTransformMatrix()
-        .multiply(transformMatrix())
-        .inverse()
-        .translate(_e.movementX, _e.movementY)
+
+      const offsetX = _e.clientX - startClientX
+      const offsetY = _e.clientY - startClientY
+      const m = parentTransformMatrix().inverse().translate(offsetX, offsetY)
       const movementX = m.e
       const movementY = m.f
+
+      const _adsorbLine: AdsorbLine = {}
 
       let xOffset = 0
       let yOffset = 0
@@ -264,16 +267,30 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomLeft' ||
         direction === 'bottomRight'
       ) {
-        let widthOffset =
-          direction === 'right' || direction === 'topRight' || direction === 'bottomRight'
-            ? movementX
-            : -movementX
-        widthOffset = Math.max(-value().width, widthOffset)
-        xOffset =
-          direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
-            ? widthOffset
-            : 0
-        changedValue.width = value().width + widthOffset
+        const isLeft = direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
+        let widthOffset = isLeft ? -movementX : movementX
+        widthOffset = Math.max(-startValue.width, widthOffset)
+        xOffset = isLeft ? -widthOffset : 0
+        changedValue.width = startValue.width + widthOffset
+
+        if (props.adsorb) {
+          if (isLeft) {
+            if (inRange(startValue.x + xOffset, -adsorbGap(), +adsorbGap())) {
+              xOffset = -startValue.x
+              changedValue.width = NP.minus(startValue.width, xOffset)
+            }
+          } else {
+            if (
+              inRange(
+                startValue.x + changedValue.width,
+                props.adsorb.width - adsorbGap(),
+                props.adsorb.width + adsorbGap(),
+              )
+            ) {
+              changedValue.width = NP.minus(props.adsorb.width, startValue.x)
+            }
+          }
+        }
       }
       if (
         direction === 'top' ||
@@ -283,38 +300,50 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomLeft' ||
         direction === 'bottomRight'
       ) {
-        let heightOffset =
-          direction === 'bottom' || direction === 'bottomLeft' || direction === 'bottomRight'
-            ? movementY
-            : -movementY
-        heightOffset = Math.max(-value().height, heightOffset)
-        yOffset =
-          direction === 'top' || direction === 'topLeft' || direction === 'topRight'
-            ? heightOffset
-            : 0
-        changedValue.height = value().height + heightOffset
+        const isTop = direction === 'top' || direction === 'topLeft' || direction === 'topRight'
+        let heightOffset = isTop ? -movementY : movementY
+        heightOffset = Math.max(-startValue.height, heightOffset)
+        yOffset = isTop ? -heightOffset : 0
+        changedValue.height = startValue.height + heightOffset
+
+        if (props.adsorb) {
+          if (isTop) {
+            if (inRange(startValue.y + yOffset, -adsorbGap(), +adsorbGap())) {
+              yOffset = -startValue.y
+              changedValue.height = NP.minus(startValue.height, yOffset)
+            }
+          } else {
+            if (
+              inRange(
+                startValue.y + changedValue.height,
+                props.adsorb.height - adsorbGap(),
+                props.adsorb.height + adsorbGap(),
+              )
+            ) {
+              changedValue.height = NP.minus(props.adsorb.height, startValue.y)
+            }
+          }
+        }
       }
 
-      const newTransformOrigin = parseTransformOrigin(
-        changedValue.width ?? value().width,
-        changedValue.height ?? value().height,
-      )
+      setAdsorbLine(_adsorbLine)
+
       const newTransformOriginPoint = new DOMPoint(
-        newTransformOrigin[0] - xOffset,
-        newTransformOrigin[1] - yOffset,
+        startTransformOrigin[0] + xOffset,
+        startTransformOrigin[1] + yOffset,
       ).matrixTransform(transformOriginMatrix())
       const newTransformMatrix = new DOMMatrix()
         .translate(newTransformOriginPoint.x, newTransformOriginPoint.y)
         .multiply(transformMatrix())
         .translate(-newTransformOriginPoint.x, -newTransformOriginPoint.y)
-        .translate(xOffset, yOffset)
+        .translate(-xOffset, -yOffset)
         .inverse()
 
       const offsetPoint = new DOMPoint()
         .matrixTransform(transformOriginMatrix())
         .matrixTransform(newTransformMatrix)
-      changedValue.x = value().x + offsetPoint.x
-      changedValue.y = value().y + offsetPoint.y
+      changedValue.x = startValue.x + offsetPoint.x
+      changedValue.y = startValue.y + offsetPoint.y
 
       setValue({
         ...value(),
@@ -611,7 +640,7 @@ const Transformer: Component<TransformerProps> = _props => {
           '--vertex-size': '32px',
           '--vertex-inner-size': '8px',
           '--vertex-resize-handler-size':
-            'calc(var(--vertex-size) / 2 + var(--vertex-inner-size) / 2)',
+            'calc(var(--vertex-size) / 2 + var(--vertex-inner-size) / 2 + 4px)',
           '--width': `calc(${transformedSize().width}px - var(--vertex-inner-size))`,
           '--height': `calc(${transformedSize().height}px - var(--vertex-inner-size))`,
           '--edge-width': '8px',
