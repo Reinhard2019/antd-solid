@@ -572,7 +572,7 @@ const Transformer: Component<TransformerProps> = _props => {
       <div
         class={cs(
           'w-[--edge-length] h-[--edge-width] cursor-none rounded-3px absolute pointer-events-initial',
-          'after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:h-1px after:bg-[--ant-color-primary]',
+          'after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-1px after:bg-[--ant-color-primary]',
         )}
         {...getResizeHandlerProps(direction)}
         style={{
