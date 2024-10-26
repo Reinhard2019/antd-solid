@@ -24,7 +24,14 @@ import { unwrapStringOrJSXElement } from '../utils/solid'
 export interface SliderProps extends StyleProps {
   defaultValue?: number | null
   value?: number | null
+  /**
+   * 当 Slider 的值发生改变时，会触发 onChange 事件，并把改变后的值作为参数传入
+   */
   onChange?: (value: number) => void
+  /**
+   * 与 mouseup 和 keyup 触发时机一致，把当前值作为参数传入
+   */
+  onChangeComplete?: (value: number) => void
   disabled?: boolean
   /**
    * 最大值
@@ -192,6 +199,7 @@ const Slider: Component<SliderProps> = _props => {
                 const onMouseUp = () => {
                   window.removeEventListener('mousemove', onMouseMove)
                   window.removeEventListener('mouseup', onMouseUp)
+                  props.onChangeComplete?.(value())
                   setIsDragging(false)
                 }
                 window.addEventListener('mouseup', onMouseUp)
