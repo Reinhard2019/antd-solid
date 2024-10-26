@@ -53,7 +53,7 @@ export interface TooltipProps {
    */
   placement?: TooltipPlacement
   contentStyle?: JSX.CSSProperties
-  content?: string | number | undefined | null | ((close: () => void) => JSXElement)
+  content?: JSXElement | ((close: () => void) => JSXElement)
   children?: JSXElement
   open?: boolean
   onOpenChange?: (open: boolean) => void

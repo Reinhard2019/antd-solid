@@ -8,6 +8,7 @@ import {
   children,
   Show,
   type JSX,
+  type JSXElement,
 } from 'solid-js'
 import cs from 'classnames'
 import { clamp, isNil } from 'lodash-es'
@@ -44,7 +45,11 @@ export interface SliderProps extends StyleProps {
    * 是否展示 tooltip
    * 默认 true
    */
-  tooltip?: boolean
+  tooltip?:
+  | boolean
+  | {
+    formatter?: (value: number) => JSXElement
+  }
   /**
    * 抓取点元素
    */
@@ -156,7 +161,11 @@ const Slider: Component<SliderProps> = _props => {
         <div class="absolute left-[calc(var(--ant-slider-handle-size)/2)] right-[calc(var(--ant-slider-handle-size)/2)] top-1/2 -translate-y-1/2">
           <Tooltip
             open={props.tooltip && (isHover() || isFocus() || isDragging())}
-            content={value()}
+            content={
+              typeof props.tooltip === 'object' && props.tooltip.formatter
+                ? props.tooltip.formatter(value())
+                : value()
+            }
           >
             <div
               ref={handleRef}
