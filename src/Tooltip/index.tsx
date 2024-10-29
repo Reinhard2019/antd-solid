@@ -1,4 +1,4 @@
-import { compact } from 'lodash-es'
+import { compact, isEqual } from 'lodash-es'
 import {
   type Component,
   type JSXElement,
@@ -9,7 +9,6 @@ import {
   mergeProps,
   onCleanup,
   createMemo,
-  untrack,
   createSignal,
   on,
   createRenderEffect,
@@ -101,26 +100,6 @@ export interface TooltipProps {
    * 暂时仅支持 'contextMenu'
    */
   displayInMouseTrigger?: boolean
-}
-
-/**
- * 获取滚动元素
- * @param ele
- * @returns
- */
-function collectScroll(ele: HTMLElement) {
-  const scrollList: HTMLElement[] = []
-  let current = ele?.parentElement
-
-  while (current) {
-    if (current.scrollHeight > current.clientHeight) {
-      scrollList.push(current)
-    }
-
-    current = current.parentElement
-  }
-
-  return [window, ...scrollList]
 }
 
 export const unwrapContent = (content: TooltipProps['content'], close: () => void) => {
@@ -250,9 +229,9 @@ const Tooltip: Component<TooltipProps> = _props => {
   // =========================== Tooltip ============================
   const id = nanoid()
   const resolvedChildren = children(() => _props.children)
-  let contentRef: HTMLDivElement | undefined
+  const [contentRef, setContentRef] = createSignal<HTMLDivElement>()
   const setPopupRef = (node: HTMLDivElement) => {
-    contentRef = node
+    setContentRef(node)
     parentContext?.registerSubPopup(id, node)
   }
   const [_open, setOpen] = createControllableValue(_props, {
@@ -266,7 +245,29 @@ const Tooltip: Component<TooltipProps> = _props => {
   const show = () => setOpen(true)
   const hide = () => setOpen(false)
 
-  const contentHovering = useHover(() => (open() ? contentRef : undefined))
+  // children 的 BoundingClientRect
+  const [childrenRect, setChildrenRect] = createSignal<DOMRect>(new DOMRect(), {
+    equals: (a, b) => isEqual(a.toJSON(), b.toJSON()),
+  })
+  createEffect(() => {
+    if (!open()) return
+
+    const _children = resolvedChildren() as Element
+
+    let handle: number | undefined
+    const tick = () => {
+      setChildrenRect(_children.getBoundingClientRect())
+
+      handle = window.requestAnimationFrame(tick)
+    }
+    tick()
+
+    onCleanup(() => {
+      if (typeof handle === 'number') window.cancelAnimationFrame(handle)
+    })
+  })
+
+  const contentHovering = useHover(() => (open() ? contentRef() : undefined))
   const childrenHovering = useHover(() =>
     toArray(props.trigger).includes('hover') ? (resolvedChildren() as HTMLElement) : undefined,
   )
@@ -288,13 +289,17 @@ const Tooltip: Component<TooltipProps> = _props => {
   })
 
   // 触发时，鼠标相对于触发元素位置
-  let mouseTriggerOffset: { x: number; y: number } | undefined
+  const [mouseTriggerOffset, setMouseTriggerOffset] = createSignal<
+  { x: number; y: number } | undefined
+  >(undefined, {
+    equals: isEqual,
+  })
   createRenderEffect(
     on(
       open,
       () => {
         if (!open()) {
-          mouseTriggerOffset = undefined
+          setMouseTriggerOffset()
         }
       },
       {
@@ -328,17 +333,15 @@ const Tooltip: Component<TooltipProps> = _props => {
           _children.addEventListener(
             'contextmenu',
             (e: MouseEvent) => {
-              if (props.displayInMouseTrigger) {
-                const rect = _children.getBoundingClientRect()
-                mouseTriggerOffset = {
-                  x: e.clientX - rect.left,
-                  y: e.clientY - rect.top,
-                }
-                setTranslate()
-              }
-
               e.preventDefault()
               show()
+
+              if (props.displayInMouseTrigger) {
+                setMouseTriggerOffset({
+                  x: e.clientX - childrenRect().x,
+                  y: e.clientY - childrenRect().y,
+                })
+              }
             },
             {
               signal: abortController.signal,
@@ -349,7 +352,9 @@ const Tooltip: Component<TooltipProps> = _props => {
     })
 
     if (triggerArray.includes('click')) {
-      useClickAway(hide, () => compact([...Object.values(subPopupElements), contentRef, _children]))
+      useClickAway(hide, () =>
+        compact([...Object.values(subPopupElements), contentRef(), _children]),
+      )
     }
 
     if (triggerArray.includes('contextMenu')) {
@@ -374,8 +379,9 @@ const Tooltip: Component<TooltipProps> = _props => {
     reverse() ? REVERSE_PLACEMENT_DICT[props.placement] : props.placement,
   )
   // 设置 content 显示时的 translate
-  const setTranslate = () => {
-    if (!contentRef) return
+  createEffect(() => {
+    const _contentRef = contentRef()
+    if (!_contentRef || !open()) return
 
     const _children = resolvedChildren() as HTMLElement
     if (isHide(_children)) {
@@ -383,93 +389,98 @@ const Tooltip: Component<TooltipProps> = _props => {
       return
     }
 
-    const _childrenRect = _children.getBoundingClientRect()
-    console.log('_childrenRect', _childrenRect)
-    const childrenRect = {
-      left: _childrenRect.left + (props.offset?.[0] ?? 0),
-      right: _childrenRect.right + (props.offset?.[0] ?? 0),
-      top: _childrenRect.top + (props.offset?.[1] ?? 0),
-      bottom: _childrenRect.bottom + (props.offset?.[1] ?? 0),
-      width: _childrenRect.width,
-      height: _childrenRect.height,
-    }
     let translateX = 0
     let translateY = 0
 
-    if (mouseTriggerOffset) {
-      translateX = _childrenRect.left + mouseTriggerOffset.x
-      translateY = _childrenRect.top + mouseTriggerOffset.y
+    const _mouseTriggerOffset = mouseTriggerOffset()
+    const translatedChildrenRect = new DOMRect(
+      childrenRect().x,
+      childrenRect().y,
+      childrenRect().width,
+      childrenRect().height,
+    )
+    translatedChildrenRect.x += props.offset?.[0] ?? 0
+    translatedChildrenRect.y += props.offset?.[1] ?? 0
+    if (_mouseTriggerOffset) {
+      translateX = translatedChildrenRect.x + _mouseTriggerOffset.x
+      translateY = translatedChildrenRect.y + _mouseTriggerOffset.y
       switch (props.placement) {
         case 'top':
         case 'topLeft':
         case 'topRight':
-          translateY -= contentRef.clientHeight + arrowOffset()
+          translateY -= _contentRef.clientHeight + arrowOffset()
           break
         case 'left':
         case 'leftTop':
         case 'leftBottom':
-          translateX -= contentRef.clientWidth + arrowOffset()
+          translateX -= _contentRef.clientWidth + arrowOffset()
           break
       }
       switch (props.placement) {
         case 'top':
         case 'bottom':
-          translateX -= contentRef.clientWidth / 2
+          translateX -= _contentRef.clientWidth / 2
           break
         case 'topRight':
         case 'bottomRight':
-          translateX -= contentRef.clientWidth
+          translateX -= _contentRef.clientWidth
           break
         case 'left':
         case 'right':
-          translateY -= contentRef.clientHeight / 2
+          translateY -= _contentRef.clientHeight / 2
           break
         case 'leftBottom':
         case 'rightBottom':
-          translateY -= contentRef.clientHeight
+          translateY -= _contentRef.clientHeight
           break
       }
     } else {
       switch (props.placement) {
         case 'top':
         case 'bottom':
-          translateX = childrenRect.left + childrenRect.width / 2 - contentRef.clientWidth / 2
+          translateX =
+            translatedChildrenRect.left +
+            translatedChildrenRect.width / 2 -
+            _contentRef.clientWidth / 2
           break
         case 'topLeft':
         case 'bottomLeft':
-          translateX = childrenRect.left
+          translateX = translatedChildrenRect.left
           break
         case 'topRight':
         case 'bottomRight':
-          translateX = childrenRect.right - contentRef.clientWidth
+          translateX = translatedChildrenRect.right - _contentRef.clientWidth
           break
         case 'left':
         case 'right':
-          translateY = childrenRect.top + childrenRect.height / 2 - contentRef.clientHeight / 2
+          translateY =
+            translatedChildrenRect.top +
+            translatedChildrenRect.height / 2 -
+            _contentRef.clientHeight / 2
           break
         case 'leftTop':
         case 'rightTop':
-          translateY = childrenRect.top
+          translateY = translatedChildrenRect.top
           break
         case 'leftBottom':
         case 'rightBottom':
-          translateY = childrenRect.bottom - contentRef.clientHeight
+          translateY = translatedChildrenRect.bottom - _contentRef.clientHeight
           break
       }
 
       const updateTranslateByMainPlacement = (type: 'top' | 'bottom' | 'left' | 'right') => {
         switch (type) {
           case 'top':
-            translateY = childrenRect.top - arrowOffset() - contentRef!.clientHeight
+            translateY = translatedChildrenRect.top - arrowOffset() - _contentRef!.clientHeight
             break
           case 'bottom':
-            translateY = childrenRect.bottom + arrowOffset()
+            translateY = translatedChildrenRect.bottom + arrowOffset()
             break
           case 'left':
-            translateX = childrenRect.left - arrowOffset() - contentRef!.clientWidth
+            translateX = translatedChildrenRect.left - arrowOffset() - _contentRef!.clientWidth
             break
           case 'right':
-            translateX = childrenRect.right + arrowOffset()
+            translateX = translatedChildrenRect.right + arrowOffset()
             break
         }
       }
@@ -481,7 +492,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           case 'topRight':
             if (reverse()) {
               updateTranslateByMainPlacement('bottom')
-              if (translateY + contentRef.clientHeight > window.innerHeight) {
+              if (translateY + _contentRef.clientHeight > window.innerHeight) {
                 setReverse(false)
                 updateTranslateByMainPlacement('top')
               }
@@ -504,7 +515,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               }
             } else {
               updateTranslateByMainPlacement('bottom')
-              if (translateY + contentRef.clientHeight > window.innerHeight) {
+              if (translateY + _contentRef.clientHeight > window.innerHeight) {
                 setReverse(true)
                 updateTranslateByMainPlacement('top')
               }
@@ -521,7 +532,7 @@ const Tooltip: Component<TooltipProps> = _props => {
               }
             } else {
               updateTranslateByMainPlacement('left')
-              if (translateX + contentRef.clientWidth > window.innerWidth) {
+              if (translateX + _contentRef.clientWidth > window.innerWidth) {
                 setReverse(true)
                 updateTranslateByMainPlacement('right')
               }
@@ -532,7 +543,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           case 'rightBottom':
             if (reverse()) {
               updateTranslateByMainPlacement('left')
-              if (translateX + contentRef.clientWidth > window.innerWidth) {
+              if (translateX + _contentRef.clientWidth > window.innerWidth) {
                 setReverse(false)
                 updateTranslateByMainPlacement('right')
               }
@@ -571,91 +582,25 @@ const Tooltip: Component<TooltipProps> = _props => {
       }
     }
 
-    contentRef.style.setProperty('--translate-x', `${translateX}px`)
-    contentRef.style.setProperty('--translate-y', `${translateY}px`)
+    _contentRef.style.setProperty('--translate-x', `${translateX}px`)
+    _contentRef.style.setProperty('--translate-y', `${translateY}px`)
 
     // placement 为 top 和 bottom 时，tooltip 超出可视区域时对 content 进行偏移矫正
     if (props.placement === 'top' || props.placement === 'bottom') {
       let innerTranslateX = 0
-      const maxInnerTranslateX = contentRef.clientWidth / 2 - 20
+      const maxInnerTranslateX = _contentRef.clientWidth / 2 - 20
       if (translateX < 0) {
         innerTranslateX = Math.min(-translateX, maxInnerTranslateX)
       }
-      if (translateX + contentRef.clientWidth > window.innerWidth) {
+      if (translateX + _contentRef.clientWidth > window.innerWidth) {
         innerTranslateX = Math.max(
-          window.innerWidth - (translateX + contentRef.clientWidth),
+          window.innerWidth - (translateX + _contentRef.clientWidth),
           -maxInnerTranslateX,
         )
       }
-      contentRef.style.setProperty('--inner-translate-x', `${innerTranslateX}px`)
+      _contentRef.style.setProperty('--inner-translate-x', `${innerTranslateX}px`)
     }
-  }
-  createEffect(
-    on(open, () => {
-      if (!open()) return
-
-      setTranslate()
-    }),
-  )
-  // 监听滚动
-  createEffect(
-    on([open, resolvedChildren], () => {
-      if (!open()) return
-
-      const cleanupFnList: Array<() => void> = []
-
-      const _children = resolvedChildren() as HTMLElement
-      const scrollList = collectScroll(_children)
-      scrollList.forEach(scroll => {
-        const onScroll = () => {
-          untrack(setTranslate)
-        }
-        scroll.addEventListener('scroll', onScroll)
-        cleanupFnList.push(() => {
-          scroll.removeEventListener('scroll', onScroll)
-        })
-      })
-
-      onCleanup(() => {
-        cleanupFnList.forEach(fn => {
-          fn()
-        })
-      })
-    }),
-  )
-  // 监听 children 的 size 变化
-  createEffect(
-    on([open, resolvedChildren], () => {
-      if (!open()) return
-
-      const _children = resolvedChildren() as HTMLElement
-      const ro = new ResizeObserver(() => {
-        setTranslate()
-      })
-      ro.observe(_children)
-      onCleanup(() => {
-        ro.disconnect()
-      })
-    }),
-  )
-  // 监听 children 的位置变化
-  createEffect(
-    on([open, resolvedChildren], () => {
-      if (!open()) return
-
-      const _children = resolvedChildren() as HTMLElement
-
-      const config = { attributes: true }
-      const ro = new MutationObserver(() => {
-        setTranslate()
-      })
-      ro.observe(_children, config)
-
-      onCleanup(() => {
-        ro.disconnect()
-      })
-    }),
-  )
+  })
 
   return (
     <TooltipContext.Provider value={context}>
