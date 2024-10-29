@@ -284,28 +284,61 @@ const Tooltip: Component<TooltipProps> = _props => {
 
   createEffect(() => {
     const _children = resolvedChildren() as Element
-    toArray(props.trigger).forEach(trigger => {
+    const abortController = new AbortController()
+
+    const triggerArray = toArray(props.trigger)
+
+    triggerArray.forEach(trigger => {
       switch (trigger) {
         case 'click':
-          _children.addEventListener('click', reverseOpen)
-          onCleanup(() => {
-            _children.removeEventListener('click', reverseOpen)
+          _children.addEventListener('click', reverseOpen, {
+            signal: abortController.signal,
           })
-
-          useClickAway(
-            () => setOpen(false),
-            () => compact([...Object.values(subPopupElements), contentRef, _children]),
-          )
           break
         case 'focus':
-          _children.addEventListener('focusin', show)
-          _children.addEventListener('focusout', hide)
-          onCleanup(() => {
-            _children.removeEventListener('focusin', show)
-            _children.removeEventListener('focusout', hide)
+          _children.addEventListener('focusin', show, {
+            signal: abortController.signal,
+          })
+          _children.addEventListener('focusout', hide, {
+            signal: abortController.signal,
           })
           break
+        case 'contextMenu':
+          _children.addEventListener(
+            'contextmenu',
+            e => {
+              e.preventDefault()
+              setOpen(true)
+            },
+            {
+              signal: abortController.signal,
+            },
+          )
+          break
       }
+    })
+
+    if (triggerArray.includes('click')) {
+      useClickAway(
+        () => setOpen(false),
+        () => compact([...Object.values(subPopupElements), contentRef, _children]),
+      )
+    }
+
+    if (triggerArray.includes('contextMenu')) {
+      window.addEventListener(
+        'click',
+        () => {
+          setOpen(false)
+        },
+        {
+          signal: abortController.signal,
+        },
+      )
+    }
+
+    onCleanup(() => {
+      abortController.abort()
     })
   })
 
