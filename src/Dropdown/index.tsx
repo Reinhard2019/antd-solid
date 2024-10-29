@@ -60,7 +60,7 @@ const Dropdown: Component<DropdownProps> = _props => {
         ]}
         {...popoverProps}
       >
-        <span ref={ref} class="cursor-pointer">
+        <span ref={ref} class="cursor-pointer inline-block">
           {props.children}
         </span>
       </Popover>
