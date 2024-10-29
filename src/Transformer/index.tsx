@@ -146,7 +146,18 @@ const Transformer: Component<TransformerProps> = _props => {
       .multiply(transformMatrix())
       .translate(-transformOrigin()[0], -transformOrigin()[1]),
   )
-  const parentTransformMatrix = createMemo(() => props.parentTransform ?? new DOMMatrix())
+  const parentTransformMatrix = createMemo(() =>
+    props.parentTransform
+      ? new DOMMatrix([
+        props.parentTransform.a,
+        props.parentTransform.b,
+        props.parentTransform.c,
+        props.parentTransform.d,
+        0,
+        0,
+      ])
+      : new DOMMatrix(),
+  )
   const inverseParentTransformMatrix = createMemo(() => parentTransformMatrix().inverse())
 
   interface AdsorbLine {
