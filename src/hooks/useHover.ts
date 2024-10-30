@@ -1,6 +1,6 @@
 import { createEffect, type Accessor, onCleanup, createSignal } from 'solid-js'
 
-export default function useHover(target: Accessor<HTMLElement | undefined>) {
+export default function useHover(target: Accessor<Element | undefined>) {
   const [hover, setHover] = createSignal(false)
 
   createEffect(() => {

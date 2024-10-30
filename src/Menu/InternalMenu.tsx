@@ -56,50 +56,55 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
         const hasChildren = createMemo(() => !isEmpty(item.children))
 
         const getLabel = (options?: { onClick?: () => void; expandIcon?: JSXElement }) => (
-          <div
-            class={cs(
-              'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center',
-              inDropdown ? 'min-h-32px' : 'min-h-40px m-[--ant-menu-item-margin]',
-              props.selectedKeys.includes(item.key)
-                ? 'bg-[--ant-control-item-bg-active] text-[--ant-color-primary]'
-                : 'text-[--ant-color-text] hover:bg-[var(--ant-color-bg-text-hover)]',
-              !hasChildren()
-                ? [
-                  'px-[var(--ant-padding)]',
-                  props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
-                ]
-                : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
-            )}
-            onClick={() => {
-              options?.onClick?.()
+          <div class={cs(item.disabled && 'cursor-not-allowed')}>
+            <div
+              class={cs(
+                'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center',
+                inDropdown ? 'min-h-32px' : 'min-h-40px m-[--ant-menu-item-margin]',
+                item.disabled
+                  ? 'text-[--ant-color-text-disabled]'
+                  : props.selectedKeys.includes(item.key)
+                    ? 'bg-[--ant-control-item-bg-active] text-[--ant-color-primary]'
+                    : 'text-[--ant-color-text] hover:bg-[var(--ant-color-bg-text-hover)]',
+                !hasChildren()
+                  ? [
+                    'px-[var(--ant-padding)]',
+                    props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
+                  ]
+                  : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
+                item.disabled && 'pointer-events-none',
+              )}
+              onClick={() => {
+                options?.onClick?.()
 
-              if (!hasChildren()) {
-                const info = {
-                  key: item.key,
-                  keyPath: keyPath(),
+                if (!hasChildren()) {
+                  const info = {
+                    key: item.key,
+                    keyPath: keyPath(),
+                  }
+
+                  item.onClick?.(info)
+                  props.onClick?.(info)
+
+                  if (props.selectable) {
+                    props.onSelect?.({
+                      ...info,
+                      selectedKeys: [item.key],
+                    })
+                  }
                 }
+              }}
+              style={{
+                'padding-left':
+                  props.mode === 'inline'
+                    ? `calc(${keyPath().length} * var(--ant-padding))`
+                    : undefined,
+              }}
+            >
+              {unwrapStringOrJSXElement(item.label)}
 
-                item.onClick?.(info)
-                props.onClick?.(info)
-
-                if (props.selectable) {
-                  props.onSelect?.({
-                    ...info,
-                    selectedKeys: [item.key],
-                  })
-                }
-              }
-            }}
-            style={{
-              'padding-left':
-                props.mode === 'inline'
-                  ? `calc(${keyPath().length} * var(--ant-padding))`
-                  : undefined,
-            }}
-          >
-            {unwrapStringOrJSXElement(item.label)}
-
-            <Show when={hasChildren()}>{options?.expandIcon}</Show>
+              <Show when={hasChildren()}>{options?.expandIcon}</Show>
+            </div>
           </div>
         )
 
@@ -111,6 +116,8 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                   trigger="hover"
                   open={expanded()}
                   onOpenChange={value => {
+                    if (item.disabled) return
+
                     if (value) {
                       props.onExpandedKeysChange(keyPath())
                       return

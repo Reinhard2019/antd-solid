@@ -51,6 +51,7 @@ const items: MenuItem[] = [
   {
     key: 'sub3',
     label: 'Navigation Three',
+    disabled: true,
   },
 ]
 

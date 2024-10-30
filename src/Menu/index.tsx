@@ -7,6 +7,7 @@ import createControllableValue from '../hooks/createControllableValue'
 export interface MenuItemType<T = any> {
   key: T
   label: StringOrJSXElement
+  disabled?: boolean
   children?: MenuItem[]
   onClick?: (info: { key: T; keyPath: T[] }) => void
 }

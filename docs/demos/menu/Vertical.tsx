@@ -9,6 +9,7 @@ const items: MenuItem[] = [
       {
         key: '1-1',
         label: '1-1',
+        disabled: true,
         children: [
           {
             key: '1-1-1',
