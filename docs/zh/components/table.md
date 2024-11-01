@@ -13,7 +13,7 @@ outline: deep
 
 简单的表格
 
-<Code path="table/Base" />
+<Code path="table/Base" iframe />
 
 ## API
 

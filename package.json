@@ -70,11 +70,6 @@
     "solid-transition-group": "^0.2.3",
     "yup": "^1.2.0"
   },
-  "pnpm": {
-    "patchedDependencies": {
-      "vitepress@1.1.4": "patches/vitepress@1.1.4.patch"
-    }
-  },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
       "prettier --write",
