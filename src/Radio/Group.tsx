@@ -2,9 +2,8 @@ import { type Component, type JSX, For, mergeProps, createSelector } from 'solid
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
-import { type StyleProps, type StringOrJSXElement, type ComponentSize } from '../types'
+import { type StyleProps, type ComponentSize } from '../types'
 import Radio from '.'
-import { unwrapStringOrJSXElement } from '../utils/solid'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 
@@ -13,7 +12,7 @@ export interface RadioGroupProps extends StyleProps {
   value?: string
   onChange?: JSX.ChangeEventHandler<HTMLInputElement, Event>
   optionType?: 'default' | 'button'
-  options: Array<{ label: StringOrJSXElement; value: string; disabled?: boolean }>
+  options: Array<{ label: JSX.Element; value: string; disabled?: boolean }>
   block?: boolean
   disabled?: boolean
   size?: ComponentSize
@@ -56,7 +55,7 @@ const Group: Component<RadioGroupProps> = _props => {
             }
             size={size()}
           >
-            {unwrapStringOrJSXElement(option.label)}
+            {option.label}
           </Dynamic>
         )}
       </For>
