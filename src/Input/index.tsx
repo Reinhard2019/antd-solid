@@ -129,7 +129,7 @@ export function CommonInput(props: CommonInputProps) {
       <div
         class={cs(
           'ant-input-affix-wrapper',
-          'flex items-center w-full relative p:hover-child[input]:border-[var(--ant-color-primary)]',
+          'flex items-center w-full relative p:hover-child[input]:border-[--ant-color-primary] bg-[--ant-color-bg-container]',
           ['[--actions-display:none]', !props.disabled && 'hover:[--actions-display:block]'],
           'p-[--ant-input-padding]',
           {
