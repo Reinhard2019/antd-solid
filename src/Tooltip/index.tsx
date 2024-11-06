@@ -22,9 +22,8 @@ import { useClickAway } from '../hooks'
 import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
-import { isHide } from '../utils/dom'
 import useHover from '../hooks/useHover'
-import Element from '../Element'
+import AntdElement from '../Element'
 import TooltipContext, { type TooltipContextProps } from './context'
 
 type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
@@ -252,7 +251,8 @@ const Tooltip: Component<TooltipProps> = _props => {
   createEffect(() => {
     if (!open()) return
 
-    const _children = resolvedChildren() as Element
+    const _children = resolvedChildren()
+    if (!(_children instanceof Element)) return
 
     let handle: number | undefined
     const tick = () => {
@@ -309,7 +309,9 @@ const Tooltip: Component<TooltipProps> = _props => {
   )
 
   createEffect(() => {
-    const _children = resolvedChildren() as Element
+    const _children = resolvedChildren()
+    if (!(_children instanceof Element)) return
+
     const abortController = new AbortController()
 
     const triggerArray = toArray(props.trigger)
@@ -383,8 +385,8 @@ const Tooltip: Component<TooltipProps> = _props => {
     const _contentRef = contentRef()
     if (!_contentRef || !open()) return
 
-    const _children = resolvedChildren() as HTMLElement
-    if (isHide(_children)) {
+    const _children = resolvedChildren()
+    if (!(_children instanceof Element)) {
       setOpen(false)
       return
     }
@@ -609,7 +611,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
         <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
-          <Element
+          <AntdElement
             ref={setPopupRef}
             class={cs(
               'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
@@ -656,7 +658,7 @@ const Tooltip: Component<TooltipProps> = _props => {
                 }}
               />
             </Show>
-          </Element>
+          </AntdElement>
         </Portal>
       </Dynamic>
     </TooltipContext.Provider>
