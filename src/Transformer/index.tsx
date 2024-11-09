@@ -111,8 +111,7 @@ const Transformer: Component<TransformerProps> = _props => {
   )
   const adsorbGap = createMemo(() => (props.adsorb ? props.adsorb.gap ?? 5 : 0))
 
-  let containerRef: HTMLDivElement | undefined
-  let transformOriginRef: SVGSVGElement | undefined
+  let transformOriginRef: HTMLDivElement | undefined
   const [_value, setValue] = createControllableValue<TransformValue | undefined>(props)
   const value = createMemo(
     () =>
@@ -139,7 +138,7 @@ const Transformer: Component<TransformerProps> = _props => {
   const transformMatrix = createMemo(() =>
     new DOMMatrix().rotate(value().rotate).scale(props.scaleX, props.scaleY).multiply(skewMatrix()),
   )
-  // 围绕转换远点进行转换后的 Matrix
+  // 围绕转换原点进行转换后的 Matrix
   const transformOriginMatrix = createMemo(() =>
     new DOMMatrix()
       .translate(...transformOrigin())
@@ -175,19 +174,17 @@ const Transformer: Component<TransformerProps> = _props => {
     const originUserSelect = document.body.style.userSelect
     document.body.style.userSelect = 'none'
 
-    const startClientX = e.clientX
-    const startClientY = e.clientY
     const startValue = value()
 
     const onMouseMove = (_e: MouseEvent) => {
-      const offsetX = _e.clientX - startClientX
-      const offsetY = _e.clientY - startClientY
-      const m = parentTransformMatrix().inverse().translate(offsetX, offsetY)
-      const transformedOffsetX = m.e
-      const transformedOffsetY = m.f
+      const m = parentTransformMatrix()
+        .inverse()
+        .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
+      const offsetX = m.e
+      const offsetY = m.f
       const changedValue = {
-        x: startValue.x + transformedOffsetX,
-        y: startValue.y + transformedOffsetY,
+        x: startValue.x + offsetX,
+        y: startValue.y + offsetY,
       }
       if (props.adsorb) {
         const _adsorbLine: AdsorbLine = {}
@@ -252,24 +249,36 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
-    const startClientX = e.clientX
-    const startClientY = e.clientY
     const startValue = value()
-    const startTransformOrigin = parseTransformOrigin(startValue.width, startValue.height)
+
+    const getVertex = (width: number, height: number): DOMPoint =>
+      new DOMPoint(
+        direction === 'right' || direction === 'bottomRight' || direction === 'topRight'
+          ? 0
+          : width,
+        direction === 'bottom' || direction === 'bottomRight' || direction === 'bottomLeft'
+          ? 0
+          : height,
+      )
+    const startVertex = getVertex(value().width, value().height).matrixTransform(
+      new DOMMatrix()
+        .translate(...transformOrigin())
+        .multiply(transformMatrix())
+        .translate(-transformOrigin()[0], -transformOrigin()[1]),
+    )
 
     const onMouseMove = (_e: MouseEvent) => {
       const changedValue: Partial<TransformValue> = {}
 
-      const offsetX = _e.clientX - startClientX
-      const offsetY = _e.clientY - startClientY
-      const m = parentTransformMatrix().inverse().translate(offsetX, offsetY)
-      const movementX = m.e
-      const movementY = m.f
+      const m = parentTransformMatrix()
+        .multiply(transformMatrix())
+        .inverse()
+        .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
+      const offsetX = m.e
+      const offsetY = m.f
 
       const _adsorbLine: AdsorbLine = {}
 
-      let xOffset = 0
-      let yOffset = 0
       if (
         direction === 'left' ||
         direction === 'right' ||
@@ -279,13 +288,13 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomRight'
       ) {
         const isLeft = direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
-        let widthOffset = isLeft ? -movementX : movementX
+        let widthOffset = isLeft ? -offsetX : offsetX
         widthOffset = Math.max(-startValue.width, widthOffset)
-        xOffset = isLeft ? -widthOffset : 0
         changedValue.width = startValue.width + widthOffset
 
         if (props.adsorb) {
           if (isLeft) {
+            let xOffset = isLeft ? -widthOffset : 0
             if (inRange(startValue.x + xOffset, -adsorbGap(), +adsorbGap())) {
               xOffset = -startValue.x
               changedValue.width = NP.minus(startValue.width, xOffset)
@@ -312,13 +321,13 @@ const Transformer: Component<TransformerProps> = _props => {
         direction === 'bottomRight'
       ) {
         const isTop = direction === 'top' || direction === 'topLeft' || direction === 'topRight'
-        let heightOffset = isTop ? -movementY : movementY
+        let heightOffset = isTop ? -offsetY : offsetY
         heightOffset = Math.max(-startValue.height, heightOffset)
-        yOffset = isTop ? -heightOffset : 0
         changedValue.height = startValue.height + heightOffset
 
         if (props.adsorb) {
           if (isTop) {
+            let yOffset = isTop ? -heightOffset : 0
             if (inRange(startValue.y + yOffset, -adsorbGap(), +adsorbGap())) {
               yOffset = -startValue.y
               changedValue.height = NP.minus(startValue.height, yOffset)
@@ -339,22 +348,17 @@ const Transformer: Component<TransformerProps> = _props => {
 
       setAdsorbLine(_adsorbLine)
 
-      const newTransformOriginPoint = new DOMPoint(
-        startTransformOrigin[0] + xOffset,
-        startTransformOrigin[1] + yOffset,
-      ).matrixTransform(transformOriginMatrix())
-      const newTransformMatrix = new DOMMatrix()
-        .translate(newTransformOriginPoint.x, newTransformOriginPoint.y)
-        .multiply(transformMatrix())
-        .translate(-newTransformOriginPoint.x, -newTransformOriginPoint.y)
-        .translate(-xOffset, -yOffset)
-        .inverse()
-
-      const offsetPoint = new DOMPoint()
-        .matrixTransform(transformOriginMatrix())
-        .matrixTransform(newTransformMatrix)
-      changedValue.x = startValue.x + offsetPoint.x
-      changedValue.y = startValue.y + offsetPoint.y
+      const endWidth = changedValue.width ?? value().width
+      const endHeight = changedValue.height ?? value().height
+      const endTransformOrigin = parseTransformOrigin(endWidth, endHeight)
+      const endVertex = getVertex(endWidth, endHeight).matrixTransform(
+        new DOMMatrix()
+          .translate(endTransformOrigin[0], endTransformOrigin[1])
+          .multiply(transformMatrix())
+          .translate(-endTransformOrigin[0], -endTransformOrigin[1]),
+      )
+      changedValue.x = startValue.x + startVertex.x - endVertex.x
+      changedValue.y = startValue.y + startVertex.y - endVertex.y
 
       setValue({
         ...value(),
@@ -417,15 +421,13 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
-    const { x, y, width, height } = transformOriginRef.getBoundingClientRect()
+    const { x, y } = transformOriginRef.getBoundingClientRect()
 
-    const centerX = x + width / 2
-    const centerY = y + height / 2
     const startRotate = value().rotate
-    const startAngle = Math.atan2(e.clientY - centerY, e.clientX - centerX)
+    const startAngle = Math.atan2(e.clientY - y, e.clientX - x)
 
     const onMouseMove = (_e: MouseEvent) => {
-      const angle = Math.atan2(_e.clientY - centerY, _e.clientX - centerX)
+      const angle = Math.atan2(_e.clientY - y, _e.clientX - x)
       const rotate = startRotate + radToDeg(angle - startAngle)
       setValue({
         ...value(),
@@ -518,9 +520,6 @@ const Transformer: Component<TransformerProps> = _props => {
   const rightPoint = createMemo(() =>
     new DOMPoint(value().width, value().height / 2).matrixTransform(transformOriginMatrix()),
   )
-  const transformOriginPoint = createMemo(() =>
-    new DOMPoint(...transformOrigin()).matrixTransform(transformOriginMatrix()),
-  )
   const transformedSize = createMemo(() => {
     const start = new DOMPoint(0, 0).matrixTransform(
       parentTransformMatrix().multiply(transformOriginMatrix()),
@@ -572,7 +571,7 @@ const Transformer: Component<TransformerProps> = _props => {
     return _rotateDirection ? directionRotateDict()[_rotateDirection] + 45 : 0
   })
 
-  const getEdge = (direction: 'top' | 'bottom' | 'right' | 'left') => {
+  const getEdgeDom = (direction: 'top' | 'bottom' | 'right' | 'left') => {
     const point = {
       top: topPoint,
       bottom: bottomPoint,
@@ -603,7 +602,7 @@ const Transformer: Component<TransformerProps> = _props => {
     )
   }
 
-  const getVertex = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
+  const getVertexDom = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
     const point = {
       topLeft: topLeftPoint,
       bottomRight: bottomRightPoint,
@@ -643,8 +642,27 @@ const Transformer: Component<TransformerProps> = _props => {
   return (
     <Element class="relative">
       <div
-        ref={containerRef}
-        class={cs('absolute')}
+        class="absolute"
+        style={{
+          width: `${value().width}px`,
+          height: `${value().height}px`,
+          transform: `translate(${value().x}px, ${value().y}px) rotate(${value().rotate}deg) scale(${props.scaleX},${props.scaleY}) skew(${props.skewX}deg,${props.skewY}deg)`,
+          'transform-origin': `${transformOrigin()[0]}px ${transformOrigin()[1]}px`,
+        }}
+        onMouseDown={onMoveMouseDown}
+      >
+        <div
+          ref={transformOriginRef}
+          class="absolute w-0px h-0px"
+          style={{
+            top: `${transformOrigin()[1]}px`,
+            left: `${transformOrigin()[0]}px`,
+          }}
+        />
+      </div>
+
+      <div
+        class="absolute"
         style={{
           '--ant-transformer-box-shadow':
             '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
@@ -655,36 +673,33 @@ const Transformer: Component<TransformerProps> = _props => {
           '--width': `calc(${transformedSize().width}px - var(--vertex-inner-size))`,
           '--height': `calc(${transformedSize().height}px - var(--vertex-inner-size))`,
           '--edge-width': '8px',
-          width: `${value().width}px`,
-          height: `${value().height}px`,
           transform: `translate(${value().x}px, ${value().y}px)`,
           'transform-origin': `${transformOrigin()[0]}px ${transformOrigin()[1]}px`,
         }}
-        onMouseDown={onMoveMouseDown}
       >
         {/* 边框 */}
-        {getEdge('top')}
-        {getEdge('bottom')}
-        {getEdge('left')}
-        {getEdge('right')}
+        {getEdgeDom('top')}
+        {getEdgeDom('bottom')}
+        {getEdgeDom('left')}
+        {getEdgeDom('right')}
 
         {/* 顶点 */}
-        {getVertex('topLeft')}
-        {getVertex('topRight')}
-        {getVertex('bottomLeft')}
-        {getVertex('bottomRight')}
+        {getVertexDom('topLeft')}
+        {getVertexDom('topRight')}
+        {getVertexDom('bottomLeft')}
+        {getVertexDom('bottomRight')}
 
-        <CrosshairSvg
-          ref={transformOriginRef}
-          class="absolute [font-size:var(--size)] text-black"
-          style={{
-            '--size': '14px',
-            top: `calc(${transformOriginPoint().y}px - var(--size) / 2)`,
-            left: `calc(${transformOriginPoint().x}px - var(--size) / 2)`,
-            transform: inverseParentTransformMatrix().toString(),
-            opacity: props.transformOriginIcon ? 1 : 0,
-          }}
-        />
+        <Show when={props.transformOriginIcon}>
+          <CrosshairSvg
+            class="absolute [font-size:var(--size)] text-black pointer-events-none"
+            style={{
+              '--size': '14px',
+              top: `calc(${transformOrigin()[1]}px - var(--size) / 2)`,
+              left: `calc(${transformOrigin()[0]}px - var(--size) / 2)`,
+              transform: inverseParentTransformMatrix().toString(),
+            }}
+          />
+        </Show>
       </div>
 
       <Show when={!resizeDirection() && rotateDirection()}>
