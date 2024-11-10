@@ -20,6 +20,12 @@ CreateModal
 
 <Code path="modal/CreateModal" />
 
+### 使用 hooks 获得上下文
+
+通过 `Modal.useModal` 创建支持读取 context 的 `contextHolder`。其中仅有 hooks 方法支持 Promise `await` 操作。
+
+<Code path="modal/UseModal" />
+
 ## API
 
 ### Modal

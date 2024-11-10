@@ -10,7 +10,7 @@ interface ExampleModalResolveValue {
 const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveValue>(
   (props: ExampleModalProps) => {
     const { open, onCancel, onOk } = Modal.useModalProps<ExampleModalResolveValue>()
-    console.log('ExampleModal')
+
     return (
       <Modal
         open={open()}
