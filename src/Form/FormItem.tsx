@@ -14,7 +14,7 @@ import { nanoid } from 'nanoid'
 import cs from 'classnames'
 import { type Schema } from 'yup'
 import { Dynamic } from 'solid-js/web'
-import Context from './context'
+import FormContext from './context'
 import Element from '../Element'
 
 export interface FormItemComponentProps<T = any> {
@@ -41,12 +41,12 @@ export interface FormItemProps {
 
 const FormItem = (props: FormItemProps) => {
   const { formInstance, rulesDict, setErrMsgDict, setItemWidthDict, maxItemWidth, layout } =
-    useContext(Context)
+    useContext(FormContext)
   const [errMsg, setErrMsg] = createSignal('')
   const id = nanoid()
 
   createEffect(() => {
-    if (props.name && props.rules) {
+    if (props.name && props.rules && rulesDict && setErrMsgDict) {
       set(rulesDict, props.name, props.rules)
       set(setErrMsgDict, props.name, setErrMsg)
 
@@ -70,7 +70,7 @@ const FormItem = (props: FormItemProps) => {
           const borderBoxSize: ResizeObserverSize = Array.isArray(entry.borderBoxSize)
             ? entry.borderBoxSize[0]
             : entry.borderBoxSize
-          setItemWidthDict(dict => ({
+          setItemWidthDict?.(dict => ({
             ...dict,
             [id]: borderBoxSize.inlineSize,
           }))
@@ -79,7 +79,7 @@ const FormItem = (props: FormItemProps) => {
         resizeObserver.observe(label!)
 
         onCleanup(() => {
-          setItemWidthDict(dict => {
+          setItemWidthDict?.(dict => {
             // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
             delete dict[id]
             return { ...dict }
@@ -103,7 +103,10 @@ const FormItem = (props: FormItemProps) => {
       >
         <div
           class="flex items-center"
-          style={{ width: layout() === 'horizontal' ? `${maxItemWidth() ?? 0}px` : undefined }}
+          style={{
+            width:
+              layout() === 'horizontal' && maxItemWidth ? `${maxItemWidth() ?? 0}px` : undefined,
+          }}
         >
           <label
             ref={label}
@@ -121,17 +124,20 @@ const FormItem = (props: FormItemProps) => {
         </div>
 
         <div
-          class="flex flex-col relative"
+          class="flex flex-col relative flex-grow-1"
           style={{
-            width: layout() === 'horizontal' ? `calc(100% - ${maxItemWidth() ?? 0}px)` : undefined,
+            width:
+              layout() === 'horizontal' && maxItemWidth
+                ? `calc(100% - ${maxItemWidth() ?? 0}px)`
+                : undefined,
           }}
         >
           <Dynamic
             component={props.component}
-            value={props.name ? formInstance.getFieldValue(props.name) : undefined}
+            value={props.name ? formInstance?.getFieldValue(props.name) : undefined}
             status={errMsg() ? 'error' : undefined}
             onChange={(value: any) => {
-              if (!isNil(props.name)) formInstance.setFieldValue(props.name, value)
+              if (!isNil(props.name)) formInstance?.setFieldValue(props.name, value)
 
               props.rules?.forEach(rule => {
                 rule

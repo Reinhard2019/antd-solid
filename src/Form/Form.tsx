@@ -12,7 +12,7 @@ import { createStore, produce } from 'solid-js/store'
 import { cloneDeep, get, max, set, unset } from 'lodash-es'
 import { type Schema } from 'yup'
 import cs from 'classnames'
-import Context from './context'
+import FormContext from './context'
 import { setRef } from '../utils/solid'
 import Element from '../Element'
 import { type StyleProps } from '../types'
@@ -106,7 +106,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
         e.preventDefault()
       }}
     >
-      <Context.Provider
+      <FormContext.Provider
         value={{
           formInstance,
           rulesDict,
@@ -117,7 +117,7 @@ function Form<T extends {} = {}>(_props: FormProps<T>) {
         }}
       >
         {props.children}
-      </Context.Provider>
+      </FormContext.Provider>
     </Element>
   )
 }
