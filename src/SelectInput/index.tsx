@@ -137,8 +137,8 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
       >
         <div
           class={cs(
-            'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
-            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding]',
+            'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:bg-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
+            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding] bg-[--ant-color-bg-container]',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
             props.variant === 'outlined' &&

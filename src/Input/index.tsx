@@ -176,6 +176,7 @@ export function CommonInput(props: CommonInputProps) {
           onBlur={e => props.onBlur?.(e)}
           maxLength={props.maxLength}
           disabled={props.disabled}
+          placeholder={props.placeholder}
         />
 
         <Show when={showClearBtn()}>
