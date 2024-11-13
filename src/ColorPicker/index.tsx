@@ -1,9 +1,15 @@
 import cs from 'classnames'
-import { type Component, createMemo, createRenderEffect, createSignal, Show } from 'solid-js'
+import {
+  type Component,
+  createMemo,
+  createRenderEffect,
+  createSignal,
+  Show,
+  untrack,
+} from 'solid-js'
 import Color from './color'
 import Element from '../Element'
 import Popover from '../Popover'
-import createControllableValue from '../hooks/createControllableValue'
 import ColorPickerSelect from './ColorPickerSelect'
 import ColorPickerContext from './context'
 import ColorPickerSlider from './ColorPickerSlider'
@@ -19,6 +25,12 @@ export interface ColorPickerProps {
    * @returns
    */
   onChange?: (value: string | null) => void
+  /**
+   * 颜色选择完成的回调，通过 onChangeComplete 对 value 受控时拖拽不会改变展示颜色
+   * @param value Hex 格式
+   * @returns
+   */
+  onChangeComplete?: (value: string | null) => void
   allowClear?: boolean
   disabled?: boolean
   /**
@@ -33,27 +45,34 @@ export interface ColorPickerProps {
 }
 
 const ColorPicker: Component<ColorPickerProps> = props => {
-  const [colorStr] = createControllableValue<string>(props, {
-    trigger: null,
-  })
-  const [color, _setColor] = createSignal(new Color())
+  const isControlled = () => Object.keys(props).includes('value')
+
+  const [innerColor, _setInnerColor] = createSignal(untrack(() => new Color(props.defaultValue)))
   createRenderEffect(() => {
-    _setColor(new Color(colorStr()))
+    if (isControlled()) {
+      _setInnerColor(new Color(props.value))
+    }
   })
   const disabledAlpha = createMemo(() => !!props.disabledAlpha)
-  const setColor = (value: Color) => {
-    _setColor(value)
-    props.onChange?.(
-      value.isValid ? (disabledAlpha() ? value.toHexString() : value.toHex8String()) : null,
-    )
+  const setColor = (value: Color, completed?: boolean) => {
+    _setInnerColor(value)
+
+    const valueStr = value.isValid
+      ? disabledAlpha()
+        ? value.toHexString()
+        : value.toHex8String()
+      : null
+    props.onChange?.(valueStr)
+    if (completed) props.onChangeComplete?.(valueStr)
   }
   const [open, setOpen] = createSignal(false)
   const size = useComponentSize(() => props.size)
+  const color = createMemo(() => (isControlled() ? new Color(props.value) : innerColor()))
 
   const getPopoverContent = (close: () => void) => (
     <ColorPickerContext.Provider
       value={{
-        color,
+        color: innerColor,
         setColor,
         disabledAlpha,
       }}

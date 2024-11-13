@@ -19,6 +19,9 @@ const ColorPickerSlider: Component = () => {
             hsv.h = Math.round(v * 3.55)
             context?.setColor(new Color(hsv))
           }}
+          onChangeComplete={() => {
+            context?.setColor(color(), true)
+          }}
           tooltip={false}
           handle={() => getSliderHandle(color().toHueRgbString())}
           style={{
@@ -44,6 +47,9 @@ const ColorPickerSlider: Component = () => {
                   .clone()
                   .setAlpha(v / 100),
               )
+            }}
+            onChangeComplete={() => {
+              context?.setColor(color(), true)
             }}
             min={0}
             step={1}
@@ -95,7 +101,7 @@ const ColorPickerSlider: Component = () => {
             eyeDropper
               .open()
               .then(result => {
-                context?.setColor(new Color(result.sRGBHex as string))
+                context?.setColor(new Color(result.sRGBHex as string), true)
               })
               .catch(console.error)
           }}

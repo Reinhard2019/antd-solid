@@ -73,6 +73,7 @@ const ColorPickerInput: Component = () => {
             }}
             onBlur={() => {
               setHexInputValue(color().toHex())
+              context?.setColor(color(), true)
             }}
             prefix={<span class="text-[--ant-color-text-placeholder]">#</span>}
             style={{
@@ -90,6 +91,9 @@ const ColorPickerInput: Component = () => {
                 hsv.h = value ?? 0
                 context?.setColor(new Color(hsv))
               }}
+              onBlur={() => {
+                context?.setColor(color(), true)
+              }}
               min={0}
               max={359}
               precision={0}
@@ -102,6 +106,9 @@ const ColorPickerInput: Component = () => {
                 const hsv = color().toHsv()
                 hsv.s = (value ?? 0) / 100
                 context?.setColor(new Color(hsv))
+              }}
+              onBlur={() => {
+                context?.setColor(color(), true)
               }}
               min={0}
               max={100}
@@ -116,6 +123,9 @@ const ColorPickerInput: Component = () => {
                 const hsv = color().toHsv()
                 hsv.v = (value ?? 0) / 100
                 context?.setColor(new Color(hsv))
+              }}
+              onBlur={() => {
+                context?.setColor(color(), true)
               }}
               min={0}
               max={100}
@@ -135,6 +145,9 @@ const ColorPickerInput: Component = () => {
                 rgb.r = value ?? 0
                 context?.setColor(new Color(rgb))
               }}
+              onBlur={() => {
+                context?.setColor(color(), true)
+              }}
               min={0}
               max={255}
               precision={0}
@@ -148,6 +161,9 @@ const ColorPickerInput: Component = () => {
                 rgb.g = value ?? 0
                 context?.setColor(new Color(rgb))
               }}
+              onBlur={() => {
+                context?.setColor(color(), true)
+              }}
               min={0}
               max={255}
               precision={0}
@@ -160,6 +176,9 @@ const ColorPickerInput: Component = () => {
                 const rgb = color().toRgb()
                 rgb.b = value ?? 0
                 context?.setColor(new Color(rgb))
+              }}
+              onBlur={() => {
+                context?.setColor(color(), true)
               }}
               min={0}
               max={255}
@@ -179,6 +198,9 @@ const ColorPickerInput: Component = () => {
                 .clone()
                 .setAlpha((value ?? 0) / 100),
             )
+          }}
+          onBlur={() => {
+            context?.setColor(color(), true)
           }}
           size="small"
           min={0}

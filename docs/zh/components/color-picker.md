@@ -22,6 +22,12 @@ outline: deep
 
 <Code path="color-picker/Size" />
 
+### 受控模式
+
+通过 `value` 和 `onChange` 设置组件为受控模式，如果通过 `onChangeComplete` 受控则会锁定展示颜色。
+
+<Code path="color-picker/Controlled" />
+
 ### 清除颜色
 
 清除已选择的颜色。
