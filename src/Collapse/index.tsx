@@ -51,7 +51,7 @@ export interface CollapseProps extends StyleProps {
    * 自定义切换图标
    * 为 false 代表不显示图标
    */
-  expandIcon?: false | ((options: { isActive: Accessor<boolean> }) => JSX.Element)
+  expandIcon?: boolean | ((options: { isActive: Accessor<boolean> }) => JSX.Element)
   /**
    * 设置图标位置
    * 默认 'left'
