@@ -1,5 +1,6 @@
 import { clamp } from 'lodash-es'
 import { type Accessor, createSignal, type Setter } from 'solid-js'
+import NP from 'number-precision'
 import { unwrapFunction } from '../utils/solid'
 
 function useCounter(
@@ -24,12 +25,12 @@ function useCounter(
     )
   }
 
-  const inc = () => {
-    return set(value() + unwrapFunction(step))
+  const inc = (stepValue?: number) => {
+    return set(NP.plus(value(), stepValue ?? unwrapFunction(step)))
   }
 
-  const dec = () => {
-    return set(value() - unwrapFunction(step))
+  const dec = (stepValue?: number) => {
+    return set(NP.minus(value(), stepValue ?? unwrapFunction(step)))
   }
 
   const reset = () => {
