@@ -14,11 +14,6 @@ export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
    * 默认 'bottomLeft'
    */
   placement?: 'top' | 'bottom' | 'topLeft' | 'topRight' | 'bottomLeft' | 'bottomRight'
-  /**
-   * 下拉菜单和选择器同宽
-   * 默认 true
-   */
-  popupMatchWidth?: boolean
 }
 
 const Dropdown: Component<DropdownProps> = _props => {
@@ -27,7 +22,6 @@ const Dropdown: Component<DropdownProps> = _props => {
   const props = mergeProps(
     {
       placement: 'bottomLeft' as const,
-      popupMatchWidth: true,
     },
     _props,
   )
@@ -43,7 +37,6 @@ const Dropdown: Component<DropdownProps> = _props => {
             style={{
               ...props.menu.style,
               'min-width': `${size()?.width ?? 0}px`,
-              width: props.popupMatchWidth ? `${size()?.width ?? 0}px` : undefined,
               padding: '4px',
             }}
             onClick={info => {
