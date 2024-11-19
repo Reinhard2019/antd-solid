@@ -57,6 +57,10 @@ export interface CollapseProps extends StyleProps {
    * 默认 'left'
    */
   expandIconPosition?: 'left' | 'right' | 'end'
+  /**
+   * collapse header style
+   */
+  headerStyle?: JSX.CSSProperties
 }
 
 const Collapse: Component<CollapseProps> = _props => {
@@ -157,6 +161,7 @@ const Collapse: Component<CollapseProps> = _props => {
                     type() === 'card' &&
                       'bg-[var(--ant-collapse-header-bg)] p-[--ant-collapse-header-padding]',
                   )}
+                  style={props.headerStyle}
                   onClick={() => {
                     if (item.children === false) return
 
@@ -178,6 +183,7 @@ const Collapse: Component<CollapseProps> = _props => {
                     {getExpandIcon(item, 'end')}
                   </span>
                 </div>
+
                 <Transition
                   onEnter={(el, done) => {
                     el.animate([{ height: '0px' }, { height: `${el.scrollHeight}px` }], {
