@@ -36,7 +36,7 @@ const Checkbox: Component<CheckboxProps> & {
     >
       <span
         class={cs(
-          'w-16px h-16px rounded-[var(--ant-border-radius-sm)] relative',
+          'w-16px h-16px rounded-[var(--ant-border-radius-sm)] relative bg-[--ant-color-bg-container]',
           (() => {
             if (checked()) {
               return [
