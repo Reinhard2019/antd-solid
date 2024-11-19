@@ -179,7 +179,6 @@ const Tabs: Component<TabsProps> = _props => {
                 'grow flex relative',
                 (props.placement === 'top' || props.placement === 'bottom') && 'gap-32px',
                 (props.placement === 'left' || props.placement === 'right') && 'flex-col gap-16px',
-                props.navClass,
               )}
             >
               <For each={props.items}>
@@ -246,7 +245,6 @@ const Tabs: Component<TabsProps> = _props => {
               class={cs(
                 'grow flex gap-2px relative',
                 (props.placement === 'left' || props.placement === 'right') && 'flex-col',
-                props.navClass,
               )}
             >
               <For each={props.items}>
