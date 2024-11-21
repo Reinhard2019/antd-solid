@@ -36,7 +36,7 @@ const Dropdown: Component<DropdownProps> = _props => {
             {...props.menu}
             style={{
               ...props.menu.style,
-              'min-width': `${size()?.width ?? 0}px`,
+              'min-width': props.trigger === 'contextMenu' ? undefined : `${size()?.width ?? 0}px`,
               padding: '4px',
             }}
             onClick={info => {
@@ -54,7 +54,6 @@ const Dropdown: Component<DropdownProps> = _props => {
             ? -4
             : 4,
         ]}
-        displayInMouseTrigger
         {...popoverProps}
       >
         <span ref={ref} class="cursor-pointer inline-block">

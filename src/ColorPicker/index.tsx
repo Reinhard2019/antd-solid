@@ -105,7 +105,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
     <Popover
       open={open()}
       onOpenChange={setOpen}
-      trigger={props.disabled ? [] : ['click']}
+      trigger={props.disabled ? 'manual' : 'click'}
       content={getPopoverContent}
       placement="bottomLeft"
     >

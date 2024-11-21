@@ -19,14 +19,13 @@ import cs from 'classnames'
 import { nanoid } from 'nanoid'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
-import { toArray } from '../utils/array'
 import DelayShow from '../DelayShow'
 import { isEmptyJSXElement } from '../utils/solid'
 import useHover from '../hooks/useHover'
 import AntdElement from '../Element'
 import TooltipContext, { type TooltipContextProps } from './context'
 
-type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu'
+type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu' | 'manual'
 type TooltipPlacement =
   | 'top'
   | 'left'
@@ -45,7 +44,7 @@ export interface TooltipProps {
   /**
    * 默认: hover
    */
-  trigger?: ActionType | ActionType[]
+  trigger?: ActionType
   /**
    * 默认: top
    */
@@ -53,6 +52,10 @@ export interface TooltipProps {
   contentStyle?: JSX.CSSProperties
   content?: JSXElement | ((close: () => void) => JSXElement)
   children?: JSXElement
+  /**
+   * 只有在 trigger 为 manual 时生效
+   */
+  position?: [x: number, y: number]
   open?: boolean
   onOpenChange?: (open: boolean) => void
   /**
@@ -94,11 +97,6 @@ export interface TooltipProps {
    * 默认为 true
    */
   keepAliveOnHover?: boolean
-  /**
-   * 触发显示时，显示在鼠标的触发位置上
-   * 暂时仅支持 'contextMenu'
-   */
-  displayInMouseTrigger?: boolean
 }
 
 export const unwrapContent = (content: TooltipProps['content'], close: () => void) => {
@@ -249,10 +247,12 @@ const Tooltip: Component<TooltipProps> = _props => {
     equals: (a, b) => isEqual(a.toJSON(), b.toJSON()),
   })
   createEffect(() => {
-    if (!open()) return
-
     const _children = resolvedChildren()
     if (!(_children instanceof Element)) return
+
+    setChildrenRect(_children.getBoundingClientRect())
+
+    if (!open()) return
 
     let handle: number | undefined
     const tick = () => {
@@ -269,13 +269,13 @@ const Tooltip: Component<TooltipProps> = _props => {
 
   const contentHovering = useHover(() => (open() ? contentRef() : undefined))
   const childrenHovering = useHover(() =>
-    toArray(props.trigger).includes('hover') ? (resolvedChildren() as HTMLElement) : undefined,
+    props.trigger === 'hover' ? (resolvedChildren() as HTMLElement) : undefined,
   )
   const hovering = createMemo(() =>
     props.keepAliveOnHover ? childrenHovering() || contentHovering() : childrenHovering(),
   )
   createEffect(() => {
-    if (toArray(props.trigger).includes('hover')) {
+    if (props.trigger === 'hover') {
       if (hovering()) {
         show()
       } else {
@@ -289,24 +289,16 @@ const Tooltip: Component<TooltipProps> = _props => {
   })
 
   // 触发时，鼠标相对于触发元素位置
-  const [mouseTriggerOffset, setMouseTriggerOffset] = createSignal<
-  { x: number; y: number } | undefined
-  >(undefined, {
-    equals: isEqual,
-  })
-  createRenderEffect(
-    on(
-      open,
-      () => {
-        if (!open()) {
-          setMouseTriggerOffset()
-        }
-      },
-      {
-        defer: true,
-      },
-    ),
+  const [mouseTriggerOffset, setMouseTriggerOffset] = createSignal<{ x: number; y: number }>(
+    { x: 0, y: 0 },
+    {
+      equals: isEqual,
+    },
   )
+  const getMouseTriggerOffsetWithMouseEvent = (e: MouseEvent) => ({
+    x: e.clientX - childrenRect().x,
+    y: e.clientY - childrenRect().y,
+  })
 
   createEffect(() => {
     const _children = resolvedChildren()
@@ -314,52 +306,62 @@ const Tooltip: Component<TooltipProps> = _props => {
 
     const abortController = new AbortController()
 
-    const triggerArray = toArray(props.trigger)
+    switch (props.trigger) {
+      case 'click':
+        _children.addEventListener('click', reverseOpen, {
+          signal: abortController.signal,
+        })
+        break
+      case 'focus':
+        _children.addEventListener('focusin', show, {
+          signal: abortController.signal,
+        })
+        _children.addEventListener('focusout', hide, {
+          signal: abortController.signal,
+        })
+        break
+      case 'contextMenu':
+        _children.addEventListener(
+          'contextmenu',
+          (e: MouseEvent) => {
+            e.preventDefault()
 
-    triggerArray.forEach(trigger => {
-      switch (trigger) {
-        case 'click':
-          _children.addEventListener('click', reverseOpen, {
-            signal: abortController.signal,
-          })
-          break
-        case 'focus':
-          _children.addEventListener('focusin', show, {
-            signal: abortController.signal,
-          })
-          _children.addEventListener('focusout', hide, {
-            signal: abortController.signal,
-          })
-          break
-        case 'contextMenu':
-          _children.addEventListener(
-            'contextmenu',
-            (e: MouseEvent) => {
-              e.preventDefault()
-              show()
+            const offset = getMouseTriggerOffsetWithMouseEvent(e)
 
-              if (props.displayInMouseTrigger) {
-                setMouseTriggerOffset({
-                  x: e.clientX - childrenRect().x,
-                  y: e.clientY - childrenRect().y,
-                })
-              }
-            },
-            {
-              signal: abortController.signal,
-            },
-          )
-          break
-      }
-    })
+            if (open() && isEqual(offset, mouseTriggerOffset())) {
+              hide()
+              return
+            }
 
-    if (triggerArray.includes('click')) {
+            show()
+            setMouseTriggerOffset(offset)
+          },
+          {
+            signal: abortController.signal,
+          },
+        )
+
+        _children.addEventListener(
+          'mousemove',
+          (e: MouseEvent) => {
+            if (!open()) {
+              setMouseTriggerOffset(getMouseTriggerOffsetWithMouseEvent(e))
+            }
+          },
+          {
+            signal: abortController.signal,
+          },
+        )
+        break
+    }
+
+    if (props.trigger === 'click') {
       useClickAway(hide, () =>
         compact([...Object.values(subPopupElements), contentRef(), _children]),
       )
     }
 
-    if (triggerArray.includes('contextMenu')) {
+    if (props.trigger === 'contextMenu') {
       window.addEventListener('click', hide, {
         signal: abortController.signal,
       })
@@ -394,7 +396,6 @@ const Tooltip: Component<TooltipProps> = _props => {
     let translateX = 0
     let translateY = 0
 
-    const _mouseTriggerOffset = mouseTriggerOffset()
     const translatedChildrenRect = new DOMRect(
       childrenRect().x,
       childrenRect().y,
@@ -403,7 +404,8 @@ const Tooltip: Component<TooltipProps> = _props => {
     )
     translatedChildrenRect.x += props.offset?.[0] ?? 0
     translatedChildrenRect.y += props.offset?.[1] ?? 0
-    if (_mouseTriggerOffset) {
+    if (props.trigger === 'contextMenu') {
+      const _mouseTriggerOffset = mouseTriggerOffset()
       translateX = translatedChildrenRect.x + _mouseTriggerOffset.x
       translateY = translatedChildrenRect.y + _mouseTriggerOffset.y
       switch (props.placement) {
