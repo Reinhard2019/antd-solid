@@ -25,7 +25,7 @@ import useHover from '../hooks/useHover'
 import AntdElement from '../Element'
 import TooltipContext, { type TooltipContextProps } from './context'
 
-type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu' | 'manual'
+type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu' | false
 type TooltipPlacement =
   | 'top'
   | 'left'
@@ -389,7 +389,8 @@ const Tooltip: Component<TooltipProps> = _props => {
 
     const _children = resolvedChildren()
     if (!(_children instanceof Element)) {
-      setOpen(false)
+      _contentRef.style.setProperty('--translate-x', `${props.offset?.[0] ?? 0}px`)
+      _contentRef.style.setProperty('--translate-y', `${props.offset?.[1] ?? 0}px`)
       return
     }
 

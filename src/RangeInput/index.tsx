@@ -161,7 +161,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         plain
         open={open()}
         onOpenChange={setOpen}
-        trigger="manual"
+        trigger={false}
         placement="bottomLeft"
         arrow={false}
         contentStyle={{

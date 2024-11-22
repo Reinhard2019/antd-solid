@@ -116,7 +116,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         plain
         open={open()}
         onOpenChange={setOpen}
-        trigger="manual"
+        trigger={false}
         placement={props.placement}
         arrow={false}
         contentStyle={{
