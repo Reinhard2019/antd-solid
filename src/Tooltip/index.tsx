@@ -387,13 +387,6 @@ const Tooltip: Component<TooltipProps> = _props => {
     const _contentRef = contentRef()
     if (!_contentRef || !open()) return
 
-    const _children = resolvedChildren()
-    if (!(_children instanceof Element)) {
-      _contentRef.style.setProperty('--translate-x', `${props.offset?.[0] ?? 0}px`)
-      _contentRef.style.setProperty('--translate-y', `${props.offset?.[1] ?? 0}px`)
-      return
-    }
-
     let translateX = 0
     let translateY = 0
 
