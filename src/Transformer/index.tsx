@@ -29,7 +29,7 @@ export interface TransformerProps {
   /**
    * 缩放时触发
    */
-  onResize?: (value: Partial<Pick<TransformValue, 'x' | 'y' | 'width' | 'height'>>) => void
+  onResize?: (value: Pick<TransformValue, 'x' | 'y' | 'width' | 'height'>) => void
   /**
    * 旋转时触发
    */
@@ -268,7 +268,7 @@ const Transformer: Component<TransformerProps> = _props => {
     )
 
     const onMouseMove = (_e: MouseEvent) => {
-      const changedValue: Partial<TransformValue> = {}
+      const changedValue = value()
 
       const m = parentTransformMatrix()
         .multiply(transformMatrix())
