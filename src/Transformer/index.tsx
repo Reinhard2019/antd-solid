@@ -1,4 +1,12 @@
-import { Show, createMemo, createSignal, mergeProps, type Component, type JSX } from 'solid-js'
+import {
+  type Ref,
+  Show,
+  createMemo,
+  createSignal,
+  mergeProps,
+  type Component,
+  type JSX,
+} from 'solid-js'
 import cs from 'classnames'
 import { inRange } from 'lodash-es'
 import { Portal } from 'solid-js/web'
@@ -9,6 +17,7 @@ import Element from '../Element'
 import { createSkewDOMMatrix, distance, radToDeg } from '../utils/math'
 import RotateArrowSvg from '../assets/svg/RotateArrow'
 import CrosshairSvg from '../assets/svg/Crosshair'
+import { setRef } from '../utils/solid'
 
 export interface TransformValue {
   x: number
@@ -18,7 +27,17 @@ export interface TransformValue {
   rotate: number
 }
 
+export interface TransformerInstance {
+  /** 手动进入移动状态 */
+  enterMove: (e: MouseEvent) => void
+  /** 手动进入调整大小状态 */
+  enterResize: (e: MouseEvent) => void
+  /** 手动进入旋转状态 */
+  enterRotate: (e: MouseEvent) => void
+}
+
 export interface TransformerProps {
+  ref?: Ref<TransformerInstance>
   defaultValue?: TransformValue
   value?: TransformValue
   onChange?: (value: TransformValue) => void
@@ -643,6 +662,12 @@ const Transformer: Component<TransformerProps> = _props => {
       </div>
     )
   }
+
+  setRef(props, {
+    enterMove: onMoveMouseDown,
+    enterResize: onResizeMouseDown,
+    enterRotate: onRotateMouseDown,
+  })
 
   return (
     <Element class="relative">
