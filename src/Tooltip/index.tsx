@@ -97,6 +97,8 @@ export interface TooltipProps {
    * 默认为 true
    */
   keepAliveOnHover?: boolean
+  /** 是否禁用 */
+  disabled?: boolean
 }
 
 export const unwrapContent = (content: TooltipProps['content'], close: () => void) => {
@@ -237,7 +239,7 @@ const Tooltip: Component<TooltipProps> = _props => {
     trigger: 'onOpenChange',
   })
   const [isEmptyContent, setIsEmptyContent] = createSignal(false)
-  const open = createMemo(() => _open() && !isEmptyContent())
+  const open = createMemo(() => _open() && !props.disabled && !isEmptyContent())
   const reverseOpen = () => setOpen(v => !v)
   const show = () => setOpen(true)
   const hide = () => setOpen(false)
