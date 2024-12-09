@@ -99,6 +99,9 @@ type ResizeDirection =
   | 'bottomLeft'
   | 'bottomRight'
 
+// 判断是否鼠标左键触发
+const isMainButton = (e: MouseEvent) => e.button === 0
+
 const Transformer: Component<TransformerProps> = _props => {
   const props = mergeProps(
     {
@@ -169,6 +172,7 @@ const Transformer: Component<TransformerProps> = _props => {
   }
   const [adsorbLine, setAdsorbLine] = createSignal<AdsorbLine>({})
   const onMoveMouseDown = (e: MouseEvent) => {
+    if (!isMainButton(e)) return
     e.stopPropagation()
 
     const originUserSelect = document.body.style.userSelect
@@ -240,8 +244,8 @@ const Transformer: Component<TransformerProps> = _props => {
 
   let resizing = false
   const onResizeMouseDown = (e: MouseEvent, direction: ResizeDirection) => {
+    if (!isMainButton(e)) return
     if (rotating) return
-
     e.stopPropagation()
 
     const originUserSelect = document.body.style.userSelect
@@ -412,6 +416,7 @@ const Transformer: Component<TransformerProps> = _props => {
       currentTarget: HTMLDivElement
     },
   ) => {
+    if (!isMainButton(e)) return
     if (!transformOriginRef) return
     e.stopPropagation()
 
