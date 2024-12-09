@@ -1,10 +1,12 @@
 import { type Component, splitProps, mergeProps } from 'solid-js'
+import cs from 'classnames'
 import Popover, { type PopoverProps } from '../Popover'
 import Menu, { type MenuProps } from '../Menu'
 import Context from './context'
 import { useSize } from '../hooks'
+import { type StyleProps } from '../types'
 
-export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
+export interface DropdownProps extends Omit<PopoverProps, 'placement'>, StyleProps {
   /**
    * 菜单配置项
    */
@@ -56,7 +58,7 @@ const Dropdown: Component<DropdownProps> = _props => {
         ]}
         {...popoverProps}
       >
-        <span ref={ref} class="cursor-pointer inline-block">
+        <span ref={ref} class={cs('cursor-pointer inline-block', props.class)} style={props.style}>
           {props.children}
         </span>
       </Popover>
