@@ -32,7 +32,7 @@ export interface SelectProps<T = Key>
   value?: T | T[] | null
   onChange?: (value: T | T[] | undefined) => void
   options?: Array<SelectOption<T>>
-  labelRender?: (options: SelectOption<T> | undefined) => JSXElement
+  labelRender?: (options: SelectOption<T> | undefined, value: T | undefined) => JSXElement
 }
 
 function Select<T = Key>(props: SelectProps<T>) {
@@ -63,7 +63,7 @@ function Select<T = Key>(props: SelectProps<T>) {
       {...selectInputProps}
       labelRender={v =>
         props.labelRender
-          ? props.labelRender(optionDict().get(v))
+          ? props.labelRender(optionDict().get(v), v)
           : optionDict().get(v)?.label ?? (v as string)
       }
       value={valueArr()}
