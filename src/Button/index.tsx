@@ -40,6 +40,8 @@ export interface ButtonProps
    * 将按钮宽度调整为其父宽度的选项
    */
   block?: boolean
+  contentClass?: string
+  contentStyle?: JSX.CSSProperties
 }
 
 const sizeClassMap = {
@@ -154,7 +156,12 @@ const Button: Component<ButtonProps> = _props => {
       <Show when={loading()}>
         <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite] mr-8px" />
       </Show>
-      <span class="inline-block leading-inherit">{props.children}</span>
+      <span
+        class={cs('inline-block leading-inherit', props.contentClass)}
+        style={props.contentStyle}
+      >
+        {props.children}
+      </span>
     </Element>
   )
 }
