@@ -95,7 +95,17 @@ export function CommonInput(props: CommonInputProps) {
   return (
     <Element
       block
-      class={cs(props.class, 'flex', 'ant-input-group', 'p[.ant-compact>]:not-first:ml--1px')}
+      class={cs(
+        props.class,
+        'flex',
+        'ant-input-group',
+        'p[.ant-compact>]:not-first:ml--1px',
+        {
+          small: 'h-24px',
+          middle: 'h-32px',
+          large: 'h-40px',
+        }[size()],
+      )}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -132,11 +142,6 @@ export function CommonInput(props: CommonInputProps) {
           'flex items-center w-full relative p:hover-child[input]:border-[--ant-color-primary] bg-[--ant-color-bg-container]',
           ['[--actions-display:none]', !props.disabled && 'hover:[--actions-display:block]'],
           'p-[--ant-input-padding]',
-          {
-            small: 'h-24px',
-            middle: 'h-32px',
-            large: 'h-40px',
-          }[size()],
           statusClassDict[props.status ?? 'default'](!!props.disabled),
         )}
       >

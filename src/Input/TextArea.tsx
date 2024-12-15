@@ -45,7 +45,7 @@ const TextArea: Component<TextAreaProps> = props => {
 
   return (
     <Element
-      class={props.class}
+      class={cs(props.class, 'flex')}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -62,8 +62,8 @@ const TextArea: Component<TextAreaProps> = props => {
     >
       <textarea
         class={cs(
-          'p-[--ant-input-padding] border-1px border-solid border-[--ant-color-border]',
-          'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
+          'p-[--ant-input-padding] border-1px border-solid border-[--ant-color-border] bg-[--ant-color-bg-container]',
+          'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)]',
           props.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
           {
             small: 'rounded-[var(--ant-border-radius-sm)]',
