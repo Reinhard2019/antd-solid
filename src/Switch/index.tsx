@@ -1,4 +1,4 @@
-import { mergeProps, type Component, type JSX } from 'solid-js'
+import { type Component, type JSX } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import Element from '../Element'
@@ -19,8 +19,7 @@ export interface SwitchProps {
   disabled?: boolean
 }
 
-const Switch: Component<SwitchProps> = _props => {
-  const props = mergeProps({ size: 'middle' } as const, _props)
+const Switch: Component<SwitchProps> = props => {
   const size = useComponentSize(() => props.size)
   const [checked, setChecked] = createControllableValue<boolean>(props, {
     defaultValuePropName: 'defaultChecked',
