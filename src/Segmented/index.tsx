@@ -72,7 +72,7 @@ const Segmented: Component<SegmentedProps> = props => {
           >
             <div
               class={cs(
-                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] cursor-pointer',
+                'rounded-[var(--ant-border-radius-sm)] px-[var(--ant-padding-sm)] cursor-pointer [white-space:nowrap]',
                 isSelected(unWarpValue(item)) && 'bg-[var(--ant-segmented-item-selected-bg)]',
                 isDisabledValue(item)
                   ? '[pointer-events:none] text-[var(--ant-color-text-disabled)]'
