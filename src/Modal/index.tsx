@@ -19,8 +19,6 @@ import './index.scss'
 import createTransition from '../hooks/createTransition'
 import Element from '../Element'
 import useModal from './useModal'
-import createModal from './createModal'
-import useModalProps from './useModalProps'
 import warning from './warning'
 import useLocale from '../hooks/useLocale'
 
@@ -79,6 +77,10 @@ export interface ModalProps {
    * Modal 打开动画结束事件
    */
   onAfterEnter?: () => void
+  /**
+   * Modal 关闭动画结束事件
+   */
+  onAfterExit?: () => void
 }
 
 export interface ModalLocale {
@@ -90,8 +92,6 @@ export interface ModalLocale {
 const transitionDuration = 0.3
 
 const Modal: Component<ModalProps> & {
-  useModalProps: typeof useModalProps
-  createModal: typeof createModal
   warning: typeof warning
   useModal: typeof useModal
 } = _props => {
@@ -151,7 +151,15 @@ const Modal: Component<ModalProps> & {
   )
 
   let modalRootRef: HTMLDivElement | undefined
-  createTransition(() => modalRootRef, open, 'ant-modal-fade')
+  createTransition(() => modalRootRef, open, {
+    name: 'ant-modal-fade',
+    onAfterEnter: () => {
+      props.onAfterEnter?.()
+    },
+    onAfterExit: () => {
+      props.onAfterExit?.()
+    },
+  })
 
   const locale = useLocale()
 
@@ -160,15 +168,12 @@ const Modal: Component<ModalProps> & {
       <Portal>
         <Transition
           name="ant-modal-fade"
-          appear
           onEnter={(el, done) => {
             el.animate([], {
               duration: transitionDuration * 1000,
             }).finished.finally(done)
           }}
-          onAfterEnter={() => {
-            props.onAfterEnter?.()
-          }}
+          onAfterExit={props.onAfterExit}
           onExit={(el, done) => {
             el.animate([], {
               duration: transitionDuration * 1000,
@@ -268,8 +273,6 @@ const Modal: Component<ModalProps> & {
   )
 }
 
-Modal.useModalProps = useModalProps
-Modal.createModal = createModal
 Modal.warning = warning
 Modal.useModal = useModal
 

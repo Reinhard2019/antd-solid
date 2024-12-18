@@ -1,5 +1,5 @@
 import { type Component } from 'solid-js'
-import { Button, Modal } from 'antd-solid'
+import { Button, Modal, Command } from 'antd-solid'
 
 interface ExampleModalProps {
   title: string
@@ -7,15 +7,16 @@ interface ExampleModalProps {
 interface ExampleModalResolveValue {
   msg: string
 }
-const ExampleModal = Modal.createModal<ExampleModalProps, ExampleModalResolveValue>(
+const ExampleModal = Command.createCommand<ExampleModalProps, ExampleModalResolveValue>(
   (props: ExampleModalProps) => {
-    const { open, onCancel, onOk } = Modal.useModalProps<ExampleModalResolveValue>()
+    const { open, onCancel, onOk, dispose } = Command.useCommandProps<ExampleModalResolveValue>()
 
     return (
       <Modal
+        {...props}
         open={open()}
         onCancel={onCancel}
-        {...props}
+        onAfterExit={dispose}
         // eslint-disable-next-line solid/reactivity
         onOk={async () => {
           await new Promise<void>(_resolve => {

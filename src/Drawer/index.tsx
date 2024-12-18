@@ -117,7 +117,7 @@ const Drawer: Component<DrawerProps> = _props => {
   const isBody = createMemo(() => container() === document.body)
 
   let drawerRef: HTMLDivElement | undefined
-  createTransition(() => drawerRef, open, 'ant-drawer-fade')
+  createTransition(() => drawerRef, open, { name: 'ant-drawer-fade' })
 
   const direction = createMemo(() =>
     ['top', 'bottom'].includes(props.placement) ? 'vertical' : 'horizontal',
@@ -129,7 +129,6 @@ const Drawer: Component<DrawerProps> = _props => {
   const children = (
     <Transition
       name="ant-drawer-fade"
-      appear
       onEnter={(el, done) => {
         el.animate([], {
           duration: 300,

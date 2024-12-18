@@ -4,12 +4,16 @@ import { createEffect, type Accessor, on } from 'solid-js'
  * dom 节点显示或隐藏时的动画
  * @param target
  * @param when
- * @param className 动画类名
+ * @param props.name 动画类名
  */
 export default function createTransition(
   target: Accessor<HTMLElement | undefined | null>,
   when: Accessor<boolean>,
-  className: string,
+  props: {
+    name?: string
+    onAfterEnter?: (element: Element) => void
+    onAfterExit?: (element: Element) => void
+  } = {},
 ) {
   createEffect(
     on(when, input => {
@@ -18,26 +22,28 @@ export default function createTransition(
 
       if (input) {
         targetValue.style.display = ''
-        targetValue.classList.add(`${className}-enter-active`, `${className}-enter`)
+        targetValue.classList.add(`${props.name}-enter-active`, `${props.name}-enter`)
         requestAnimationFrame(() => {
-          targetValue.classList.add(`${className}-enter-to`)
-          targetValue!.classList.remove(`${className}-enter`)
+          targetValue.classList.add(`${props.name}-enter-to`)
+          targetValue!.classList.remove(`${props.name}-enter`)
         })
         const onTransitionEnd = () => {
-          targetValue!.classList.remove(`${className}-enter-active`, `${className}-enter-to`)
+          targetValue!.classList.remove(`${props.name}-enter-active`, `${props.name}-enter-to`)
           targetValue!.removeEventListener('transitionend', onTransitionEnd)
+          props.onAfterEnter?.(targetValue)
         }
         targetValue.addEventListener('transitionend', onTransitionEnd)
       } else {
-        targetValue.classList.add(`${className}-exit-active`, `${className}-exit`)
+        targetValue.classList.add(`${props.name}-exit-active`, `${props.name}-exit`)
         requestAnimationFrame(() => {
-          targetValue!.classList.add(`${className}-exit-to`)
-          targetValue!.classList.remove(`${className}-exit`)
+          targetValue!.classList.add(`${props.name}-exit-to`)
+          targetValue!.classList.remove(`${props.name}-exit`)
         })
         const onTransitionEnd = () => {
           targetValue!.style.display = 'none'
-          targetValue!.classList.remove(`${className}-exit-active`, `${className}-exit-to`)
+          targetValue!.classList.remove(`${props.name}-exit-active`, `${props.name}-exit-to`)
           targetValue!.removeEventListener('transitionend', onTransitionEnd)
+          props.onAfterExit?.(targetValue)
         }
         targetValue.addEventListener('transitionend', onTransitionEnd)
       }

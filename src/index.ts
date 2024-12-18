@@ -75,6 +75,7 @@ export { default as CodeInput } from './CodeInput'
 export type { CodeInputProps } from './CodeInput'
 export { default as message } from './Message'
 export type { MessageApi } from './Message'
+export { default as Command } from './Command'
 
 export { default as ConfigProvider } from './ConfigProvider'
 export { default as Fragment } from './Fragment'

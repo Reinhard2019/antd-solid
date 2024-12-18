@@ -24,7 +24,7 @@ function useMessage() {
 
   const getContextHolder = () => (
     <Portal>
-      <Element class="fixed top-16px left-1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
+      <Element class="fixed top-16px left-1/2 translate-x--1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
         <TransitionGroup name="ant-message-fade" appear>
           <For each={msgConfigList()}>
             {config => (

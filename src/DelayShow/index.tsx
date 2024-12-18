@@ -1,6 +1,6 @@
 /**
  * 延迟创建组件
- * 只有当 props.when 为 true 时才创建组件
+ * 只有当 props.when 第一次为 true 时才初始化组件
  */
 import {
   type Component,
