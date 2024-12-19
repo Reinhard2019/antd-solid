@@ -290,17 +290,13 @@ const Tooltip: Component<TooltipProps> = _props => {
     }
   })
 
-  // 触发时，鼠标相对于触发元素位置
-  const [mouseTriggerOffset, setMouseTriggerOffset] = createSignal<{ x: number; y: number }>(
+  // 触发时的鼠标位置
+  const [mouseTriggerPosition, setMouseTriggerPosition] = createSignal<{ x: number; y: number }>(
     { x: 0, y: 0 },
     {
       equals: isEqual,
     },
   )
-  const getMouseTriggerOffsetWithMouseEvent = (e: MouseEvent) => ({
-    x: e.clientX - childrenRect().x,
-    y: e.clientY - childrenRect().y,
-  })
 
   createEffect(() => {
     const _children = resolvedChildren()
@@ -328,15 +324,18 @@ const Tooltip: Component<TooltipProps> = _props => {
           (e: MouseEvent) => {
             e.preventDefault()
 
-            const offset = getMouseTriggerOffsetWithMouseEvent(e)
+            const position = {
+              x: e.clientX,
+              y: e.clientY,
+            }
 
-            if (open() && isEqual(offset, mouseTriggerOffset())) {
+            if (open() && isEqual(position, mouseTriggerPosition())) {
               hide()
               return
             }
 
             show()
-            setMouseTriggerOffset(offset)
+            setMouseTriggerPosition(position)
           },
           {
             signal: abortController.signal,
@@ -347,7 +346,10 @@ const Tooltip: Component<TooltipProps> = _props => {
           'mousemove',
           (e: MouseEvent) => {
             if (!open()) {
-              setMouseTriggerOffset(getMouseTriggerOffsetWithMouseEvent(e))
+              setMouseTriggerPosition({
+                x: e.clientX,
+                y: e.clientY,
+              })
             }
           },
           {
@@ -401,9 +403,9 @@ const Tooltip: Component<TooltipProps> = _props => {
     translatedChildrenRect.x += props.offset?.[0] ?? 0
     translatedChildrenRect.y += props.offset?.[1] ?? 0
     if (props.trigger === 'contextMenu') {
-      const _mouseTriggerOffset = mouseTriggerOffset()
-      translateX = translatedChildrenRect.x + _mouseTriggerOffset.x
-      translateY = translatedChildrenRect.y + _mouseTriggerOffset.y
+      const _mouseTriggerOffset = mouseTriggerPosition()
+      translateX = translatedChildrenRect.x + _mouseTriggerOffset.x - childrenRect().x
+      translateY = translatedChildrenRect.y + _mouseTriggerOffset.y - childrenRect().y
       switch (props.placement) {
         case 'top':
         case 'topLeft':
