@@ -1,12 +1,10 @@
-import { type Component, splitProps, mergeProps } from 'solid-js'
-import cs from 'classnames'
+import { type Component, splitProps, mergeProps, children } from 'solid-js'
 import Popover, { type PopoverProps } from '../Popover'
 import Menu, { type MenuProps } from '../Menu'
 import Context from './context'
 import { useSize } from '../hooks'
-import { type StyleProps } from '../types'
 
-export interface DropdownProps extends Omit<PopoverProps, 'placement'>, StyleProps {
+export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
   /**
    * 菜单配置项
    */
@@ -19,8 +17,6 @@ export interface DropdownProps extends Omit<PopoverProps, 'placement'>, StylePro
 }
 
 const Dropdown: Component<DropdownProps> = _props => {
-  let ref: HTMLSpanElement | undefined
-  const size = useSize(() => ref, 'offset')
   const props = mergeProps(
     {
       placement: 'bottomLeft' as const,
@@ -29,12 +25,19 @@ const Dropdown: Component<DropdownProps> = _props => {
   )
   const [, popoverProps] = splitProps(props, ['menu'])
 
+  const resolvedChildren = children(() => _props.children)
+  const size = useSize(() => {
+    const _children = resolvedChildren()
+    return _children instanceof HTMLElement ? _children : undefined
+  }, 'offset')
+
   return (
     <Context.Provider value={{ inDropdown: true }}>
       <Popover
         arrow={props.arrow ?? false}
         content={close => (
           <Menu
+            selectable={false}
             {...props.menu}
             style={{
               ...props.menu.style,
@@ -58,9 +61,7 @@ const Dropdown: Component<DropdownProps> = _props => {
         ]}
         {...popoverProps}
       >
-        <span ref={ref} class={cs('cursor-pointer inline-block', props.class)} style={props.style}>
-          {props.children}
-        </span>
+        {resolvedChildren()}
       </Popover>
     </Context.Provider>
   )
