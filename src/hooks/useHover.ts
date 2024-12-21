@@ -1,6 +1,7 @@
 import { createEffect, type Accessor, onCleanup, createSignal } from 'solid-js'
+import { toArray } from '../utils/array'
 
-export default function useHover(target: Accessor<Element | undefined>) {
+export default function useHover(target: Accessor<Element | Element[] | undefined>) {
   const [hover, setHover] = createSignal(false)
 
   createEffect(() => {
@@ -13,16 +14,22 @@ export default function useHover(target: Accessor<Element | undefined>) {
     const onMouseEnter = () => {
       setHover(true)
     }
-    _target.addEventListener('mouseenter', onMouseEnter)
 
     const onMouseLeave = () => {
       setHover(false)
     }
-    _target.addEventListener('mouseleave', onMouseLeave)
+
+    const targetList = toArray(_target)
+    targetList.forEach(item => {
+      item.addEventListener('mouseenter', onMouseEnter)
+      item.addEventListener('mouseleave', onMouseLeave)
+    })
 
     onCleanup(() => {
-      _target.removeEventListener('mouseenter', onMouseEnter)
-      _target.removeEventListener('mouseleave', onMouseLeave)
+      targetList.forEach(item => {
+        item.removeEventListener('mouseenter', onMouseEnter)
+        item.removeEventListener('mouseleave', onMouseLeave)
+      })
     })
   })
 

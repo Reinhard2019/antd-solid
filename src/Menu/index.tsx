@@ -1,4 +1,4 @@
-import { createMemo, createSignal, mergeProps } from 'solid-js'
+import { createMemo, mergeProps } from 'solid-js'
 import { type StringOrJSXElement, type StyleProps } from '../types'
 import Element from '../Element'
 import InternalMenu from './InternalMenu'
@@ -89,18 +89,18 @@ function Menu<T = any>(_props: MenuProps<T>) {
   })
   const expandedKeys = createMemo(() => _expandedKeys() ?? [])
 
-  const [hoverKeyPath, setHoverKeyPathChange] = createSignal<T[]>([])
+  const style = createMemo(() => ({
+    '--ant-menu-item-margin': 'var(--ant-margin-xxs)',
+    '--ant-menu-item-height': '40px',
+    ...props.style,
+  }))
 
   return (
-    <Element
-      class={props.class}
-      style={{
-        '--ant-menu-item-margin': 'var(--ant-margin-xxs)',
-        ...props.style,
-      }}
-    >
+    <Element class={props.class} style={style()}>
       <InternalMenu
         {...props}
+        class={props.class}
+        style={style()}
         selectedKeys={selectedKeys()}
         onSelect={info => {
           props.onSelect?.(info)
@@ -112,8 +112,6 @@ function Menu<T = any>(_props: MenuProps<T>) {
         }}
         expandedKeys={expandedKeys()}
         onExpandedKeysChange={setExpandedKeys}
-        hoverKeyPath={hoverKeyPath()}
-        onHoverKeyPathChange={setHoverKeyPathChange}
       />
     </Element>
   )

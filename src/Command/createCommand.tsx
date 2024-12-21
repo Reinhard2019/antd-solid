@@ -1,47 +1,60 @@
-import { createSignal, type JSXElement, type Component, Show, createRenderEffect } from 'solid-js'
+import {
+  createSignal,
+  type JSXElement,
+  type Component,
+  Show,
+  createRenderEffect,
+  untrack,
+} from 'solid-js'
 import { Dynamic, render } from 'solid-js/web'
 import CommandContext from './context'
 import DelayShow from '../DelayShow'
+
+export interface BaseCommandIntance<
+  P extends {} | undefined = undefined,
+  R = void,
+  S = P extends undefined ? () => Promise<R> : (props: P) => Promise<R>,
+> {
+  show: S
+  hide: () => void
+  dispose: () => void
+  isOpen: () => boolean
+}
 
 /**
  * createCommand
  * @param component
  * @param contextHolder 如果为 true，则会返回 getContextHolder
  */
-function createCommand<P extends {} = {}, T = void>(
+function createCommand<P extends {} | undefined = undefined, R = void>(
   component: Component<P>,
-): {
-  show: (props?: P) => Promise<T>
-}
-function createCommand<P extends {} = {}, T = void>(
+): BaseCommandIntance<P, R>
+function createCommand<P extends {} | undefined = undefined, R = void>(
   component: Component<P>,
   contextHolder: true,
-): {
-  show: (props?: P) => Promise<T>
+): BaseCommandIntance<P, R> & {
   getContextHolder: () => JSXElement
 }
-function createCommand<P extends {} = {}, T = void>(
+function createCommand<P extends {} | undefined = undefined, R = void>(
   component: Component<P>,
   contextHolder?: true,
 ):
-  | {
-    show: (props?: P) => Promise<T>
-  }
-  | {
-    show: (props?: P) => Promise<T>
+  | BaseCommandIntance<P, R>
+  | (BaseCommandIntance<P, R> & {
     getContextHolder: () => JSXElement
-  } {
+  }) {
   const [open, _setOpen] = createSignal(false)
   const [forceDestroy, setForceDestroy] = createSignal(false)
   const setOpen = (value: boolean) => {
     if (value) setForceDestroy(false)
     _setOpen(value)
   }
-  const [props, setProps] = createSignal<P>({} as P)
-  let resolve: (value: T) => void
+  const [props, setProps] = createSignal<P>()
+  let resolve: (value: R) => void
   let reject: (reason?: any) => void
   let disposeRef: (() => void) | undefined
   const dispose = () => {
+    _setOpen(false)
     setForceDestroy(true)
     disposeRef?.()
   }
@@ -49,7 +62,7 @@ function createCommand<P extends {} = {}, T = void>(
   const hide = () => {
     setOpen(false)
   }
-  const onOk = (value?: T) => {
+  const onOk = (value?: R) => {
     hide()
     resolve(value!)
   }
@@ -57,6 +70,7 @@ function createCommand<P extends {} = {}, T = void>(
     hide()
     reject()
   }
+  const isOpen = () => untrack(open)
 
   // 监听关闭事件，自动销毁
   const onAutoDispose = () => {
@@ -84,36 +98,49 @@ function createCommand<P extends {} = {}, T = void>(
   )
 
   if (contextHolder) {
+    const show = (async (_props?: P) => {
+      setProps(_props as any)
+      setOpen(true)
+      return await new Promise<R>((_resolve, _reject) => {
+        resolve = _resolve
+        reject = _reject
+      })
+    }) as BaseCommandIntance<P, R>['show']
+
     return {
-      async show(_props?: P) {
-        setProps((_props as any) ?? {})
-        setOpen(true)
-        return await new Promise<T>((_resolve, _reject) => {
-          resolve = _resolve
-          reject = _reject
-        })
-      },
+      show,
+      hide,
+      dispose,
+      isOpen,
       getContextHolder,
     }
   }
 
-  return {
-    async show(_props?: P) {
-      if (_props) setProps(_props as any)
-      setOpen(true)
-      return await new Promise<T>((_resolve, _reject) => {
+  const show = (async (_props?: P) => {
+    setProps(_props as any)
+    const alreadyOpen = isOpen()
+    setOpen(true)
+    return await new Promise<R>((_resolve, _reject) => {
+      if (!alreadyOpen) {
         const div = document.createElement('div')
         document.body.appendChild(div)
-        const _dispose = render(getContextHolder, div)
+        const renderDispose = render(getContextHolder, div)
         disposeRef = () => {
           document.body.removeChild(div)
-          _dispose()
+          renderDispose()
         }
+      }
 
-        resolve = _resolve
-        reject = _reject
-      })
-    },
+      resolve = _resolve
+      reject = _reject
+    })
+  }) as BaseCommandIntance<P, R>['show']
+
+  return {
+    show,
+    hide,
+    dispose,
+    isOpen,
   }
 }
 

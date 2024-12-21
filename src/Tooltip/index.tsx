@@ -25,7 +25,7 @@ import useHover from '../hooks/useHover'
 import AntdElement from '../Element'
 import TooltipContext, { type TooltipContextProps } from './context'
 
-type ActionType = 'hover' | 'focus' | 'click' | 'contextMenu' | false
+type ActionType = 'hover' | 'focus' | 'click' | false
 type TooltipPlacement =
   | 'top'
   | 'left'
@@ -92,11 +92,6 @@ export interface TooltipProps {
    * 关闭时销毁 Tooltip 里的子元素
    */
   destroyOnClose?: boolean
-  /**
-   * 是否在 trigger 为 hover 的时候，悬浮在 content 时保持 content 显示
-   * 默认为 true
-   */
-  keepAliveOnHover?: boolean
   /** 是否禁用 */
   disabled?: boolean
 }
@@ -209,17 +204,19 @@ const Tooltip: Component<TooltipProps> = _props => {
       mouseLeaveDelay: 0.1,
       plain: false,
       autoAdjustOverflow: true,
-      keepAliveOnHover: true,
     } as const,
     _props,
   )
 
   // ========================== Context ===========================
-  const subPopupElements: Record<string, HTMLElement> = {}
+  const [subPopupElements, setSubPopupElements] = createSignal<Record<string, HTMLElement>>({})
   const parentContext = useContext(TooltipContext)
   const context: TooltipContextProps = {
     registerSubPopup: (id, subPopupEle) => {
-      subPopupElements[id] = subPopupEle
+      setSubPopupElements(prev => ({
+        ...prev,
+        [id]: subPopupEle,
+      }))
 
       parentContext?.registerSubPopup(id, subPopupEle)
     },
@@ -269,13 +266,14 @@ const Tooltip: Component<TooltipProps> = _props => {
     })
   })
 
-  const contentHovering = useHover(() => (open() ? contentRef() : undefined))
-  const childrenHovering = useHover(() =>
-    props.trigger === 'hover' ? (resolvedChildren() as HTMLElement) : undefined,
-  )
-  const hovering = createMemo(() =>
-    props.keepAliveOnHover ? childrenHovering() || contentHovering() : childrenHovering(),
-  )
+  const hovering = useHover(() => {
+    const _children = resolvedChildren()
+    if (props.trigger === 'hover' && _children instanceof Element) {
+      return [_children, ...Object.values(subPopupElements())].concat(
+        contentRef() ? [contentRef()!] : [],
+      )
+    }
+  })
   createEffect(() => {
     if (props.trigger === 'hover') {
       if (hovering()) {
@@ -290,14 +288,6 @@ const Tooltip: Component<TooltipProps> = _props => {
     }
   })
 
-  // 触发时的鼠标位置
-  const [mouseTriggerPosition, setMouseTriggerPosition] = createSignal<{ x: number; y: number }>(
-    { x: 0, y: 0 },
-    {
-      equals: isEqual,
-    },
-  )
-
   createEffect(() => {
     const _children = resolvedChildren()
     if (!(_children instanceof Element)) return
@@ -309,6 +299,9 @@ const Tooltip: Component<TooltipProps> = _props => {
         _children.addEventListener('click', reverseOpen, {
           signal: abortController.signal,
         })
+        useClickAway(hide, () =>
+          compact([...Object.values(subPopupElements()), contentRef(), _children]),
+        )
         break
       case 'focus':
         _children.addEventListener('focusin', show, {
@@ -318,57 +311,6 @@ const Tooltip: Component<TooltipProps> = _props => {
           signal: abortController.signal,
         })
         break
-      case 'contextMenu':
-        _children.addEventListener(
-          'contextmenu',
-          (e: MouseEvent) => {
-            e.preventDefault()
-
-            const position = {
-              x: e.clientX,
-              y: e.clientY,
-            }
-
-            if (open() && isEqual(position, mouseTriggerPosition())) {
-              hide()
-              return
-            }
-
-            show()
-            setMouseTriggerPosition(position)
-          },
-          {
-            signal: abortController.signal,
-          },
-        )
-
-        _children.addEventListener(
-          'mousemove',
-          (e: MouseEvent) => {
-            if (!open()) {
-              setMouseTriggerPosition({
-                x: e.clientX,
-                y: e.clientY,
-              })
-            }
-          },
-          {
-            signal: abortController.signal,
-          },
-        )
-        break
-    }
-
-    if (props.trigger === 'click') {
-      useClickAway(hide, () =>
-        compact([...Object.values(subPopupElements), contentRef(), _children]),
-      )
-    }
-
-    if (props.trigger === 'contextMenu') {
-      window.addEventListener('click', hide, {
-        signal: abortController.signal,
-      })
     }
 
     onCleanup(() => {
@@ -394,193 +336,152 @@ const Tooltip: Component<TooltipProps> = _props => {
     let translateX = 0
     let translateY = 0
 
-    const translatedChildrenRect = new DOMRect(
-      childrenRect().x,
-      childrenRect().y,
+    const [offsetX, offsetY] = props.offset ?? [0, 0]
+
+    const _childrenRect = new DOMRect(
+      childrenRect().x + offsetX,
+      childrenRect().y + offsetY,
       childrenRect().width,
       childrenRect().height,
     )
-    translatedChildrenRect.x += props.offset?.[0] ?? 0
-    translatedChildrenRect.y += props.offset?.[1] ?? 0
-    if (props.trigger === 'contextMenu') {
-      const _mouseTriggerOffset = mouseTriggerPosition()
-      translateX = translatedChildrenRect.x + _mouseTriggerOffset.x - childrenRect().x
-      translateY = translatedChildrenRect.y + _mouseTriggerOffset.y - childrenRect().y
+
+    switch (props.placement) {
+      case 'top':
+      case 'bottom':
+        translateX = _childrenRect.left + _childrenRect.width / 2 - _contentRef.clientWidth / 2
+        break
+      case 'topLeft':
+      case 'bottomLeft':
+        translateX = _childrenRect.left
+        break
+      case 'topRight':
+      case 'bottomRight':
+        translateX = _childrenRect.right - _contentRef.clientWidth
+        break
+      case 'left':
+      case 'right':
+        translateY = _childrenRect.top + _childrenRect.height / 2 - _contentRef.clientHeight / 2
+        break
+      case 'leftTop':
+      case 'rightTop':
+        translateY = _childrenRect.top
+        break
+      case 'leftBottom':
+      case 'rightBottom':
+        translateY = _childrenRect.bottom - _contentRef.clientHeight
+        break
+    }
+
+    const updateTranslateByMainPlacement = (type: 'top' | 'bottom' | 'left' | 'right') => {
+      switch (type) {
+        case 'top':
+          translateY = _childrenRect.top - arrowOffset() - _contentRef.clientHeight
+          break
+        case 'bottom':
+          translateY = _childrenRect.bottom + arrowOffset()
+          break
+        case 'left':
+          translateX = _childrenRect.left - arrowOffset() - _contentRef.clientWidth
+          break
+        case 'right':
+          translateX = _childrenRect.right + arrowOffset()
+          break
+      }
+    }
+
+    if (props.autoAdjustOverflow) {
       switch (props.placement) {
         case 'top':
         case 'topLeft':
         case 'topRight':
-          translateY -= _contentRef.clientHeight + arrowOffset()
+          if (reverse()) {
+            updateTranslateByMainPlacement('bottom')
+            if (translateY + _contentRef.clientHeight > window.innerHeight) {
+              setReverse(false)
+              updateTranslateByMainPlacement('top')
+            }
+          } else {
+            updateTranslateByMainPlacement('top')
+            if (translateY < 0) {
+              setReverse(true)
+              updateTranslateByMainPlacement('bottom')
+            }
+          }
+          break
+        case 'bottom':
+        case 'bottomLeft':
+        case 'bottomRight':
+          if (reverse()) {
+            updateTranslateByMainPlacement('top')
+            if (translateY < 0) {
+              setReverse(false)
+              updateTranslateByMainPlacement('bottom')
+            }
+          } else {
+            updateTranslateByMainPlacement('bottom')
+            if (translateY + _contentRef.clientHeight > window.innerHeight) {
+              setReverse(true)
+              updateTranslateByMainPlacement('top')
+            }
+          }
           break
         case 'left':
         case 'leftTop':
         case 'leftBottom':
-          translateX -= _contentRef.clientWidth + arrowOffset()
+          if (reverse()) {
+            updateTranslateByMainPlacement('right')
+            if (translateX < 0) {
+              setReverse(false)
+              updateTranslateByMainPlacement('left')
+            }
+          } else {
+            updateTranslateByMainPlacement('left')
+            if (translateX + _contentRef.clientWidth > window.innerWidth) {
+              setReverse(true)
+              updateTranslateByMainPlacement('right')
+            }
+          }
           break
-      }
-      switch (props.placement) {
-        case 'top':
-        case 'bottom':
-          translateX -= _contentRef.clientWidth / 2
-          break
-        case 'topRight':
-        case 'bottomRight':
-          translateX -= _contentRef.clientWidth
-          break
-        case 'left':
         case 'right':
-          translateY -= _contentRef.clientHeight / 2
-          break
-        case 'leftBottom':
+        case 'rightTop':
         case 'rightBottom':
-          translateY -= _contentRef.clientHeight
+          if (reverse()) {
+            updateTranslateByMainPlacement('left')
+            if (translateX + _contentRef.clientWidth > window.innerWidth) {
+              setReverse(false)
+              updateTranslateByMainPlacement('right')
+            }
+          } else {
+            updateTranslateByMainPlacement('right')
+            if (translateX < 0) {
+              setReverse(true)
+              updateTranslateByMainPlacement('left')
+            }
+          }
           break
       }
     } else {
       switch (props.placement) {
         case 'top':
-        case 'bottom':
-          translateX =
-            translatedChildrenRect.left +
-            translatedChildrenRect.width / 2 -
-            _contentRef.clientWidth / 2
-          break
         case 'topLeft':
-        case 'bottomLeft':
-          translateX = translatedChildrenRect.left
-          break
         case 'topRight':
+          updateTranslateByMainPlacement('top')
+          break
+        case 'bottom':
+        case 'bottomLeft':
         case 'bottomRight':
-          translateX = translatedChildrenRect.right - _contentRef.clientWidth
+          updateTranslateByMainPlacement('bottom')
           break
         case 'left':
-        case 'right':
-          translateY =
-            translatedChildrenRect.top +
-            translatedChildrenRect.height / 2 -
-            _contentRef.clientHeight / 2
-          break
         case 'leftTop':
-        case 'rightTop':
-          translateY = translatedChildrenRect.top
-          break
         case 'leftBottom':
-        case 'rightBottom':
-          translateY = translatedChildrenRect.bottom - _contentRef.clientHeight
+          updateTranslateByMainPlacement('left')
           break
-      }
-
-      const updateTranslateByMainPlacement = (type: 'top' | 'bottom' | 'left' | 'right') => {
-        switch (type) {
-          case 'top':
-            translateY = translatedChildrenRect.top - arrowOffset() - _contentRef!.clientHeight
-            break
-          case 'bottom':
-            translateY = translatedChildrenRect.bottom + arrowOffset()
-            break
-          case 'left':
-            translateX = translatedChildrenRect.left - arrowOffset() - _contentRef!.clientWidth
-            break
-          case 'right':
-            translateX = translatedChildrenRect.right + arrowOffset()
-            break
-        }
-      }
-
-      if (props.autoAdjustOverflow) {
-        switch (props.placement) {
-          case 'top':
-          case 'topLeft':
-          case 'topRight':
-            if (reverse()) {
-              updateTranslateByMainPlacement('bottom')
-              if (translateY + _contentRef.clientHeight > window.innerHeight) {
-                setReverse(false)
-                updateTranslateByMainPlacement('top')
-              }
-            } else {
-              updateTranslateByMainPlacement('top')
-              if (translateY < 0) {
-                setReverse(true)
-                updateTranslateByMainPlacement('bottom')
-              }
-            }
-            break
-          case 'bottom':
-          case 'bottomLeft':
-          case 'bottomRight':
-            if (reverse()) {
-              updateTranslateByMainPlacement('top')
-              if (translateY < 0) {
-                setReverse(false)
-                updateTranslateByMainPlacement('bottom')
-              }
-            } else {
-              updateTranslateByMainPlacement('bottom')
-              if (translateY + _contentRef.clientHeight > window.innerHeight) {
-                setReverse(true)
-                updateTranslateByMainPlacement('top')
-              }
-            }
-            break
-          case 'left':
-          case 'leftTop':
-          case 'leftBottom':
-            if (reverse()) {
-              updateTranslateByMainPlacement('right')
-              if (translateX < 0) {
-                setReverse(false)
-                updateTranslateByMainPlacement('left')
-              }
-            } else {
-              updateTranslateByMainPlacement('left')
-              if (translateX + _contentRef.clientWidth > window.innerWidth) {
-                setReverse(true)
-                updateTranslateByMainPlacement('right')
-              }
-            }
-            break
-          case 'right':
-          case 'rightTop':
-          case 'rightBottom':
-            if (reverse()) {
-              updateTranslateByMainPlacement('left')
-              if (translateX + _contentRef.clientWidth > window.innerWidth) {
-                setReverse(false)
-                updateTranslateByMainPlacement('right')
-              }
-            } else {
-              updateTranslateByMainPlacement('right')
-              if (translateX < 0) {
-                setReverse(true)
-                updateTranslateByMainPlacement('left')
-              }
-            }
-            break
-        }
-      } else {
-        switch (props.placement) {
-          case 'top':
-          case 'topLeft':
-          case 'topRight':
-            updateTranslateByMainPlacement('top')
-            break
-          case 'bottom':
-          case 'bottomLeft':
-          case 'bottomRight':
-            updateTranslateByMainPlacement('bottom')
-            break
-          case 'left':
-          case 'leftTop':
-          case 'leftBottom':
-            updateTranslateByMainPlacement('left')
-            break
-          case 'right':
-          case 'rightTop':
-          case 'rightBottom':
-            updateTranslateByMainPlacement('right')
-            break
-        }
+        case 'right':
+        case 'rightTop':
+        case 'rightBottom':
+          updateTranslateByMainPlacement('right')
+          break
       }
     }
 

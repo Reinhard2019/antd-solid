@@ -1,7 +1,6 @@
 import { type Component, splitProps, mergeProps, children } from 'solid-js'
 import Popover, { type PopoverProps } from '../Popover'
 import Menu, { type MenuProps } from '../Menu'
-import Context from './context'
 import { useSize } from '../hooks'
 
 export interface DropdownProps extends Omit<PopoverProps, 'placement'> {
@@ -32,38 +31,36 @@ const Dropdown: Component<DropdownProps> = _props => {
   }, 'offset')
 
   return (
-    <Context.Provider value={{ inDropdown: true }}>
-      <Popover
-        arrow={props.arrow ?? false}
-        content={close => (
-          <Menu
-            selectable={false}
-            {...props.menu}
-            style={{
-              ...props.menu.style,
-              'min-width': props.trigger === 'contextMenu' ? undefined : `${size()?.width ?? 0}px`,
-              padding: '4px',
-            }}
-            onClick={info => {
-              close()
-              props.menu?.onClick?.(info)
-            }}
-          />
-        )}
-        contentStyle={{ padding: 0 }}
-        offset={[
-          0,
-          props.placement === 'top' ||
-          props.placement === 'topLeft' ||
-          props.placement === 'bottomRight'
-            ? -4
-            : 4,
-        ]}
-        {...popoverProps}
-      >
-        {resolvedChildren()}
-      </Popover>
-    </Context.Provider>
+    <Popover
+      arrow={props.arrow ?? false}
+      content={close => (
+        <Menu
+          selectable={false}
+          {...props.menu}
+          style={{
+            '--ant-menu-item-height': '32px',
+            'min-width': `${size()?.width ?? 0}px`,
+            ...props.menu.style,
+          }}
+          onClick={info => {
+            close()
+            props.menu?.onClick?.(info)
+          }}
+        />
+      )}
+      contentStyle={{ padding: 0 }}
+      offset={[
+        0,
+        props.placement === 'top' ||
+        props.placement === 'topLeft' ||
+        props.placement === 'bottomRight'
+          ? -4
+          : 4,
+      ]}
+      {...popoverProps}
+    >
+      {resolvedChildren()}
+    </Popover>
   )
 }
 

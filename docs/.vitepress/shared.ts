@@ -41,6 +41,7 @@ export const shared = defineConfig({
             items: [
               { text: 'Dropdown 下拉菜单', link: 'dropdown' },
               { text: 'Menu 导航菜单', link: 'menu' },
+              { text: 'ContextMenu 右键菜单', link: 'context-menu' },
             ],
           },
           {
@@ -116,6 +117,7 @@ export const shared = defineConfig({
             items: [
               { text: 'Dropdown 下拉菜单', link: 'dropdown' },
               { text: 'Menu 导航菜单', link: 'menu' },
+              { text: 'ContextMenu 右键菜单', link: 'context-menu' },
             ],
           },
           {

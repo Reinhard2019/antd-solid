@@ -1,11 +1,11 @@
-import { For, type JSXElement, Match, Show, Switch, createMemo, useContext } from 'solid-js'
-import { isEmpty, last } from 'lodash-es'
+import { For, type JSXElement, Match, Show, Switch, createMemo } from 'solid-js'
+import { isEmpty } from 'lodash-es'
 import cs from 'classnames'
 import Popover from '../Popover'
-import DropdownContext from '../Dropdown/context'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import { type MenuItem, type MenuDividerType, type MenuProps } from '.'
 import DelayShow from '../DelayShow'
+import { type StyleProps } from '../types'
 
 function isMenuDividerType(value: MenuItem): value is MenuDividerType {
   return (value as MenuDividerType).type === 'divider'
@@ -15,7 +15,8 @@ interface InternalMenuProps<T = any>
   extends Pick<
   MenuProps<T>,
   'mode' | 'items' | 'selectable' | 'onClick' | 'onSelect' | 'onDeselect'
-  > {
+  >,
+  StyleProps {
   /**
    * 当前选中的菜单项 key 数组
    */
@@ -29,22 +30,12 @@ interface InternalMenuProps<T = any>
    */
   onExpandedKeysChange: (expandedKeys: T[]) => void
   /**
-   * 当前 hover 的 key 的路径
-   */
-  hoverKeyPath: T[]
-  /**
-   * hoverKeyPath 变化的回调
-   */
-  onHoverKeyPathChange: (hoverKeyPath: T[]) => void
-  /**
    * 父级 keys
    */
   parentKeys?: T[]
 }
 
 function InternalMenu<T = any>(props: InternalMenuProps<T>) {
-  const { inDropdown } = useContext(DropdownContext)
-
   return (
     <For each={props.items}>
       {item => {
@@ -59,8 +50,7 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
           <div class={cs(item.disabled && 'cursor-not-allowed')}>
             <div
               class={cs(
-                'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center',
-                inDropdown ? 'min-h-32px' : 'min-h-40px m-[--ant-menu-item-margin]',
+                'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center m-[--ant-menu-item-margin] min-h-[--ant-menu-item-height]',
                 item.disabled
                   ? 'text-[--ant-color-text-disabled]'
                   : props.selectedKeys.includes(item.key)
@@ -123,22 +113,12 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                       return
                     }
 
-                    const lastKey = last(props.expandedKeys)
-                    if (item.key === lastKey) {
-                      props.onExpandedKeysChange(props.hoverKeyPath)
-                    }
+                    props.onExpandedKeysChange([])
                   }}
                   placement="rightTop"
                   arrow={false}
                   content={() => (
-                    <div
-                      onMouseEnter={() => {
-                        props.onHoverKeyPathChange(keyPath())
-                      }}
-                      onMouseLeave={() => {
-                        props.onHoverKeyPathChange([])
-                      }}
-                    >
+                    <div class={props.class} style={props.style}>
                       <InternalMenu
                         {...props}
                         items={item.children}
@@ -151,7 +131,7 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                     </div>
                   )}
                   contentStyle={{
-                    padding: inDropdown ? '4px' : 0,
+                    padding: 0,
                   }}
                   offset={[8, 0]}
                 >
