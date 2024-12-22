@@ -5,6 +5,7 @@ import {
   mergeProps,
   useContext,
   untrack,
+  onMount,
 } from 'solid-js'
 import ConfigProviderContext from './context'
 import { type SeedToken } from './types'
@@ -25,6 +26,10 @@ interface ConfigProviderProps extends ParentProps {
    */
   componentSize?: 'small' | 'middle' | 'large'
   locale?: Locale
+  /**
+   * 初始化时样式是否挂载 body 上
+   */
+  mountBodyStyle?: boolean
 }
 
 function useConfig() {
@@ -49,12 +54,19 @@ const ConfigProvider: Component<ConfigProviderProps> & {
   }))
   const cssVariables = createMemo(() => createCssVariables(mergedToken(), props.theme))
   const locale = createMemo(() => props.locale)
+  const cssVariablesClass = getCssVariablesClass()
+
+  onMount(() => {
+    if (props.mountBodyStyle) {
+      document.body.classList.add(cssVariablesClass)
+    }
+  })
 
   return (
     <ConfigProviderContext.Provider
       value={{
         theme: () => props.theme,
-        cssVariablesClass: getCssVariablesClass(),
+        cssVariablesClass,
         cssVariables,
         componentSize: () => props.componentSize,
         locale,
