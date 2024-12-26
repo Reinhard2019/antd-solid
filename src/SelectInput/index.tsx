@@ -9,6 +9,7 @@ import {
 } from 'solid-js'
 import cs from 'classnames'
 import { compact, isUndefined, pick } from 'lodash-es'
+import { Dynamic } from 'solid-js/web'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
@@ -212,22 +213,42 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
             <Show
               when={props.multiple}
               fallback={
-                <div class="w-full h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] ellipsis">
-                  {optionLabelRender(valueArr()[0])}
-                </div>
+                <Dynamic
+                  component={() => {
+                    const optionLabel = createMemo(() => optionLabelRender(valueArr()[0]))
+                    return (
+                      <div
+                        class="w-full h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] ellipsis"
+                        title={
+                          typeof optionLabel() === 'string' ? (optionLabel() as string) : undefined
+                        }
+                      >
+                        {optionLabel()}
+                      </div>
+                    )
+                  }}
+                />
               }
             >
               <div class="w-full">
                 <For each={valueArr()}>
-                  {item => (
-                    <span class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]">
-                      {optionLabelRender(item)}
+                  {item => {
+                    const optionLabel = createMemo(() => optionLabelRender(valueArr()[0]))
+                    return (
                       <span
-                        class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
-                        onClick={() => setValue(valueArr().filter(v => v !== item))}
-                      />
-                    </span>
-                  )}
+                        class="inline-block my-2px mr-4px bg-[var(--ant-select-multiple-item-bg)] leading-[var(--ant-select-multiple-item-height)] h-[var(--ant-select-multiple-item-height)] pl-8px pr-4px rounded-[var(--ant-border-radius-sm)]"
+                        title={
+                          typeof optionLabel() === 'string' ? (optionLabel() as string) : undefined
+                        }
+                      >
+                        {optionLabel()}
+                        <span
+                          class="i-ant-design:close-outlined text-[var(--ant-color-icon)] hover:text-[var(--ant-color-icon-hover)] text-12px cursor-pointer"
+                          onClick={() => setValue(valueArr().filter(v => v !== item))}
+                        />
+                      </span>
+                    )
+                  }}
                 </For>
               </div>
             </Show>
