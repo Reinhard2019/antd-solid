@@ -81,6 +81,7 @@ export { default as ContextMenu } from './ContextMenu'
 export { default as ConfigProvider } from './ConfigProvider'
 export { default as Fragment } from './Fragment'
 export { default as DelayShow } from './DelayShow'
+export { default as TreeFor } from './TreeFor'
 
 export { default as createControllableValue } from './hooks/createControllableValue'
 export { default as useClickAway } from './hooks/useClickAway'
