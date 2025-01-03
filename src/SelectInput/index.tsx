@@ -139,23 +139,23 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         <div
           class={cs(
             'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:bg-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
-            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding] bg-[--ant-color-bg-container]',
+            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding]',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
             props.variant === 'outlined' &&
               {
                 default: cs(
-                  'border-1px border-solid border-[--ant-color-border]',
+                  'border-1px border-solid border-[--ant-color-border] bg-[--ant-color-bg-container]',
                   !props.disabled &&
                     'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
                 ),
                 error: cs(
-                  'border-1px border-solid border-[--ant-color-error]',
+                  'border-1px border-solid border-[--ant-color-error] bg-[--ant-color-bg-container]',
                   !props.disabled &&
                     'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
                 ),
                 warning: cs(
-                  'border-1px border-solid border-[--ant-color-warning]',
+                  'border-1px border-solid border-[--ant-color-warning] bg-[--ant-color-bg-container]',
                   !props.disabled &&
                     'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
                 ),
