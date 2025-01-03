@@ -200,7 +200,6 @@ const Tooltip: Component<TooltipProps> = _props => {
       mode: 'dark',
       arrow: true,
       getPopupContainer: () => document.body,
-      offset: [0, 0],
       mouseLeaveDelay: 0.1,
       plain: false,
       autoAdjustOverflow: true,
@@ -336,14 +335,53 @@ const Tooltip: Component<TooltipProps> = _props => {
     let translateX = 0
     let translateY = 0
 
-    const [offsetX, offsetY] = props.offset ?? [0, 0]
-
     const _childrenRect = new DOMRect(
-      childrenRect().x + offsetX,
-      childrenRect().y + offsetY,
+      childrenRect().x,
+      childrenRect().y,
       childrenRect().width,
       childrenRect().height,
     )
+
+    type MainPlacement = 'top' | 'bottom' | 'left' | 'right'
+    let mainPlacement: MainPlacement = 'top'
+    switch (props.placement) {
+      case 'bottom':
+      case 'bottomLeft':
+      case 'bottomRight':
+        mainPlacement = 'bottom'
+        break
+      case 'left':
+      case 'leftTop':
+      case 'leftBottom':
+        mainPlacement = 'left'
+        break
+      case 'right':
+      case 'rightTop':
+      case 'rightBottom':
+        mainPlacement = 'right'
+        break
+    }
+
+    if (props.offset) {
+      const [offsetX, offsetY] = props.offset
+      _childrenRect.x += offsetX
+      _childrenRect.y += offsetY
+    } else {
+      switch (mainPlacement) {
+        case 'top':
+          _childrenRect.y -= 8
+          break
+        case 'bottom':
+          _childrenRect.y += 8
+          break
+        case 'left':
+          _childrenRect.x -= 8
+          break
+        case 'right':
+          _childrenRect.x += 8
+          break
+      }
+    }
 
     switch (props.placement) {
       case 'top':
