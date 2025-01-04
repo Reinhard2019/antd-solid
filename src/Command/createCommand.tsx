@@ -57,6 +57,7 @@ function createCommand<P extends {} | undefined = undefined, R = void>(
     _setOpen(false)
     setForceDestroy(true)
     disposeRef?.()
+    disposeRef = undefined
   }
 
   const hide = () => {
@@ -126,8 +127,8 @@ function createCommand<P extends {} | undefined = undefined, R = void>(
         document.body.appendChild(div)
         const renderDispose = render(getContextHolder, div)
         disposeRef = () => {
-          document.body.removeChild(div)
           renderDispose()
+          document.body.removeChild(div)
         }
       }
 
