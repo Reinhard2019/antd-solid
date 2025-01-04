@@ -3,6 +3,7 @@ import { Portal } from 'solid-js/web'
 import { TransitionGroup } from 'solid-transition-group'
 import Message, { type MessageProps } from './Message'
 import Element from '../Element'
+import DelayShow from '../DelayShow'
 
 export interface MessageApi {
   open: (config: Omit<MessageProps, 'onClose'>) => () => void
@@ -23,22 +24,24 @@ function useMessage() {
   }
 
   const getContextHolder = () => (
-    <Portal>
-      <Element class="fixed top-16px left-1/2 translate-x--1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
-        <TransitionGroup name="ant-message-fade" appear>
-          <For each={msgConfigList()}>
-            {config => (
-              <Message
-                {...config}
-                onClose={() => {
-                  setMsgConfigList(prev => prev.filter(item => item !== config))
-                }}
-              />
-            )}
-          </For>
-        </TransitionGroup>
-      </Element>
-    </Portal>
+    <DelayShow when={msgConfigList().length > 0}>
+      <Portal>
+        <Element class="fixed top-16px left-1/2 translate-x--1/2 z-2010 flex items-center flex-col gap-[--ant-margin-sm]">
+          <TransitionGroup name="ant-message-fade" appear>
+            <For each={msgConfigList()}>
+              {config => (
+                <Message
+                  {...config}
+                  onClose={() => {
+                    setMsgConfigList(prev => prev.filter(item => item !== config))
+                  }}
+                />
+              )}
+            </For>
+          </TransitionGroup>
+        </Element>
+      </Portal>
+    </DelayShow>
   )
 
   return [messageApi, getContextHolder] as const
