@@ -58,7 +58,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
     _setInnerColor(value)
 
     const valueStr = value.isValid
-      ? disabledAlpha()
+      ? disabledAlpha() || value.a === 1
         ? value.toHexString()
         : value.toHex8String()
       : null
@@ -114,7 +114,9 @@ const ColorPicker: Component<ColorPickerProps> = props => {
           class={cs(
             'p-[calc(var(--ant-padding-xxs)-var(--border-width))] border-width-[--border-width] border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer hover:border-[--ant-color-primary-hover]',
             open() && '!border-[--ant-color-primary-active]',
-            props.disabled && 'pointer-events-none bg-[--ant-color-bg-container-disabled]',
+            props.disabled
+              ? 'pointer-events-none bg-[--ant-color-bg-container-disabled]'
+              : 'bg-[--ant-color-bg-elevated]',
           )}
           style={{
             '--border-width': '1px',
