@@ -1,54 +1,97 @@
-import { Show, type Component, type ParentProps, type JSX, createSignal } from 'solid-js'
+import {
+  Show,
+  type Component,
+  type ParentProps,
+  type JSX,
+  createSignal,
+  children,
+  createEffect,
+  onCleanup,
+} from 'solid-js'
 import { Portal } from 'solid-js/web'
-import cs from 'classnames'
-import Element from '../Element'
-import useHover from '../hooks/useHover'
-import { type StyleProps } from '../types'
 
-export interface CursorProps extends ParentProps, StyleProps {
+export interface CursorProps extends ParentProps {
   cursor: JSX.Element
 }
 
 const Cursor: Component<CursorProps> = props => {
-  let ref: HTMLDivElement | undefined
-  const hover = useHover(() => ref)
+  const resolvedChildren = children(() => props.children)
+
+  const [hover, setHover] = createSignal(false)
   const [cursorPosition, setCursorPosition] = createSignal({
     x: 0,
     y: 0,
   })
 
-  return (
-    <Element
-      ref={ref}
-      class={cs(
-        props.class,
-        'inline-block cursor-none [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-      )}
-      style={props.style}
-      onMouseMove={e => {
+  let originalCursor: string | undefined
+
+  createEffect(() => {
+    const _children = resolvedChildren()
+    if (!(_children instanceof HTMLElement || _children instanceof SVGElement)) return
+
+    const abortController = new AbortController()
+
+    _children.addEventListener(
+      'mouseenter',
+      () => {
+        setHover(true)
+
+        originalCursor = _children.style.cursor
+        _children.style.cursor = 'none'
+      },
+      {
+        signal: abortController.signal,
+      },
+    )
+
+    _children.addEventListener(
+      'mousemove',
+      (e: MouseEvent) => {
         setCursorPosition({
-          x: e.pageX,
-          y: e.pageY,
+          x: e.clientX,
+          y: e.clientY,
         })
-      }}
-    >
-      {props.children}
+      },
+      {
+        signal: abortController.signal,
+      },
+    )
+
+    _children.addEventListener(
+      'mouseleave',
+      () => {
+        setHover(false)
+
+        if (originalCursor) _children.style.cursor = originalCursor
+      },
+      {
+        signal: abortController.signal,
+      },
+    )
+
+    onCleanup(() => {
+      abortController.abort()
+    })
+  })
+
+  return (
+    <>
+      {resolvedChildren}
 
       <Show when={hover()}>
         <Portal>
-          <Element
-            tag="span"
-            class="absolute pointer-events-none [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]"
+          <span
+            class="absolute pointer-events-none z-2000"
             style={{
               top: `${cursorPosition().y}px`,
               left: `${cursorPosition().x}px`,
             }}
           >
             {props.cursor}
-          </Element>
+          </span>
         </Portal>
       </Show>
-    </Element>
+    </>
   )
 }
 
