@@ -102,78 +102,64 @@ export const unwrapContent = (content: TooltipProps['content'], close: () => voi
 
 const ARROW_STYLE_DICT: Record<TooltipPlacement, JSX.CSSProperties> = {
   top: {
-    'border-top-color': 'var(--color)',
     top: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     left: '50%',
-    transform: 'translateX(-50%)',
+    transform: 'translate(-50%, -50%) rotate(135deg)',
   },
   topLeft: {
-    'border-top-color': 'var(--color)',
     top: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     left: '8px',
+    transform: 'translateY(-50%) rotate(135deg)',
   },
   topRight: {
-    'border-top-color': 'var(--color)',
     top: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     right: '8px',
+    transform: 'translateY(-50%) rotate(135deg)',
   },
   bottom: {
-    'border-bottom-color': 'var(--color)',
     bottom: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     left: '50%',
-    transform: 'translateX(-50%)',
+    transform: 'translate(-50%, 50%) rotate(-45deg)',
   },
   bottomLeft: {
-    'border-bottom-color': 'var(--color)',
     bottom: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     left: '8px',
+    transform: 'translateY(50%) rotate(-45deg)',
   },
   bottomRight: {
-    'border-bottom-color': 'var(--color)',
     bottom: '100%',
-    filter: 'drop-shadow(3px 2px 2px rgba(0, 0, 0, 0.08))',
     right: '8px',
+    transform: 'translateY(50%) rotate(-45deg)',
   },
   left: {
-    'border-left-color': 'var(--color)',
     top: '50%',
     right: 0,
-    transform: 'translate(100%, -50%)',
+    transform: 'translate(50%, -50%) rotate(45deg)',
   },
   leftTop: {
-    'border-left-color': 'var(--color)',
     top: '8px',
     right: 0,
-    transform: 'translate(100%, 0)',
+    transform: 'translate(50%, 0%) rotate(45deg)',
   },
   leftBottom: {
-    'border-left-color': 'var(--color)',
     bottom: '8px',
     right: 0,
-    transform: 'translate(100%, 0)',
+    transform: 'translate(50%, 0%) rotate(45deg)',
   },
   right: {
-    'border-right-color': 'var(--color)',
     top: '50%',
     left: 0,
-    transform: 'translate(-100%, -50%)',
+    transform: 'translate(-50%, -50%) rotate(-135deg)',
   },
   rightTop: {
-    'border-right-color': 'var(--color)',
     top: '8px',
     left: 0,
-    transform: 'translate(-100%, 0)',
+    transform: 'translate(-50%, 0%) rotate(-135deg)',
   },
   rightBottom: {
-    'border-right-color': 'var(--color)',
     bottom: '8px',
     left: 0,
-    transform: 'translate(-100%, 0)',
+    transform: 'translate(-50%, 0%) rotate(-135deg)',
   },
 }
 
@@ -560,9 +546,12 @@ const Tooltip: Component<TooltipProps> = _props => {
 
             <Show when={props.arrow}>
               <div
-                class={cs('w-8px h-8px absolute border-solid border-4px border-transparent')}
+                class={cs(
+                  'w-8px h-8px absolute border-transparent [box-shadow:var(--ant-box-shadow)]',
+                )}
                 style={{
-                  '--color': props.plain
+                  'clip-path': 'polygon(-100% -100%, 200% -100%, 200% 200%)',
+                  'background-color': props.plain
                     ? 'var(--ant-color-bg-container-tertiary)'
                     : 'var(--ant-color-bg-spotlight)',
                   ...ARROW_STYLE_DICT[reversedPlacement()],
