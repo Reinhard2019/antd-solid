@@ -6,6 +6,7 @@ import {
   Show,
   createMemo,
   mergeProps,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import { compact, isUndefined, pick } from 'lodash-es'
@@ -15,6 +16,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
+import CompactContext from '../Compact/context'
 
 export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContainer'> {
   multiple?: boolean
@@ -56,6 +58,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
   let select: HTMLDivElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
+  const { compact: isCompact } = useContext(CompactContext)
   const props = mergeProps(
     {
       variant: 'outlined',
@@ -107,7 +110,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
       class={cs(
         '!p[.ant-input-addon]:my--1px !p[.ant-input-addon]:mx--12px',
         'rounded-6px cursor-pointer inline-block text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-        'ant-compact-item',
+        isCompact && 'ant-compact-item',
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}
@@ -263,7 +266,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
               when={showClearBtn()}
               fallback={
                 <Show when={isUndefined(props.suffixIcon)} fallback={props.suffixIcon}>
-                  <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)]" />
+                  <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)] text-12px" />
                 </Show>
               }
             >

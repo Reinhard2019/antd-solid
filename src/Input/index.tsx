@@ -1,5 +1,5 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, onMount } from 'solid-js'
+import { Show, createMemo, onMount, useContext } from 'solid-js'
 import type { JSX, Component, JSXElement, Ref } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
@@ -9,6 +9,8 @@ import TextArea from './TextArea'
 import useComponentSize from '../hooks/useComponentSize'
 import './index.scss'
 import { type StyleProps } from '../types'
+import useFocus from '../hooks/useFocus'
+import CompactContext from '../Compact/context'
 
 type CommonInputProps = StyleProps & {
   ref?: Ref<HTMLInputElement>
@@ -48,34 +50,46 @@ type CommonInputProps = StyleProps & {
   maxLength?: number
 }
 
-const statusClassDict = {
-  default: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-border)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-primary)] focus-within:border-[var(--ant-color-primary)] focus-within:[box-shadow:0_0_0_2px_var(--ant-control-outline)]',
-    ),
-  error: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-error)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-error-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,38,5,.06)]',
-    ),
-  warning: (disabled: boolean) =>
-    cs(
-      '[border:1px_solid_var(--ant-color-warning)]',
-      !disabled &&
-        'hover:border-[var(--ant-color-warning-border-hover)] focus-within:[box-shadow:0_0_0_2px_rgba(255,215,5,.1)]',
-    ),
+export const statusClassDict = {
+  default: (disabled: boolean, foucs: boolean) => {
+    if (disabled) {
+      return 'border-[--ant-color-border]'
+    }
+    if (foucs) {
+      return 'border-[--ant-color-primary] [box-shadow:0_0_0_2px_rgba(5,145,255,0.1)]'
+    }
+    return 'border-[--ant-color-border] hover:border-[--ant-color-primary]'
+  },
+  error: (disabled: boolean, foucs: boolean) => {
+    if (disabled) {
+      return 'border-[--ant-color-error]'
+    }
+    if (foucs) {
+      return 'border-[--ant-color-error] [box-shadow:0_0_0_2px_rgba(255,38,5,.06)]'
+    }
+    return 'border-[--ant-color-error] hover:border-[--ant-color-error-border-hover]'
+  },
+  warning: (disabled: boolean, foucs: boolean) => {
+    if (disabled) {
+      return 'border-[--ant-color-warning]'
+    }
+    if (foucs) {
+      return 'border-[--ant-color-warning] [box-shadow:0_0_0_2px_rgba(255,215,5,.1)]'
+    }
+    return 'border-[--ant-color-warning] hover:border-[--ant-color-warning-border-hover]'
+  },
 }
 
 export function CommonInput(props: CommonInputProps) {
   const size = useComponentSize(() => props.size)
+  const { compact } = useContext(CompactContext)
 
-  let input: HTMLInputElement | undefined
+  let inputRef: HTMLInputElement | undefined
+  const foucs = useFocus(() => inputRef)
+
   onMount(() => {
     if (props.autoFocus) {
-      input?.focus()
+      inputRef?.focus()
     }
   })
 
@@ -99,7 +113,7 @@ export function CommonInput(props: CommonInputProps) {
         props.class,
         'flex',
         'ant-input-group',
-        'p[.ant-compact>]:not-first:ml--1px',
+        compact && 'ant-compact-item p[.ant-compact>]:not-first:ml--1px',
         {
           small: 'h-24px',
           middle: 'h-32px',
@@ -139,10 +153,9 @@ export function CommonInput(props: CommonInputProps) {
       <div
         class={cs(
           'ant-input-affix-wrapper',
-          'flex items-center w-full relative p:hover-child[input]:border-[--ant-color-primary] bg-[--ant-color-bg-container]',
+          'flex items-center w-full relative p:hover-child[input]:border-[--ant-color-primary] bg-[--ant-color-bg-container] p-[--ant-input-padding] border-1px border-solid',
           ['[--actions-display:none]', !props.disabled && 'hover:[--actions-display:block]'],
-          'p-[--ant-input-padding]',
-          statusClassDict[props.status ?? 'default'](!!props.disabled),
+          statusClassDict[props.status ?? 'default'](!!props.disabled, foucs()),
         )}
       >
         <Show when={!isNil(prefix())}>
@@ -152,7 +165,7 @@ export function CommonInput(props: CommonInputProps) {
         <input
           ref={el => {
             setRef(props, el)
-            input = el
+            inputRef = el
           }}
           class={cs(
             'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
@@ -190,11 +203,11 @@ export function CommonInput(props: CommonInputProps) {
             onClick={e => {
               e.stopPropagation()
 
-              input!.value = ''
+              inputRef!.value = ''
               const inputEvent = new InputEvent('input', { bubbles: true })
-              input!.dispatchEvent(inputEvent)
+              inputRef!.dispatchEvent(inputEvent)
 
-              input?.focus()
+              inputRef?.focus()
             }}
           />
         </Show>

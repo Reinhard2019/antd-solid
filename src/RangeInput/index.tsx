@@ -7,6 +7,7 @@ import {
   createEffect,
   on,
   type Accessor,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import { compact, isNil } from 'lodash-es'
@@ -14,6 +15,7 @@ import Tooltip from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway } from '../hooks'
 import Element from '../Element'
+import CompactContext from '../Compact/context'
 
 export interface RangeInputProps<T> {
   multiple?: boolean
@@ -67,6 +69,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
   let endDom: HTMLDivElement | undefined
   let tooltipContent: HTMLDivElement | undefined
 
+  const { compact: isCompact } = useContext(CompactContext)
   const [currentFocusType, setCurrentFocusType] = createSignal<'start' | 'end'>('start')
   const [value, setValue] = createControllableValue<T[] | undefined>(props, {
     defaultValue: [],
@@ -152,7 +155,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
     <Element
       class={cs(
         'rounded-6px',
-        'ant-compact-item',
+        isCompact && 'ant-compact-item',
         props.class,
         props.disabled && 'cursor-not-allowed',
       )}

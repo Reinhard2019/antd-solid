@@ -2,6 +2,7 @@ import { mergeProps, type JSX, type ParentProps } from 'solid-js'
 import cs from 'classnames'
 import Element from '../Element'
 import './index.scss'
+import CompactContext from './context'
 
 interface CompactProps extends ParentProps {
   block?: boolean
@@ -32,7 +33,7 @@ function Compact(_props: CompactProps) {
       )}
       style={props.style}
     >
-      {props.children}
+      <CompactContext.Provider value={{ compact: true }}>{props.children}</CompactContext.Provider>
     </Element>
   )
 }

@@ -1,11 +1,15 @@
-import { type JSX, type Component, onMount } from 'solid-js'
+import { type JSX, type Component, onMount, type Ref } from 'solid-js'
 import cs from 'classnames'
 import Element from '../Element'
 import { type StyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import useComponentSize from '../hooks/useComponentSize'
+import { statusClassDict } from '.'
+import useFocus from '../hooks/useFocus'
+import { setRef } from '../utils/solid'
 
 export interface TextAreaProps extends StyleProps {
+  ref?: Ref<HTMLTextAreaElement>
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   autoFocus?: boolean
@@ -30,10 +34,12 @@ export interface TextAreaProps extends StyleProps {
 const TextArea: Component<TextAreaProps> = props => {
   const size = useComponentSize(() => props.size)
 
-  let input: HTMLTextAreaElement | undefined
+  let inputRef: HTMLTextAreaElement | undefined
+  const foucs = useFocus(() => inputRef)
+
   onMount(() => {
     if (props.autoFocus) {
-      input?.focus()
+      inputRef?.focus()
     }
   })
 
@@ -61,8 +67,12 @@ const TextArea: Component<TextAreaProps> = props => {
       }}
     >
       <textarea
+        ref={el => {
+          setRef(props, el)
+          inputRef = el
+        }}
         class={cs(
-          'p-[--ant-input-padding] border-1px border-solid border-[--ant-color-border] bg-[--ant-color-bg-container]',
+          'p-[--ant-input-padding] border-1px border-solid bg-[--ant-color-bg-container]',
           'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)]',
           props.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
           {
@@ -70,6 +80,7 @@ const TextArea: Component<TextAreaProps> = props => {
             middle: 'rounded-[var(--ant-border-radius)]',
             large: 'rounded-[var(--ant-border-radius-lg)]',
           }[size()],
+          statusClassDict[props.status ?? 'default'](!!props.disabled, foucs()),
         )}
         value={value() ?? ''}
         onInput={e => {
