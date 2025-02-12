@@ -190,19 +190,34 @@ const Slider: Component<SliderProps> = _props => {
 
                 const handleWidth = handleRef!.offsetWidth
 
-                const onMouseMove = (_e: MouseEvent) => {
-                  const moveX = _e.clientX - startX
-                  setValue(startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap())
-                }
-                window.addEventListener('mousemove', onMouseMove)
+                const abortController = new AbortController()
 
-                const onMouseUp = () => {
-                  window.removeEventListener('mousemove', onMouseMove)
-                  window.removeEventListener('mouseup', onMouseUp)
-                  props.onChangeComplete?.(value())
-                  setIsDragging(false)
-                }
-                window.addEventListener('mouseup', onMouseUp)
+                window.addEventListener(
+                  'mousemove',
+                  (_e: MouseEvent) => {
+                    const moveX = _e.clientX - startX
+                    setValue(
+                      startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap(),
+                    )
+                  },
+                  {
+                    capture: true,
+                    signal: abortController.signal,
+                  },
+                )
+
+                window.addEventListener(
+                  'mouseup',
+                  () => {
+                    props.onChangeComplete?.(value())
+                    setIsDragging(false)
+                    abortController.abort()
+                  },
+                  {
+                    capture: true,
+                    once: true,
+                  },
+                )
               }}
             >
               <Show when={isNil(resolvedHandle())} fallback={resolvedHandle()}>

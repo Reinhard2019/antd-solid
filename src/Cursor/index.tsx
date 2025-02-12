@@ -40,6 +40,7 @@ const Cursor: Component<CursorProps> = props => {
         _children.style.cursor = 'none'
       },
       {
+        capture: true,
         signal: abortController.signal,
       },
     )
@@ -53,6 +54,7 @@ const Cursor: Component<CursorProps> = props => {
         })
       },
       {
+        capture: true,
         signal: abortController.signal,
       },
     )
@@ -65,6 +67,7 @@ const Cursor: Component<CursorProps> = props => {
         if (originalCursor) _children.style.cursor = originalCursor
       },
       {
+        capture: true,
         signal: abortController.signal,
       },
     )

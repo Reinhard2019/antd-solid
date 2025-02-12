@@ -199,66 +199,78 @@ const Transformer: Component<TransformerProps> = _props => {
 
     const startValue = value()
 
-    const onMouseMove = (_e: MouseEvent) => {
-      const m = parentTransformMatrix()
-        .inverse()
-        .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
-      const offsetX = m.e
-      const offsetY = m.f
-      const changedValue = {
-        x: startValue.x + offsetX,
-        y: startValue.y + offsetY,
-      }
-      if (props.adsorb) {
-        const _adsorbLine: AdsorbLine = {}
+    const abortController = new AbortController()
 
-        // x 轴
-        const right = props.adsorb.width - value().width
-        const centerX = right / 2
-        if (inRange(changedValue.x, centerX - adsorbGap(), centerX + adsorbGap())) {
-          changedValue.x = centerX
-          _adsorbLine.centerX = true
-        } else if (inRange(changedValue.x, -adsorbGap(), adsorbGap())) {
-          changedValue.x = 0
-          _adsorbLine.left = true
-        } else if (inRange(changedValue.x, right - adsorbGap(), right + adsorbGap())) {
-          changedValue.x = right
-          _adsorbLine.right = true
+    window.addEventListener(
+      'mousemove',
+      (_e: MouseEvent) => {
+        const m = parentTransformMatrix()
+          .inverse()
+          .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
+        const offsetX = m.e
+        const offsetY = m.f
+        const changedValue = {
+          x: startValue.x + offsetX,
+          y: startValue.y + offsetY,
         }
+        if (props.adsorb) {
+          const _adsorbLine: AdsorbLine = {}
 
-        // y 轴
-        const bottom = props.adsorb.height - value().height
-        const centerY = bottom / 2
-        if (inRange(changedValue.y, centerY - adsorbGap(), centerY + adsorbGap())) {
-          changedValue.y = centerY
-          _adsorbLine.centerY = true
-        } else if (inRange(changedValue.y, -adsorbGap(), adsorbGap())) {
-          changedValue.y = 0
-          _adsorbLine.top = true
-        } else if (inRange(changedValue.y, bottom - adsorbGap(), bottom + adsorbGap())) {
-          changedValue.y = bottom
-          _adsorbLine.bottom = true
+          // x 轴
+          const right = props.adsorb.width - value().width
+          const centerX = right / 2
+          if (inRange(changedValue.x, centerX - adsorbGap(), centerX + adsorbGap())) {
+            changedValue.x = centerX
+            _adsorbLine.centerX = true
+          } else if (inRange(changedValue.x, -adsorbGap(), adsorbGap())) {
+            changedValue.x = 0
+            _adsorbLine.left = true
+          } else if (inRange(changedValue.x, right - adsorbGap(), right + adsorbGap())) {
+            changedValue.x = right
+            _adsorbLine.right = true
+          }
+
+          // y 轴
+          const bottom = props.adsorb.height - value().height
+          const centerY = bottom / 2
+          if (inRange(changedValue.y, centerY - adsorbGap(), centerY + adsorbGap())) {
+            changedValue.y = centerY
+            _adsorbLine.centerY = true
+          } else if (inRange(changedValue.y, -adsorbGap(), adsorbGap())) {
+            changedValue.y = 0
+            _adsorbLine.top = true
+          } else if (inRange(changedValue.y, bottom - adsorbGap(), bottom + adsorbGap())) {
+            changedValue.y = bottom
+            _adsorbLine.bottom = true
+          }
+
+          setAdsorbLine(_adsorbLine)
         }
+        setValue({
+          ...value(),
+          ...changedValue,
+        })
+        props.onMove?.(changedValue)
+      },
+      {
+        capture: true,
+        signal: abortController.signal,
+      },
+    )
 
-        setAdsorbLine(_adsorbLine)
-      }
-      setValue({
-        ...value(),
-        ...changedValue,
-      })
-      props.onMove?.(changedValue)
-    }
-    window.addEventListener('mousemove', onMouseMove, true)
-
-    const onMouseUp = () => {
-      document.body.style.userSelect = originUserSelect
-      props.onTransformEnd?.()
-      setAdsorbLine({})
-      window.removeEventListener('mousemove', onMouseMove, true)
-    }
-    window.addEventListener('mouseup', onMouseUp, {
-      once: true,
-    })
+    window.addEventListener(
+      'mouseup',
+      () => {
+        document.body.style.userSelect = originUserSelect
+        props.onTransformEnd?.()
+        setAdsorbLine({})
+        abortController.abort()
+      },
+      {
+        capture: true,
+        once: true,
+      },
+    )
   }
 
   let resizing = false
@@ -290,121 +302,133 @@ const Transformer: Component<TransformerProps> = _props => {
         .translate(-transformOrigin()[0], -transformOrigin()[1]),
     )
 
-    const onMouseMove = (_e: MouseEvent) => {
-      const changedValue = value()
+    const abortController = new AbortController()
+    window.addEventListener(
+      'mousemove',
+      (_e: MouseEvent) => {
+        const changedValue = value()
 
-      const m = parentTransformMatrix()
-        .multiply(transformMatrix())
-        .inverse()
-        .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
-      const offsetX = m.e
-      const offsetY = m.f
-
-      const _adsorbLine: AdsorbLine = {}
-
-      if (
-        direction === 'left' ||
-        direction === 'right' ||
-        direction === 'topLeft' ||
-        direction === 'topRight' ||
-        direction === 'bottomLeft' ||
-        direction === 'bottomRight'
-      ) {
-        const isLeft = direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
-        let widthOffset = isLeft ? -offsetX : offsetX
-        widthOffset = Math.max(-startValue.width, widthOffset)
-        changedValue.width = startValue.width + widthOffset
-
-        if (props.adsorb) {
-          if (isLeft) {
-            let xOffset = isLeft ? -widthOffset : 0
-            if (inRange(startValue.x + xOffset, -adsorbGap(), +adsorbGap())) {
-              xOffset = -startValue.x
-              changedValue.width = NP.minus(startValue.width, xOffset)
-            }
-          } else {
-            if (
-              inRange(
-                startValue.x + changedValue.width,
-                props.adsorb.width - adsorbGap(),
-                props.adsorb.width + adsorbGap(),
-              )
-            ) {
-              changedValue.width = NP.minus(props.adsorb.width, startValue.x)
-            }
-          }
-        }
-      }
-      if (
-        direction === 'top' ||
-        direction === 'bottom' ||
-        direction === 'topLeft' ||
-        direction === 'topRight' ||
-        direction === 'bottomLeft' ||
-        direction === 'bottomRight'
-      ) {
-        const isTop = direction === 'top' || direction === 'topLeft' || direction === 'topRight'
-        let heightOffset = isTop ? -offsetY : offsetY
-        heightOffset = Math.max(-startValue.height, heightOffset)
-        changedValue.height = startValue.height + heightOffset
-
-        if (props.adsorb) {
-          if (isTop) {
-            let yOffset = isTop ? -heightOffset : 0
-            if (inRange(startValue.y + yOffset, -adsorbGap(), +adsorbGap())) {
-              yOffset = -startValue.y
-              changedValue.height = NP.minus(startValue.height, yOffset)
-            }
-          } else {
-            if (
-              inRange(
-                startValue.y + changedValue.height,
-                props.adsorb.height - adsorbGap(),
-                props.adsorb.height + adsorbGap(),
-              )
-            ) {
-              changedValue.height = NP.minus(props.adsorb.height, startValue.y)
-            }
-          }
-        }
-      }
-
-      setAdsorbLine(_adsorbLine)
-
-      const endWidth = changedValue.width ?? value().width
-      const endHeight = changedValue.height ?? value().height
-      const endTransformOrigin = parseTransformOrigin(endWidth, endHeight)
-      const endVertex = getVertex(endWidth, endHeight).matrixTransform(
-        new DOMMatrix()
-          .translate(endTransformOrigin[0], endTransformOrigin[1])
+        const m = parentTransformMatrix()
           .multiply(transformMatrix())
-          .translate(-endTransformOrigin[0], -endTransformOrigin[1]),
-      )
-      changedValue.x = startValue.x + startVertex.x - endVertex.x
-      changedValue.y = startValue.y + startVertex.y - endVertex.y
+          .inverse()
+          .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
+        const offsetX = m.e
+        const offsetY = m.f
 
-      setValue({
-        ...value(),
-        ...changedValue,
-      })
-      props.onResize?.(changedValue)
+        const _adsorbLine: AdsorbLine = {}
 
-      updateResizeArrowPosition(_e)
-    }
-    window.addEventListener('mousemove', onMouseMove, true)
+        if (
+          direction === 'left' ||
+          direction === 'right' ||
+          direction === 'topLeft' ||
+          direction === 'topRight' ||
+          direction === 'bottomLeft' ||
+          direction === 'bottomRight'
+        ) {
+          const isLeft =
+            direction === 'left' || direction === 'topLeft' || direction === 'bottomLeft'
+          let widthOffset = isLeft ? -offsetX : offsetX
+          widthOffset = Math.max(-startValue.width, widthOffset)
+          changedValue.width = startValue.width + widthOffset
+
+          if (props.adsorb) {
+            if (isLeft) {
+              let xOffset = isLeft ? -widthOffset : 0
+              if (inRange(startValue.x + xOffset, -adsorbGap(), +adsorbGap())) {
+                xOffset = -startValue.x
+                changedValue.width = NP.minus(startValue.width, xOffset)
+              }
+            } else {
+              if (
+                inRange(
+                  startValue.x + changedValue.width,
+                  props.adsorb.width - adsorbGap(),
+                  props.adsorb.width + adsorbGap(),
+                )
+              ) {
+                changedValue.width = NP.minus(props.adsorb.width, startValue.x)
+              }
+            }
+          }
+        }
+        if (
+          direction === 'top' ||
+          direction === 'bottom' ||
+          direction === 'topLeft' ||
+          direction === 'topRight' ||
+          direction === 'bottomLeft' ||
+          direction === 'bottomRight'
+        ) {
+          const isTop = direction === 'top' || direction === 'topLeft' || direction === 'topRight'
+          let heightOffset = isTop ? -offsetY : offsetY
+          heightOffset = Math.max(-startValue.height, heightOffset)
+          changedValue.height = startValue.height + heightOffset
+
+          if (props.adsorb) {
+            if (isTop) {
+              let yOffset = isTop ? -heightOffset : 0
+              if (inRange(startValue.y + yOffset, -adsorbGap(), +adsorbGap())) {
+                yOffset = -startValue.y
+                changedValue.height = NP.minus(startValue.height, yOffset)
+              }
+            } else {
+              if (
+                inRange(
+                  startValue.y + changedValue.height,
+                  props.adsorb.height - adsorbGap(),
+                  props.adsorb.height + adsorbGap(),
+                )
+              ) {
+                changedValue.height = NP.minus(props.adsorb.height, startValue.y)
+              }
+            }
+          }
+        }
+
+        setAdsorbLine(_adsorbLine)
+
+        const endWidth = changedValue.width ?? value().width
+        const endHeight = changedValue.height ?? value().height
+        const endTransformOrigin = parseTransformOrigin(endWidth, endHeight)
+        const endVertex = getVertex(endWidth, endHeight).matrixTransform(
+          new DOMMatrix()
+            .translate(endTransformOrigin[0], endTransformOrigin[1])
+            .multiply(transformMatrix())
+            .translate(-endTransformOrigin[0], -endTransformOrigin[1]),
+        )
+        changedValue.x = startValue.x + startVertex.x - endVertex.x
+        changedValue.y = startValue.y + startVertex.y - endVertex.y
+
+        setValue({
+          ...value(),
+          ...changedValue,
+        })
+        props.onResize?.(changedValue)
+
+        updateResizeArrowPosition(_e)
+      },
+      {
+        capture: true,
+        signal: abortController.signal,
+      },
+    )
 
     resizing = true
-    const onMouseUp = () => {
-      resizing = false
-      setResizeDirection(false)
-      props.onTransformEnd?.()
-      document.body.style.userSelect = originUserSelect
-      document.body.style.cursor = originCursor
-      window.removeEventListener('mousemove', onMouseMove, true)
-    }
-    window.addEventListener('mouseup', onMouseUp, {
-      once: true,
-    })
+    window.addEventListener(
+      'mouseup',
+      () => {
+        resizing = false
+        setResizeDirection(false)
+        props.onTransformEnd?.()
+        document.body.style.userSelect = originUserSelect
+        document.body.style.cursor = originCursor
+        abortController.abort()
+      },
+      {
+        capture: true,
+        once: true,
+      },
+    )
   }
   const getResizeHandlerProps = (
     direction: ResizeDirection,
@@ -450,30 +474,42 @@ const Transformer: Component<TransformerProps> = _props => {
     const startRotate = value().rotate
     const startAngle = Math.atan2(e.clientY - y, e.clientX - x)
 
-    const onMouseMove = (_e: MouseEvent) => {
-      const angle = Math.atan2(_e.clientY - y, _e.clientX - x)
-      const rotate = startRotate + radToDeg(angle - startAngle)
-      setValue({
-        ...value(),
-        rotate,
-      })
-      props.onRotate?.({ rotate })
+    const abortController = new AbortController()
 
-      updateRotateArrowPosition(_e)
-    }
-    window.addEventListener('mousemove', onMouseMove, true)
+    window.addEventListener(
+      'mousemove',
+      (_e: MouseEvent) => {
+        const angle = Math.atan2(_e.clientY - y, _e.clientX - x)
+        const rotate = startRotate + radToDeg(angle - startAngle)
+        setValue({
+          ...value(),
+          rotate,
+        })
+        props.onRotate?.({ rotate })
 
-    const onMouseUp = () => {
-      rotating = false
-      setRotateDirection(false)
-      document.body.style.userSelect = originUserSelect
-      document.body.style.cursor = originCursor
-      props.onTransformEnd?.()
-      window.removeEventListener('mousemove', onMouseMove, true)
-    }
-    window.addEventListener('mouseup', onMouseUp, {
-      once: true,
-    })
+        updateRotateArrowPosition(_e)
+      },
+      {
+        capture: true,
+        signal: abortController.signal,
+      },
+    )
+
+    window.addEventListener(
+      'mouseup',
+      () => {
+        rotating = false
+        setRotateDirection(false)
+        document.body.style.userSelect = originUserSelect
+        document.body.style.cursor = originCursor
+        props.onTransformEnd?.()
+        abortController.abort()
+      },
+      {
+        capture: true,
+        once: true,
+      },
+    )
   }
   const getRotateHandlerProps = (
     direction: ResizeDirection,

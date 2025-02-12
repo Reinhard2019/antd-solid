@@ -10,6 +10,7 @@ export default function useMouse() {
       setMouse(e)
     },
     {
+      capture: true,
       signal: abortController.signal,
     },
   )
