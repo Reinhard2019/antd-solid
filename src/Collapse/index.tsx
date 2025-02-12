@@ -1,4 +1,4 @@
-import { type Component, createMemo, For, type JSX, Show } from 'solid-js'
+import { type Component, For, type JSX, mergeProps, Show } from 'solid-js'
 import cs from 'classnames'
 import { isEmpty } from 'lodash-es'
 import { type StringOrJSXElement, type Key, type StyleProps } from '../types'
@@ -44,12 +44,19 @@ export interface CollapseProps
   onChange?: (value: Key[]) => void
   items: CollapseItem[] | undefined | null
   fallback?: JSX.Element
+  divider?: boolean
 }
 
 const Collapse: Component<CollapseProps> & {
   Item: typeof CollapseItemComponent
-} = props => {
-  const type = createMemo(() => props.type ?? 'line')
+} = _props => {
+  const props = mergeProps(
+    {
+      divider: true,
+      type: 'line',
+    } as const,
+    _props,
+  )
   const size = useComponentSize(() => props.size)
   const [activeKey, setActiveKey] = createControllableValue<Key[]>(props, {
     defaultValuePropName: 'defaultActiveKey',
@@ -60,9 +67,9 @@ const Collapse: Component<CollapseProps> & {
   return (
     <Show when={!isEmpty(props.items)} fallback={props.fallback}>
       <Element
-        class={cs(getElementClass(type()), props.class)}
+        class={cs(getElementClass(props.type), props.class)}
         style={{
-          ...getElementCssVariables(type(), size()),
+          ...getElementCssVariables(props.type, size()),
           ...props.style,
         }}
       >
@@ -74,11 +81,11 @@ const Collapse: Component<CollapseProps> & {
           <For each={props.items}>
             {(item, index) => (
               <>
-                <Show when={index() !== 0}>
+                <Show when={index() !== 0 && props.divider}>
                   <div
                     class={cs(
                       'h-1px bg-[var(--ant-color-split)]',
-                      type() === 'line' && 'm-[--ant-collapse-divider-margin]',
+                      props.type === 'line' && 'm-[--ant-collapse-divider-margin]',
                     )}
                   />
                 </Show>
@@ -94,7 +101,8 @@ const Collapse: Component<CollapseProps> & {
                     }
                   }}
                   size={size()}
-                  type={type()}
+                  type={props.type}
+                  bordered={props.bordered}
                   expandIcon={props.expandIcon}
                   expandIconPosition={props.expandIconPosition}
                   headerStyle={props.headerStyle}

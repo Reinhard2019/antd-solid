@@ -9,7 +9,7 @@ import {
 } from 'solid-js'
 import Color from './color'
 import Element from '../Element'
-import Popover from '../Popover'
+import Popover, { type PopoverProps } from '../Popover'
 import ColorPickerSelect from './ColorPickerSelect'
 import ColorPickerContext from './context'
 import ColorPickerSlider from './ColorPickerSlider'
@@ -17,7 +17,7 @@ import ColorPickerInput from './ColorPickerInput'
 import { type ComponentSize } from '../types'
 import useComponentSize from '../hooks/useComponentSize'
 
-export interface ColorPickerProps {
+export interface ColorPickerProps extends Pick<PopoverProps, 'placement'> {
   defaultValue?: string | null
   value?: string | null
   /**
@@ -107,7 +107,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
       onOpenChange={setOpen}
       trigger={props.disabled ? false : 'click'}
       content={getPopoverContent}
-      placement="bottomLeft"
+      placement={props.placement ?? 'bottomLeft'}
     >
       <Element class={cs('inline-block', props.disabled && 'cursor-not-allowed')}>
         <div

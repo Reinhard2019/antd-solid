@@ -3,9 +3,8 @@ import { type CollapseItemProps } from './Item'
 
 export function getElementClass(type: CollapseItemProps['type']) {
   return cs(
-    '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
-    type === 'card' &&
-      'rounded-[var(--ant-border-radius-lg)] overflow-hidden [border:1px_solid_var(--ant-color-border)]',
+    '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)] rounded-[var(--ant-collapse-border-radius)] overflow-hidden',
+    type === 'card' && '[border:1px_solid_var(--ant-color-border)]',
   )
 }
 
@@ -35,6 +34,11 @@ export function getElementCssVariables(
       small: 'var(--ant-margin-sm) 0',
       middle: 'var(--ant-margin) 0',
       large: 'var(--ant-margin-lg) 0',
+    }[size],
+    '--ant-collapse-border-radius': {
+      small: 'var(--ant-border-radius-sm)',
+      middle: 'var(--ant-border-radius)',
+      large: 'var(--ant-border-radius-lg)',
     }[size],
   }
 }

@@ -1,5 +1,3 @@
-import { inRange } from 'lodash-es'
-
 /**
  * 角度转弧度
  * @param degrees
@@ -14,32 +12,6 @@ export function degToRad(degrees: number) {
  */
 export function radToDeg(radian: number) {
   return (radian / Math.PI) * 180
-}
-
-/**
- * 获取圆上的点
- * 角度以 x 轴正轴为起点，顺时针
- * 注意：与 canvas 一样，y 轴正轴朝下
- */
-export function getPointOfCircle(_angle: number, radius = 1) {
-  // 将超出[0, 360]范围的角度转换为[0, 360]
-  const angle = _angle >= 0 ? _angle % (Math.PI * 2) : Math.PI * 2 + (_angle % (Math.PI * 2))
-  let x = 0
-  let y = 0
-  if (inRange(angle, 0, Math.PI / 2)) {
-    x = Math.cos(angle) * radius
-    y = Math.sin(angle) * radius
-  } else if (inRange(angle, Math.PI / 2, Math.PI)) {
-    x = -Math.sin(angle - Math.PI / 2) * radius
-    y = Math.cos(angle - Math.PI / 2) * radius
-  } else if (inRange(angle, Math.PI, Math.PI * 1.5)) {
-    x = -Math.cos(angle - Math.PI) * radius
-    y = -Math.sin(angle - Math.PI) * radius
-  } else if (inRange(angle, Math.PI * 1.5, Math.PI * 2)) {
-    x = Math.sin(angle - Math.PI * 1.5) * radius
-    y = -Math.cos(angle - Math.PI * 1.5) * radius
-  }
-  return [x, y]
 }
 
 /**
