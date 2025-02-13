@@ -20,7 +20,6 @@ import { nanoid } from 'nanoid'
 import createControllableValue from '../hooks/createControllableValue'
 import { useClickAway, useSize } from '../hooks'
 import DelayShow from '../DelayShow'
-import { isEmptyJSXElement } from '../utils/solid'
 import useHover from '../hooks/useHover'
 import AntdElement from '../Element'
 import TooltipContext, { type TooltipContextProps } from './context'
@@ -163,19 +162,77 @@ const ARROW_STYLE_DICT: Record<TooltipPlacement, JSX.CSSProperties> = {
   },
 }
 
-const REVERSE_PLACEMENT_DICT: Record<TooltipPlacement, TooltipPlacement> = {
+type SinglePlacement = 'top' | 'bottom' | 'left' | 'right'
+
+const REVERSE_PLACEMENT_DICT: Record<SinglePlacement, SinglePlacement> = {
   top: 'bottom',
-  topLeft: 'bottomLeft',
-  topRight: 'bottomRight',
   bottom: 'top',
-  bottomLeft: 'topLeft',
-  bottomRight: 'topRight',
   left: 'right',
-  leftTop: 'rightTop',
-  leftBottom: 'rightBottom',
   right: 'left',
-  rightTop: 'leftTop',
-  rightBottom: 'leftBottom',
+}
+
+const mergePlacement = (
+  mainPlacement: SinglePlacement,
+  minorPlacement: SinglePlacement | undefined,
+): TooltipPlacement => {
+  if (!minorPlacement) return mainPlacement
+
+  switch (mainPlacement) {
+    case 'top':
+      return minorPlacement === 'left' ? 'topLeft' : 'topRight'
+    case 'bottom':
+      return minorPlacement === 'left' ? 'bottomLeft' : 'bottomRight'
+    case 'left':
+      return minorPlacement === 'top' ? 'leftTop' : 'leftBottom'
+    case 'right':
+      return minorPlacement === 'top' ? 'rightTop' : 'rightBottom'
+  }
+}
+
+const getMainPlacement = (placement: TooltipPlacement): SinglePlacement => {
+  let mainPlacement: SinglePlacement = 'top'
+  switch (placement) {
+    case 'bottom':
+    case 'bottomLeft':
+    case 'bottomRight':
+      mainPlacement = 'bottom'
+      break
+    case 'left':
+    case 'leftTop':
+    case 'leftBottom':
+      mainPlacement = 'left'
+      break
+    case 'right':
+    case 'rightTop':
+    case 'rightBottom':
+      mainPlacement = 'right'
+      break
+  }
+  return mainPlacement
+}
+
+type MinorPlacement = SinglePlacement | undefined
+const getMinorPlacement = (placement: TooltipPlacement): MinorPlacement => {
+  let minorPlacement: MinorPlacement
+  switch (placement) {
+    case 'leftTop':
+    case 'rightTop':
+      minorPlacement = 'top'
+      break
+    case 'leftBottom':
+    case 'rightBottom':
+      minorPlacement = 'bottom'
+      break
+    case 'topLeft':
+    case 'bottomLeft':
+      minorPlacement = 'left'
+      break
+    case 'topRight':
+    case 'bottomRight':
+      minorPlacement = 'right'
+      break
+  }
+  return minorPlacement
 }
 
 const Tooltip: Component<TooltipProps> = _props => {
@@ -209,7 +266,9 @@ const Tooltip: Component<TooltipProps> = _props => {
 
   // =========================== Tooltip ============================
   const id = nanoid()
-  const resolvedChildren = children(() => _props.children)
+  const resolvedChildren = children(() => (
+    <TooltipContext.Provider value={context}>{props.children}</TooltipContext.Provider>
+  ))
   const [contentRef, setContentRef] = createSignal<HTMLDivElement>()
   const setPopupRef = (node: HTMLDivElement) => {
     setContentRef(node)
@@ -220,7 +279,7 @@ const Tooltip: Component<TooltipProps> = _props => {
     valuePropName: 'open',
     trigger: 'onOpenChange',
   })
-  const [isEmptyContent, setIsEmptyContent] = createSignal(false)
+  const isEmptyContent = createMemo(() => !props.content)
   const open = createMemo(() => _open() && !props.disabled && !isEmptyContent())
   const reverseOpen = () => setOpen(v => !v)
   const show = () => setOpen(true)
@@ -304,15 +363,16 @@ const Tooltip: Component<TooltipProps> = _props => {
   })
 
   const arrowOffset = createMemo(() => (props.arrow ? 4 : 0))
-  const [reverse, setReverse] = createSignal(false)
+  let mainPlacementReverse = false
+  let minorPlacementReverse = false
   createRenderEffect(
     on(open, () => {
-      setReverse(false)
+      mainPlacementReverse = false
+      minorPlacementReverse = false
     }),
   )
-  const reversedPlacement = createMemo(() =>
-    reverse() ? REVERSE_PLACEMENT_DICT[props.placement] : props.placement,
-  )
+  const [reversedMainPlacement, setReversedMainPlacement] = createSignal<SinglePlacement>('top')
+  const [reversedMinorPlacement, setReversedMinorPlacement] = createSignal<MinorPlacement>()
   const contentSize = useSize(contentRef)
   // 设置 content 显示时的 translate
   createEffect(() => {
@@ -336,36 +396,40 @@ const Tooltip: Component<TooltipProps> = _props => {
       _childrenRect.y += offsetY
     }
 
-    switch (props.placement) {
-      case 'top':
-      case 'bottom':
-        translateX = _childrenRect.left + _childrenRect.width / 2 - _contentSize.width / 2
-        break
-      case 'topLeft':
-      case 'bottomLeft':
-        translateX = _childrenRect.left
-        break
-      case 'topRight':
-      case 'bottomRight':
-        translateX = _childrenRect.right - _contentSize.width
-        break
-      case 'left':
-      case 'right':
-        translateY = _childrenRect.top + _childrenRect.height / 2 - _contentSize.height / 2
-        break
-      case 'leftTop':
-      case 'rightTop':
-        translateY = _childrenRect.top
-        break
-      case 'leftBottom':
-      case 'rightBottom':
-        translateY = _childrenRect.bottom - _contentSize.height
-        break
+    const updateTranslateByMinorPlacement = (placement: TooltipPlacement) => {
+      switch (placement) {
+        case 'top':
+        case 'bottom':
+          translateX = _childrenRect.left + _childrenRect.width / 2 - _contentSize.width / 2
+          break
+        case 'topLeft':
+        case 'bottomLeft':
+          translateX = _childrenRect.left
+          break
+        case 'topRight':
+        case 'bottomRight':
+          translateX = _childrenRect.right - _contentSize.width
+          break
+        case 'left':
+        case 'right':
+          translateY = _childrenRect.top + _childrenRect.height / 2 - _contentSize.height / 2
+          break
+        case 'leftTop':
+        case 'rightTop':
+          translateY = _childrenRect.top
+          break
+        case 'leftBottom':
+        case 'rightBottom':
+          translateY = _childrenRect.bottom - _contentSize.height
+          break
+      }
     }
 
-    const updateTranslateByMainPlacement = (type: MainPlacement) => {
+    updateTranslateByMinorPlacement(props.placement)
+
+    const updateTranslateByMainPlacement = (mainPlacement: SinglePlacement) => {
       const defaultOffset = props.offset ? 0 : 6
-      switch (type) {
+      switch (mainPlacement) {
         case 'top':
           translateY = _childrenRect.top - arrowOffset() - defaultOffset - _contentSize.height
           break
@@ -381,104 +445,88 @@ const Tooltip: Component<TooltipProps> = _props => {
       }
     }
 
-    type MainPlacement = 'top' | 'bottom' | 'left' | 'right'
-    let mainPlacement: MainPlacement = 'top'
-    switch (props.placement) {
-      case 'bottom':
-      case 'bottomLeft':
-      case 'bottomRight':
-        mainPlacement = 'bottom'
-        break
-      case 'left':
-      case 'leftTop':
-      case 'leftBottom':
-        mainPlacement = 'left'
-        break
-      case 'right':
-      case 'rightTop':
-      case 'rightBottom':
-        mainPlacement = 'right'
-        break
-    }
+    let mainPlacement = getMainPlacement(props.placement)
 
     if (props.autoAdjustOverflow) {
+      if (mainPlacementReverse) {
+        mainPlacement = REVERSE_PLACEMENT_DICT[mainPlacement]
+      }
+
+      updateTranslateByMainPlacement(mainPlacement)
+
+      const reverseMainPlacement = () => {
+        mainPlacementReverse = !mainPlacementReverse
+        mainPlacement = REVERSE_PLACEMENT_DICT[mainPlacement]
+        updateTranslateByMainPlacement(mainPlacement)
+      }
+
       switch (mainPlacement) {
         case 'top':
-          if (reverse()) {
-            updateTranslateByMainPlacement('bottom')
-            if (translateY + _contentSize.height > window.innerHeight) {
-              setReverse(false)
-              updateTranslateByMainPlacement('top')
-            }
-          } else {
-            updateTranslateByMainPlacement('top')
-            if (translateY < 0) {
-              setReverse(true)
-              updateTranslateByMainPlacement('bottom')
-            }
+          if (translateY < 0) {
+            reverseMainPlacement()
           }
           break
         case 'bottom':
-          if (reverse()) {
-            updateTranslateByMainPlacement('top')
-            if (translateY < 0) {
-              setReverse(false)
-              updateTranslateByMainPlacement('bottom')
-            }
-          } else {
-            updateTranslateByMainPlacement('bottom')
-            if (translateY + _contentSize.height > window.innerHeight) {
-              setReverse(true)
-              updateTranslateByMainPlacement('top')
-            }
+          if (translateY + _contentSize.height > window.innerHeight) {
+            reverseMainPlacement()
           }
           break
         case 'left':
-          if (reverse()) {
-            updateTranslateByMainPlacement('right')
-            if (translateX < 0) {
-              setReverse(false)
-              updateTranslateByMainPlacement('left')
-            }
-          } else {
-            updateTranslateByMainPlacement('left')
-            if (translateX + _contentSize.width > window.innerWidth) {
-              setReverse(true)
-              updateTranslateByMainPlacement('right')
-            }
+          if (translateX + _contentSize.width > window.innerWidth) {
+            reverseMainPlacement()
           }
           break
         case 'right':
-          if (reverse()) {
-            updateTranslateByMainPlacement('left')
-            if (translateX + _contentSize.width > window.innerWidth) {
-              setReverse(false)
-              updateTranslateByMainPlacement('right')
-            }
-          } else {
-            updateTranslateByMainPlacement('right')
-            if (translateX < 0) {
-              setReverse(true)
-              updateTranslateByMainPlacement('left')
-            }
+          if (translateX < 0) {
+            reverseMainPlacement()
           }
           break
       }
+
+      let minorPlacement = getMinorPlacement(props.placement)
+
+      if (minorPlacement) {
+        if (minorPlacementReverse) {
+          minorPlacement = REVERSE_PLACEMENT_DICT[minorPlacement]
+        }
+
+        updateTranslateByMinorPlacement(mergePlacement(mainPlacement, minorPlacement))
+
+        const reverseMinorPlacement = () => {
+          if (!minorPlacement) return
+          minorPlacementReverse = !minorPlacementReverse
+          minorPlacement = REVERSE_PLACEMENT_DICT[minorPlacement]
+          updateTranslateByMinorPlacement(mergePlacement(mainPlacement, minorPlacement))
+        }
+
+        switch (minorPlacement) {
+          case 'top':
+            if (translateY < 0) {
+              reverseMinorPlacement()
+            }
+            break
+          case 'bottom':
+            if (translateY + _contentSize.height > window.innerHeight) {
+              reverseMinorPlacement()
+            }
+            break
+          case 'left':
+            if (translateX + _contentSize.width > window.innerWidth) {
+              reverseMinorPlacement()
+            }
+            break
+          case 'right':
+            if (translateX < 0) {
+              reverseMinorPlacement()
+            }
+            break
+        }
+      }
+
+      setReversedMainPlacement(mainPlacement)
+      setReversedMinorPlacement(minorPlacement)
     } else {
-      switch (mainPlacement) {
-        case 'top':
-          updateTranslateByMainPlacement('top')
-          break
-        case 'bottom':
-          updateTranslateByMainPlacement('bottom')
-          break
-        case 'left':
-          updateTranslateByMainPlacement('left')
-          break
-        case 'right':
-          updateTranslateByMainPlacement('right')
-          break
-      }
+      updateTranslateByMainPlacement(mainPlacement)
     }
 
     _contentRef.style.setProperty('--translate-x', `${translateX}px`)
@@ -498,11 +546,26 @@ const Tooltip: Component<TooltipProps> = _props => {
         )
       }
       _contentRef.style.setProperty('--inner-translate-x', `${innerTranslateX}px`)
+      _contentRef.style.setProperty('--inner-translate-y', '0px')
+    } else if (props.placement === 'left' || props.placement === 'right') {
+      let innerTranslateY = 0
+      const maxInnerTranslateY = _contentSize.height / 2 - 20
+      if (translateY < 0) {
+        innerTranslateY = Math.min(-translateY, maxInnerTranslateY)
+      }
+      if (translateY + _contentSize.height > window.innerHeight) {
+        innerTranslateY = Math.max(
+          window.innerHeight - (translateY + _contentSize.height),
+          -maxInnerTranslateY,
+        )
+      }
+      _contentRef.style.setProperty('--inner-translate-x', '0px')
+      _contentRef.style.setProperty('--inner-translate-y', `${innerTranslateY}px`)
     }
   })
 
   return (
-    <TooltipContext.Provider value={context}>
+    <>
       {resolvedChildren()}
 
       <Dynamic component={props.destroyOnClose ? Show : DelayShow} when={open()}>
@@ -524,24 +587,18 @@ const Tooltip: Component<TooltipProps> = _props => {
             <div
               class={cs(
                 'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto',
-                props.placement === 'top' || props.placement === 'bottom'
-                  ? 'max-w-100vw'
-                  : 'max-w-[calc(100vw-var(--translate-x))]',
-                'max-h-[calc(100vh-var(--translate-y))]',
                 props.plain
                   ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                   : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
               )}
               style={{
-                transform: 'translateX(var(--inner-translate-x))',
+                transform: 'translate(var(--inner-translate-x), var(--inner-translate-y))',
                 ...props.contentStyle,
               }}
             >
-              {(() => {
-                const resolvedContent = unwrapContent(props.content, () => setOpen(false))
-                setIsEmptyContent(isEmptyJSXElement(resolvedContent))
-                return resolvedContent
-              })()}
+              <TooltipContext.Provider value={context}>
+                {unwrapContent(props.content, () => setOpen(false))}
+              </TooltipContext.Provider>
             </div>
 
             <Show when={props.arrow}>
@@ -554,14 +611,16 @@ const Tooltip: Component<TooltipProps> = _props => {
                   'background-color': props.plain
                     ? 'var(--ant-color-bg-container-tertiary)'
                     : 'var(--ant-color-bg-spotlight)',
-                  ...ARROW_STYLE_DICT[reversedPlacement()],
+                  ...ARROW_STYLE_DICT[
+                    mergePlacement(reversedMainPlacement(), reversedMinorPlacement())
+                  ],
                 }}
               />
             </Show>
           </AntdElement>
         </Portal>
       </Dynamic>
-    </TooltipContext.Provider>
+    </>
   )
 }
 
