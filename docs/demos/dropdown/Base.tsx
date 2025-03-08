@@ -15,15 +15,15 @@ const items: MenuItem[] = [
     label: '3rd menu item',
     children: [
       {
-        key: '1',
+        key: '2-1',
         label: '1st menu item',
       },
       {
-        key: '2',
+        key: '2-2',
         label: '2nd menu item',
       },
       {
-        key: '3',
+        key: '2-3',
         label: '3rd menu item',
       },
     ],

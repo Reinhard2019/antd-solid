@@ -58,7 +58,7 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                     : 'text-[--ant-color-text] hover:bg-[var(--ant-color-bg-text-hover)]',
                 !hasChildren()
                   ? [
-                    'px-[var(--ant-padding)]',
+                    'px-[--ant-padding-sm]',
                     props.selectable && 'active:bg-[var(--ant-control-item-bg-active)]',
                   ]
                   : 'pl-[var(--ant-padding)] pr-[calc(var(--ant-padding)+0.7em+var(--ant-margin-xs))]',
