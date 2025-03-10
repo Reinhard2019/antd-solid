@@ -1,19 +1,20 @@
-import { createEffect, createSignal, getOwner, onCleanup, runWithOwner } from 'solid-js'
+import { createEffect, createSignal, getOwner, onCleanup, runWithOwner, splitProps } from 'solid-js'
 import Command from '../Command'
 import { inRange } from '../utils/number'
 import Menu, { type MenuProps } from '../Menu'
 import Element from '../Element'
 
-interface Props {
+interface Props extends MenuProps {
   x: number
   y: number
-  items: MenuProps['items']
 }
 
 const offsetY = 4
 
 const ContextMenuCommand = Command.createCommand<Props>(props => {
   let ref: HTMLDivElement | undefined
+
+  const [, menuProps] = splitProps(props, ['x', 'y'])
 
   const [reverse, setReverse] = createSignal(false)
   createEffect(() => {
@@ -66,11 +67,14 @@ const ContextMenuCommand = Command.createCommand<Props>(props => {
       }}
     >
       <Menu
-        items={props.items}
         selectable={false}
-        onClick={dispose}
         style={{
           '--ant-menu-item-height': '32px',
+        }}
+        {...menuProps}
+        onClick={info => {
+          dispose()
+          menuProps.onClick?.(info)
         }}
       />
     </Element>
@@ -81,16 +85,12 @@ let prevPosition: { x: number; y: number } | undefined
 // 用于范围检测
 const padding = 2
 
-interface TriggerOptions {
-  items: MenuProps['items']
-}
-
-const trigger = (event: MouseEvent, { items }: TriggerOptions) => {
+const trigger = (event: MouseEvent, options: MenuProps) => {
   event.preventDefault()
   event.stopPropagation()
 
   if (
-    !items?.length ||
+    !options.items?.length ||
     (ContextMenuCommand.isOpen() &&
       inRange(prevPosition?.x ?? 0, event.clientX - padding, event.clientX + padding, '[]') &&
       inRange(prevPosition?.y ?? 0, event.clientY - padding, event.clientY + padding, '[]'))
@@ -105,7 +105,7 @@ const trigger = (event: MouseEvent, { items }: TriggerOptions) => {
   }
   ContextMenuCommand.show({
     ...prevPosition,
-    items,
+    ...options,
   })
 }
 
@@ -113,7 +113,7 @@ const useContextMenu = () => {
   const owner = getOwner()
 
   return {
-    trigger: (event: MouseEvent, options: TriggerOptions) => {
+    trigger: (event: MouseEvent, options: MenuProps) => {
       runWithOwner(owner, () => {
         trigger(event, options)
       })
