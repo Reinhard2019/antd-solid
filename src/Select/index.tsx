@@ -10,6 +10,7 @@ import Empty from '../Empty'
 interface SelectOption<T = Key> {
   label: JSXElement
   value: T
+  class?: string
 }
 
 export interface SelectProps<T = Key>
@@ -79,6 +80,7 @@ function Select<T = Key>(props: SelectProps<T>) {
                   class={cs(
                     'ellipsis box-content px-12px py-5px min-h-22px leading-22px hover:bg-[var(--ant-select-option-active-bg)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
                     selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
+                    item.class,
                   )}
                   onClick={() => {
                     if (!props.multiple) {

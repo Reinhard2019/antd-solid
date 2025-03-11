@@ -85,7 +85,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
   const optionLabelRender = (v: T) => (props.labelRender ? props.labelRender(v) : String(v))
 
   const style = createMemo(() => ({
-    '--ant-select-font-size': {
+    '--ant-select-input-font-size': {
       small: 'var(--ant-font-size)',
       middle: 'var(--ant-font-size)',
       large: 'var(--ant-font-size-lg)',
@@ -101,6 +101,11 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
       '0 var(--ant-select-input-padding-right) 0 var(--ant-select-input-padding-left)',
     '--ant-select-input-addon-after-padding': '0 0 0 var(--ant-padding-xs)',
     '--ant-select-popup-match-width': `${popupMatchWidth()}px`,
+    '--ant-select-popup-font-size': {
+      small: 'var(--ant-font-size)',
+      middle: 'var(--ant-font-size)',
+      large: 'var(--ant-font-size-lg)',
+    }[size()],
     ...props.style,
   }))
 
@@ -129,9 +134,9 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         content={() => (
           <div
             ref={tooltipContent}
-            class="w-[--ant-select-popup-match-width] max-h-400px overflow-auto [font-size:var(--ant-select-font-size)]"
+            class="w-[--ant-select-popup-match-width] max-h-400px overflow-auto [font-size:var(--ant-select-popup-font-size)]"
             style={{
-              ...pick(style(), ['--ant-select-font-size', '--ant-select-popup-match-width']),
+              ...pick(style(), ['--ant-select-popup-font-size', '--ant-select-popup-match-width']),
             }}
           >
             {props.content(() => setOpen(false))}
@@ -142,7 +147,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         <div
           class={cs(
             'p[.ant-input-addon]:border-transparent p[.ant-input-addon]:bg-transparent p[.ant-input-addon]:focus-within:border-transparent p[.ant-input-addon]:hover:border-transparent p[.ant-input-addon]:focus-within:[box-shadow:none]',
-            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-font-size)] p-[--ant-select-input-padding]',
+            'relative h-[--ant-select-input-height] rounded-inherit py-1px flex items-center [font-size:var(--ant-select-input-font-size)] p-[--ant-select-input-padding]',
             props.disabled &&
               '[pointer-events:none] bg-[var(--ant-color-bg-container-disabled)] color-[var(--ant-color-text-disabled)]',
             props.variant === 'outlined' &&
