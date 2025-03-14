@@ -29,6 +29,7 @@ interface SingleLevelTreeProps<T extends {} = TreeNode>
   | 'checkStrategy'
   | 'checkOnClick'
   | 'indentSize'
+  | 'selectable'
   > {
   indentSize: number
   /**
@@ -37,7 +38,7 @@ interface SingleLevelTreeProps<T extends {} = TreeNode>
   indent: number
   parentIndexes?: number[]
   selectedKeys: Accessor<any[]>
-  setSelectedKeys: Setter<any[]>
+  setSelectedKeys: Setter<any[] | undefined>
   draggableNode: Accessor<T | null>
   setDraggableNode: Setter<T | null>
   draggableIndexes: Accessor<number[] | null>
@@ -347,8 +348,11 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                   )}
                   onClick={() => {
                     const key = props.getKey(item)
+                    if (!props.selectable) return
+
                     if (props.multiple) {
                       props.setSelectedKeys(keys => {
+                        keys = keys ?? []
                         if (keys.includes(key)) {
                           return keys.filter(n => n !== key)
                         }
@@ -356,7 +360,7 @@ const SingleLevelTree = <T extends {} = TreeNode>(props: SingleLevelTreeProps<T>
                       })
                     } else {
                       props.setSelectedKeys(keys => {
-                        return keys.includes(key) ? [] : [key]
+                        return keys?.includes(key) ? [] : [key]
                       })
                     }
 

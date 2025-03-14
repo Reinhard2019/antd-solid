@@ -39,6 +39,11 @@ export interface TreeProps<T extends {} = TreeNode> extends StyleProps {
   defaultSelectedKeys?: any[] | undefined | null
   selectedKeys?: any[] | undefined | null
   onSelect?: (selectedKeys: any[]) => void
+  /**
+   * 是否可选中
+   * 默认 true
+   */
+  selectable?: boolean
   defaultExpandedKeys?: any[] | undefined | null
   expandedKeys?: any[] | undefined | null
   onExpand?: (expandedKeys: any[]) => void
@@ -96,6 +101,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
     {
       checkStrategy: 'all' as const,
       indentSize: 24,
+      selectable: true,
     },
     _props,
   )
@@ -122,7 +128,7 @@ function Tree<T extends {} = TreeNode>(_props: TreeProps<T>) {
       : get(node, childrenFieldName)
   }
 
-  const [_selectedKeys, setSelectedKeys] = createControllableValue<Key[]>(props, {
+  const [_selectedKeys, setSelectedKeys] = createControllableValue<Key[] | undefined>(props, {
     defaultValuePropName: 'defaultSelectedKeys',
     valuePropName: 'selectedKeys',
     trigger: 'onSelect',
