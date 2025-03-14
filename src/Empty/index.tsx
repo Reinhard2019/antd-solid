@@ -10,10 +10,10 @@ export interface EmptyProps {
 }
 
 const Empty: Component<EmptyProps> & {
-  PRESENTED_IMAGE_SIMPLE: Component
+  PRESENTED_IMAGE_SIMPLE: typeof PRESENTED_IMAGE_SIMPLE
 } = props => {
   return (
-    <Element {...props} style={props.style}>
+    <Element class={props.class} style={props.style}>
       <div class="mb-[var(--ant-margin-xs)] flex justify-center">
         <EmptySvg />
       </div>
