@@ -67,6 +67,8 @@ export interface TabsProps extends StyleProps {
    * 被隐藏时是否销毁 DOM 结构
    */
   destroyInactiveTabPane?: boolean
+  /** tab bar 的样式对象 */
+  tabBarStyle?: JSX.CSSProperties
 }
 
 const Tabs: Component<TabsProps> = _props => {
@@ -166,6 +168,7 @@ const Tabs: Component<TabsProps> = _props => {
             large: '[font-size:var(--ant-font-size-lg)]',
           }[size()],
         )}
+        style={props.tabBarStyle}
       >
         <Show when={resolvedAddonBefore()}>
           <div>{resolvedAddonBefore()}</div>
