@@ -7,12 +7,15 @@ import {
   createSignal,
   createMemo,
   splitProps,
+  children,
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
 import { wave } from '../utils/animation'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
+import { type StringOrJSXElement } from '../types'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
 export interface ButtonProps
   extends ParentProps,
@@ -42,6 +45,7 @@ export interface ButtonProps
   block?: boolean
   contentClass?: string
   contentStyle?: JSX.CSSProperties
+  icon?: StringOrJSXElement
 }
 
 const sizeClassMap = {
@@ -112,6 +116,8 @@ const Button: Component<ButtonProps> = _props => {
   const loading = createMemo(() =>
     typeof props.loading === 'boolean' ? props.loading : innerLoading(),
   )
+  const resolvedChildren = children(() => props.children)
+  const resolvedIcon = children(() => unwrapStringOrJSXElement(props.icon))
 
   return (
     <Element<JSX.ButtonHTMLAttributes<HTMLButtonElement>>
@@ -120,6 +126,7 @@ const Button: Component<ButtonProps> = _props => {
       ref={props.ref}
       class={cs(
         `ant-btn ant-btn-${props.type}`,
+        'flex items-center gap-8px',
         'relative cursor-pointer [font-size:var(--ant-font-size)] rounded-[--ant-button-border-radius]',
         'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
         props.block && 'block w-full',
@@ -153,15 +160,25 @@ const Button: Component<ButtonProps> = _props => {
         }
       }}
     >
-      <Show when={loading()}>
-        <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite] mr-8px" />
-      </Show>
-      <span
-        class={cs('inline-block leading-inherit', props.contentClass)}
-        style={props.contentStyle}
+      <Show
+        when={loading()}
+        fallback={
+          <Show when={resolvedIcon()}>
+            <span class="inline-block leading-inherit">{resolvedIcon()}</span>
+          </Show>
+        }
       >
-        {props.children}
-      </span>
+        <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite]" />
+      </Show>
+
+      <Show when={resolvedChildren()}>
+        <span
+          class={cs('inline-block leading-inherit', props.contentClass)}
+          style={props.contentStyle}
+        >
+          {resolvedChildren()}
+        </span>
+      </Show>
     </Element>
   )
 }
