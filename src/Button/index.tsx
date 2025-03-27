@@ -126,7 +126,7 @@ const Button: Component<ButtonProps> = _props => {
       ref={props.ref}
       class={cs(
         `ant-btn ant-btn-${props.type}`,
-        'flex items-center gap-8px',
+        'inline-flex justify-center items-center gap-8px',
         'relative cursor-pointer [font-size:var(--ant-font-size)] rounded-[--ant-button-border-radius]',
         'focus-visible:[outline:4px_solid_var(--ant-color-primary-border)] focus-visible:[outline-offset:1px]',
         props.block && 'block w-full',
