@@ -1,14 +1,15 @@
 import { For, createSelector, createMemo, splitProps, Show, type JSXElement } from 'solid-js'
 import cs from 'classnames'
 import { isEmpty } from 'lodash-es'
-import { type Key } from '../types'
+import { type StringOrJSXElement, type Key } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import { toArray } from '../utils/array'
 import SelectInput, { type SelectInputProps } from '../SelectInput'
 import Empty from '../Empty'
+import { unwrapStringOrJSXElement } from '../utils/solid'
 
-interface SelectOption<T = Key> {
-  label: JSXElement
+export interface SelectOption<T = Key> {
+  label: StringOrJSXElement
   value: T
   class?: string
 }
@@ -65,7 +66,7 @@ function Select<T = Key>(props: SelectProps<T>) {
       labelRender={v =>
         props.labelRender
           ? props.labelRender(optionDict().get(v), v)
-          : optionDict().get(v)?.label ?? (v as string)
+          : unwrapStringOrJSXElement(optionDict().get(v)?.label) ?? (v as string)
       }
       value={valueArr()}
       onChange={v => {
@@ -101,7 +102,7 @@ function Select<T = Key>(props: SelectProps<T>) {
                       : undefined
                   }
                 >
-                  {item.label}
+                  {unwrapStringOrJSXElement(item.label)}
                 </div>
               )}
             </For>
