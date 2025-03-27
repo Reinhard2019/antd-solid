@@ -29,6 +29,9 @@ export interface SelectProps<T = Key>
   | 'suffixIcon'
   | 'placement'
   | 'getPopupContainer'
+  | 'defaultOpen'
+  | 'open'
+  | 'onOpenChange'
   > {
   defaultValue?: T | T[] | null
   value?: T | T[] | null

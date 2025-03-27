@@ -55,6 +55,7 @@ export interface TooltipProps {
    * 只有在 trigger 为 manual 时生效
    */
   position?: [x: number, y: number]
+  defaultOpen?: boolean
   open?: boolean
   onOpenChange?: (open: boolean) => void
   /**
@@ -276,6 +277,7 @@ const Tooltip: Component<TooltipProps> = _props => {
   }
   const [_open, setOpen] = createControllableValue(_props, {
     defaultValue: false,
+    defaultValuePropName: 'defaultOpen',
     valuePropName: 'open',
     trigger: 'onOpenChange',
   })

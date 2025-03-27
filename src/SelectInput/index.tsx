@@ -18,7 +18,8 @@ import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 import CompactContext from '../Compact/context'
 
-export interface SelectInputProps<T> extends Pick<TooltipProps, 'getPopupContainer'> {
+export interface SelectInputProps<T>
+  extends Pick<TooltipProps, 'getPopupContainer' | 'defaultOpen' | 'open' | 'onOpenChange'> {
   multiple?: boolean
   defaultValue?: T[] | null
   value?: T[] | null
@@ -72,7 +73,12 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
   })
   const valueArr = createMemo(() => value() ?? [])
 
-  const [open, setOpen] = createSignal(false)
+  const [open, setOpen] = createControllableValue(_props, {
+    defaultValue: false,
+    defaultValuePropName: 'defaultOpen',
+    valuePropName: 'open',
+    trigger: 'onOpenChange',
+  })
   useClickAway(
     () => setOpen(false),
     () => compact([select, tooltipContent]),
