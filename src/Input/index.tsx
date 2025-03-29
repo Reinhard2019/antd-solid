@@ -1,5 +1,5 @@
 import { isNil, omit } from 'lodash-es'
-import { Show, createMemo, onMount, useContext } from 'solid-js'
+import { Show, createMemo, onMount, splitProps, useContext } from 'solid-js'
 import type { JSX, Component, JSXElement, Ref } from 'solid-js'
 import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
@@ -8,11 +8,12 @@ import Element from '../Element'
 import TextArea from './TextArea'
 import useComponentSize from '../hooks/useComponentSize'
 import './index.scss'
-import { type StyleProps } from '../types'
+import { type RootStyleProps } from '../types'
 import useFocus from '../hooks/useFocus'
 import CompactContext from '../Compact/context'
 
-type CommonInputProps = StyleProps & {
+type CommonInputProps = RootStyleProps &
+Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'prefix' | 'suffix'> & {
   ref?: Ref<HTMLInputElement>
   defaultValue?: string | null | undefined
   value?: string | null | undefined
@@ -20,34 +21,25 @@ type CommonInputProps = StyleProps & {
   addonAfter?: JSXElement
   prefix?: JSXElement
   suffix?: JSXElement
-  placeholder?: string
   /**
-   * 仅供 InputNumber 使用
-   */
+     * 仅供 InputNumber 使用
+     */
   actions?: JSXElement
   /**
-   * 设置校验状态
-   */
+     * 设置校验状态
+     */
   status?: 'error' | 'warning'
   /**
-   * 设置尺寸
-   * 默认 'middle'
-   * 高度分别为 40px、32px 和 24px
-   */
+     * 设置尺寸
+     * 默认 'middle'
+     * 高度分别为 40px、32px 和 24px
+     */
   size?: 'small' | 'middle' | 'large'
   autoFocus?: boolean
   allowClear?: boolean
   onChange?: JSX.InputEventHandler<HTMLInputElement, InputEvent>
   onPressEnter?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
   onKeyDown?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
-  onFocus?: JSX.EventHandler<HTMLInputElement, FocusEvent>
-  onBlur?: JSX.EventHandler<HTMLInputElement, FocusEvent>
-  disabled?: boolean
-  /**
-   * 声明 input 类型，同原生 input 标签的 type 属性
-   */
-  type?: string
-  maxLength?: number
 }
 
 export const statusClassDict = {
@@ -83,6 +75,22 @@ export const statusClassDict = {
 export function CommonInput(props: CommonInputProps) {
   const size = useComponentSize(() => props.size)
   const { compact } = useContext(CompactContext)
+  const [_, inputProps] = splitProps(props, [
+    'defaultValue',
+    'value',
+    'onChange',
+    'onPressEnter',
+    'onKeyDown',
+    'size',
+    'autoFocus',
+    'status',
+    'actions',
+    'addonBefore',
+    'addonAfter',
+    'prefix',
+    'suffix',
+    'allowClear',
+  ])
 
   let inputRef: HTMLInputElement | undefined
   const foucs = useFocus(() => inputRef)
@@ -110,7 +118,7 @@ export function CommonInput(props: CommonInputProps) {
     <Element
       block
       class={cs(
-        props.class,
+        props.rootClass,
         'flex',
         'ant-input-group',
         compact && 'ant-compact-item p[.ant-compact>]:not-first:ml--1px',
@@ -136,7 +144,7 @@ export function CommonInput(props: CommonInputProps) {
           middle: 'var(--ant-border-radius)',
           large: 'var(--ant-border-radius-lg)',
         }[size()],
-        ...props.style,
+        ...props.rootStyle,
       }}
     >
       <Show when={!isNil(addonBefore())}>
@@ -163,6 +171,7 @@ export function CommonInput(props: CommonInputProps) {
         </Show>
 
         <input
+          {...inputProps}
           ref={el => {
             setRef(props, el)
             inputRef = el
@@ -170,8 +179,8 @@ export function CommonInput(props: CommonInputProps) {
           class={cs(
             'w-full h-full [font-size:var(--ant-input-font-size)] [outline:none] placeholder-text-[var(--ant-color-text-placeholder)] bg-transparent',
             props.disabled && 'color-[var(--ant-color-text-disabled)] cursor-not-allowed',
+            props.class,
           )}
-          type={props.type}
           value={value() ?? ''}
           onInput={e => {
             setValue(e.target.value)
@@ -190,11 +199,6 @@ export function CommonInput(props: CommonInputProps) {
 
             props.onKeyDown?.(e)
           }}
-          onFocus={e => props.onFocus?.(e)}
-          onBlur={e => props.onBlur?.(e)}
-          maxLength={props.maxLength}
-          disabled={props.disabled}
-          placeholder={props.placeholder}
         />
 
         <Show when={showClearBtn()}>

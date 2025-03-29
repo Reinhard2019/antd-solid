@@ -1,14 +1,16 @@
-import { type JSX, type Component, onMount, type Ref } from 'solid-js'
+import { type JSX, type Component, onMount, type Ref, splitProps } from 'solid-js'
 import cs from 'classnames'
 import Element from '../Element'
-import { type StyleProps } from '../types'
+import { type RootStyleProps } from '../types'
 import createControllableValue from '../hooks/createControllableValue'
 import useComponentSize from '../hooks/useComponentSize'
 import { statusClassDict } from '.'
 import useFocus from '../hooks/useFocus'
 import { setRef } from '../utils/solid'
 
-export interface TextAreaProps extends StyleProps {
+export interface TextAreaProps
+  extends RootStyleProps,
+  Omit<JSX.TextareaHTMLAttributes<HTMLTextAreaElement>, 'value'> {
   ref?: Ref<HTMLTextAreaElement>
   defaultValue?: string | null | undefined
   value?: string | null | undefined
@@ -26,13 +28,20 @@ export interface TextAreaProps extends StyleProps {
   onChange?: JSX.InputEventHandler<HTMLTextAreaElement, InputEvent>
   onPressEnter?: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent>
   onKeyDown?: JSX.EventHandler<HTMLTextAreaElement, KeyboardEvent>
-  disabled?: boolean
-  placeholder?: string
-  rows?: number
 }
 
 const TextArea: Component<TextAreaProps> = props => {
   const size = useComponentSize(() => props.size)
+  const [_, inputProps] = splitProps(props, [
+    'defaultValue',
+    'value',
+    'onChange',
+    'onPressEnter',
+    'onKeyDown',
+    'size',
+    'autoFocus',
+    'status',
+  ])
 
   let inputRef: HTMLTextAreaElement | undefined
   const foucs = useFocus(() => inputRef)
@@ -51,7 +60,7 @@ const TextArea: Component<TextAreaProps> = props => {
 
   return (
     <Element
-      class={cs(props.class, 'flex')}
+      class={cs(props.rootClass, 'flex')}
       style={{
         '--ant-input-padding': {
           small: '0 7px',
@@ -63,10 +72,11 @@ const TextArea: Component<TextAreaProps> = props => {
           middle: 'var(--ant-font-size)',
           large: 'var(--ant-font-size-lg)',
         }[size()],
-        ...props.style,
+        ...props.rootStyle,
       }}
     >
       <textarea
+        {...inputProps}
         ref={el => {
           setRef(props, el)
           inputRef = el
@@ -81,6 +91,7 @@ const TextArea: Component<TextAreaProps> = props => {
             large: 'rounded-[var(--ant-border-radius-lg)]',
           }[size()],
           statusClassDict[props.status ?? 'default'](!!props.disabled, foucs()),
+          props.class,
         )}
         value={value() ?? ''}
         onInput={e => {
@@ -100,8 +111,6 @@ const TextArea: Component<TextAreaProps> = props => {
 
           props.onKeyDown?.(e)
         }}
-        rows={props.rows}
-        disabled={props.disabled}
       />
     </Element>
   )

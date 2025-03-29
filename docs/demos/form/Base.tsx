@@ -3,7 +3,7 @@ import { Button, Form, type FormInstance, Input } from 'antd-solid'
 import { string } from 'yup'
 
 const App: Component = () => {
-  let ref: FormInstance
+  let ref: FormInstance | undefined
 
   return (
     <Form ref={ref!}>
@@ -43,7 +43,7 @@ const App: Component = () => {
             // eslint-disable-next-line solid/reactivity
             onClick={() => {
               ref
-                .validateFields()
+                ?.validateFields()
                 .then(resp => {
                   console.log('resp', resp)
                 })

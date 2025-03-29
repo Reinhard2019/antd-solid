@@ -143,9 +143,9 @@ const InputNumber: Component<InputNumberProps> = _props => {
   return (
     <CommonInput
       {...inputProps}
-      style={{
+      rootStyle={{
         '--ant-input-number-handle-width': '22px',
-        ...props.style,
+        ...props.rootStyle,
       }}
       actions={
         props.controls ? (
