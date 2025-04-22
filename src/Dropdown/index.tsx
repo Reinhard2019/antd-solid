@@ -49,12 +49,6 @@ const Dropdown: Component<DropdownProps> = _props => {
         />
       )}
       contentStyle={{ padding: 0 }}
-      offset={[
-        0,
-        props.placement === 'top' || props.placement === 'topLeft' || props.placement === 'topRight'
-          ? -4
-          : 4,
-      ]}
       {...popoverProps}
     >
       {resolvedChildren()}

@@ -133,7 +133,6 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                   contentStyle={{
                     padding: 0,
                   }}
-                  offset={[8, 0]}
                 >
                   {getLabel({
                     expandIcon: (
