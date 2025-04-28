@@ -23,13 +23,3 @@ export function radToDeg(radian: number) {
 export function distance(p1: [number, number], p2: [number, number]) {
   return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2))
 }
-
-/**
- * 根据 skewX、skewY 创建 DOMMatrix
- * @param sx
- * @param sy
- * @returns
- */
-export function createSkewDOMMatrix(sx: number, sy: number) {
-  return new DOMMatrix([1, Math.tan(degToRad(sy)), Math.tan(degToRad(sx)), 1, 0, 0])
-}

@@ -1,20 +1,11 @@
-import {
-  type Ref,
-  Show,
-  createMemo,
-  createSignal,
-  mergeProps,
-  type Component,
-  type JSX,
-} from 'solid-js'
-import cs from 'classnames'
-import { inRange } from 'lodash-es'
+import { type Ref, Show, createMemo, createSignal, type Component, type JSX } from 'solid-js'
+import { clamp, inRange } from 'lodash-es'
 import { Portal } from 'solid-js/web'
 import NP from 'number-precision'
 import createControllableValue from '../hooks/createControllableValue'
 import ResizeSvg from '../assets/svg/Resize'
 import Element from '../Element'
-import { createSkewDOMMatrix, distance, radToDeg } from '../utils/math'
+import { radToDeg } from '../utils/math'
 import RotateArrowSvg from '../assets/svg/RotateArrow'
 import CrosshairSvg from '../assets/svg/Crosshair'
 import { setRef } from '../utils/solid'
@@ -75,33 +66,21 @@ export interface TransformerProps {
      */
     gap?: number
   }
+  project?: (point: DOMPoint, transformValue: TransformValue, transformOrigin: DOMPoint) => DOMPoint
+  unproject?: (
+    point: DOMPoint,
+    transformValue: TransformValue,
+    transformOrigin: DOMPoint,
+  ) => DOMPoint
+  parentProject?: (point: DOMPoint) => DOMPoint
+  parentUnproject?: (point: DOMPoint) => DOMPoint
   /**
-   * 单位：deg
-   */
-  skewX?: number
-  /**
-   * 单位：deg
-   */
-  skewY?: number
-  /**
-   * 单位：deg
-   */
-  scaleX?: number
-  /**
-   * 单位：deg
-   */
-  scaleY?: number
-  /**
-   * 单位：px
+   * 转换中心
    * 默认为 ['50%', '50%']
    */
   transformOrigin?:
   | [x: number | `${number}%`, y: number | `${number}%`]
   | ((width: number, height: number) => [x: number, y: number])
-  /**
-   * 当父元素存在 transform 时，需要将父元素的 transform 传入，保证 Transformer 显示正常
-   */
-  parentTransform?: DOMMatrix
   /**
    * 是否显示 transformOriginIcon
    */
@@ -121,65 +100,91 @@ type ResizeDirection =
 // 判断是否鼠标左键触发
 const isMainButton = (e: MouseEvent) => e.button === 0
 
-const Transformer: Component<TransformerProps> = _props => {
-  const props = mergeProps(
-    {
-      skewX: 0,
-      skewY: 0,
-      scaleX: 1,
-      scaleY: 1,
-    } as const,
-    _props,
-  )
+const Transformer: Component<TransformerProps> = props => {
+  let ref: HTMLDivElement | undefined
+
   const adsorbGap = createMemo(() => (props.adsorb ? props.adsorb.gap ?? 5 : 0))
 
-  let transformOriginRef: HTMLDivElement | undefined
+  const getTransform = (value: TransformValue, transformOrigin: DOMPoint) =>
+    new DOMMatrix()
+      .translate(value.x, value.y)
+      .translate(transformOrigin.x, transformOrigin.y)
+      .rotate(value.rotate)
+      .translate(-transformOrigin.x, -transformOrigin.y)
+
   const [_value, setValue] = createControllableValue<TransformValue | undefined>(props)
   const value = createMemo(
     () =>
       _value() ?? {
         x: 0,
         y: 0,
-        width: 100,
-        height: 100,
+        width: 0,
+        height: 0,
         rotate: 0,
       },
   )
-  const parseTransformOrigin = (width: number, height: number): [number, number] => {
+
+  const parseTransformOrigin = (width: number, height: number) => {
     if (typeof props.transformOrigin === 'function') {
-      return props.transformOrigin(width, height)
+      return new DOMPoint(...props.transformOrigin(width, height))
     }
     const [x, y] = props.transformOrigin ?? ['50%', '50%']
-    return [
+    return new DOMPoint(
       typeof x === 'string' ? (width * parseFloat(x)) / 100 : x,
       typeof y === 'string' ? (height * parseFloat(y)) / 100 : y,
-    ]
+    )
   }
-  const transformOrigin = createMemo(() => parseTransformOrigin(value().width, value().height))
-  const skewMatrix = createMemo(() => createSkewDOMMatrix(props.skewX, props.skewY))
-  const transformMatrix = createMemo(() =>
-    new DOMMatrix().rotate(value().rotate).scale(props.scaleX, props.scaleY).multiply(skewMatrix()),
-  )
-  // 围绕转换原点进行转换后的 Matrix
-  const transformOriginMatrix = createMemo(() =>
-    new DOMMatrix()
-      .translate(...transformOrigin())
-      .multiply(transformMatrix())
-      .translate(-transformOrigin()[0], -transformOrigin()[1]),
-  )
-  const parentTransformMatrix = createMemo(() =>
-    props.parentTransform
-      ? new DOMMatrix([
-        props.parentTransform.a,
-        props.parentTransform.b,
-        props.parentTransform.c,
-        props.parentTransform.d,
-        0,
-        0,
-      ])
-      : new DOMMatrix(),
-  )
-  const inverseParentTransformMatrix = createMemo(() => parentTransformMatrix().inverse())
+
+  const project = (
+    point: DOMPoint,
+    transformValue?: TransformValue,
+    transformOrigin?: DOMPoint,
+  ) => {
+    point = parentProject(point, transformValue, transformOrigin)
+    return props.parentProject ? props.parentProject(point) : point
+  }
+  const parentProject = (
+    point: DOMPoint,
+    transformValue?: TransformValue,
+    transformOrigin?: DOMPoint,
+  ) => {
+    transformValue = transformValue ?? value()
+    transformOrigin =
+      transformOrigin ?? parseTransformOrigin(transformValue.width, transformValue.height)
+
+    if (props.project) {
+      return props.project(point, transformValue, transformOrigin)
+    }
+
+    return point.matrixTransform(getTransform(transformValue, transformOrigin))
+  }
+  const parentUnproject = (point: DOMPoint) => {
+    if (ref) {
+      const rect = ref.getBoundingClientRect()
+      point = new DOMPoint(point.x - rect.x, point.y - rect.y)
+    }
+
+    if (props.parentUnproject) return props.parentUnproject(point)
+
+    return point
+  }
+  const unproject = (
+    point: DOMPoint,
+    transformValue?: TransformValue,
+    transformOrigin?: DOMPoint,
+  ) => {
+    transformValue = transformValue ?? value()
+    transformOrigin =
+      transformOrigin ?? parseTransformOrigin(transformValue.width, transformValue.height)
+
+    point = parentUnproject(point)
+
+    if (props.unproject) {
+      return props.unproject(point, transformValue, transformOrigin)
+    }
+
+    return point.matrixTransform(getTransform(transformValue, transformOrigin).inverse())
+  }
 
   interface AdsorbLine {
     left?: boolean
@@ -198,20 +203,17 @@ const Transformer: Component<TransformerProps> = _props => {
     document.body.style.userSelect = 'none'
 
     const startValue = value()
+    const startPoint = parentUnproject(new DOMPoint(e.clientX, e.clientY))
 
     const abortController = new AbortController()
 
     window.addEventListener(
       'mousemove',
       (_e: MouseEvent) => {
-        const m = parentTransformMatrix()
-          .inverse()
-          .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
-        const offsetX = m.e
-        const offsetY = m.f
+        const currentMousePoint = parentUnproject(new DOMPoint(_e.clientX, _e.clientY))
         const changedValue = {
-          x: startValue.x + offsetX,
-          y: startValue.y + offsetY,
+          x: startValue.x + (currentMousePoint.x - startPoint.x),
+          y: startValue.y + (currentMousePoint.y - startPoint.y),
         }
         if (props.adsorb) {
           const _adsorbLine: AdsorbLine = {}
@@ -284,7 +286,7 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
-    const startValue = value()
+    const startValue = { ...value() }
 
     const getVertex = (width: number, height: number): DOMPoint =>
       new DOMPoint(
@@ -295,12 +297,9 @@ const Transformer: Component<TransformerProps> = _props => {
           ? 0
           : height,
       )
-    const startVertex = getVertex(value().width, value().height).matrixTransform(
-      new DOMMatrix()
-        .translate(...transformOrigin())
-        .multiply(transformMatrix())
-        .translate(-transformOrigin()[0], -transformOrigin()[1]),
-    )
+    const startVertex = parentProject(getVertex(value().width, value().height))
+    const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
+    const startTransformOrigin = parseTransformOrigin(value().width, value().height)
 
     const abortController = new AbortController()
     window.addEventListener(
@@ -308,12 +307,13 @@ const Transformer: Component<TransformerProps> = _props => {
       (_e: MouseEvent) => {
         const changedValue = value()
 
-        const m = parentTransformMatrix()
-          .multiply(transformMatrix())
-          .inverse()
-          .translate(_e.clientX - e.clientX, _e.clientY - e.clientY)
-        const offsetX = m.e
-        const offsetY = m.f
+        const currentPoint = unproject(
+          new DOMPoint(_e.clientX, _e.clientY),
+          startValue,
+          startTransformOrigin,
+        )
+        const offsetX = currentPoint.x - startPoint.x
+        const offsetY = currentPoint.y - startPoint.y
 
         const _adsorbLine: AdsorbLine = {}
 
@@ -390,11 +390,10 @@ const Transformer: Component<TransformerProps> = _props => {
         const endWidth = changedValue.width ?? value().width
         const endHeight = changedValue.height ?? value().height
         const endTransformOrigin = parseTransformOrigin(endWidth, endHeight)
-        const endVertex = getVertex(endWidth, endHeight).matrixTransform(
-          new DOMMatrix()
-            .translate(endTransformOrigin[0], endTransformOrigin[1])
-            .multiply(transformMatrix())
-            .translate(-endTransformOrigin[0], -endTransformOrigin[1]),
+        const endVertex = parentProject(
+          getVertex(endWidth, endHeight),
+          startValue,
+          endTransformOrigin,
         )
         changedValue.x = startValue.x + startVertex.x - endVertex.x
         changedValue.y = startValue.y + startVertex.y - endVertex.y
@@ -430,9 +429,7 @@ const Transformer: Component<TransformerProps> = _props => {
       },
     )
   }
-  const getResizeHandlerProps = (
-    direction: ResizeDirection,
-  ): JSX.HTMLAttributes<HTMLDivElement> => {
+  const getResizeHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
     return {
       onMouseDown: e => {
         onResizeMouseDown(e, direction)
@@ -460,7 +457,6 @@ const Transformer: Component<TransformerProps> = _props => {
     },
   ) => {
     if (!isMainButton(e)) return
-    if (!transformOriginRef) return
     e.stopPropagation()
 
     rotating = true
@@ -469,18 +465,30 @@ const Transformer: Component<TransformerProps> = _props => {
     const originCursor = document.body.style.cursor
     document.body.style.cursor = 'none'
 
-    const { x, y } = transformOriginRef.getBoundingClientRect()
+    const transformOrigin = parseTransformOrigin(value().width, value().height)
 
-    const startRotate = value().rotate
-    const startAngle = Math.atan2(e.clientY - y, e.clientX - x)
+    const startValue = { ...value() }
+    const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
+    const startAngle = Math.atan2(
+      startPoint.y - transformOrigin.y,
+      startPoint.x - transformOrigin.x,
+    )
 
     const abortController = new AbortController()
 
     window.addEventListener(
       'mousemove',
       (_e: MouseEvent) => {
-        const angle = Math.atan2(_e.clientY - y, _e.clientX - x)
-        const rotate = startRotate + radToDeg(angle - startAngle)
+        const currentPoint = unproject(
+          new DOMPoint(_e.clientX, _e.clientY),
+          startValue,
+          transformOrigin,
+        )
+        const angle = Math.atan2(
+          currentPoint.y - transformOrigin.y,
+          currentPoint.x - transformOrigin.x,
+        )
+        const rotate = startValue.rotate + radToDeg(angle - startAngle)
         setValue({
           ...value(),
           rotate,
@@ -511,9 +519,7 @@ const Transformer: Component<TransformerProps> = _props => {
       },
     )
   }
-  const getRotateHandlerProps = (
-    direction: ResizeDirection,
-  ): JSX.HTMLAttributes<HTMLDivElement> => {
+  const getRotateHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
     return {
       onMouseDown: e => {
         onRotateMouseDown(e)
@@ -558,146 +564,207 @@ const Transformer: Component<TransformerProps> = _props => {
     })
   }
 
-  const topLeftPoint = createMemo(() => new DOMPoint(0, 0).matrixTransform(transformOriginMatrix()))
-  const topRightPoint = createMemo(() =>
-    new DOMPoint(value().width, 0).matrixTransform(transformOriginMatrix()),
-  )
-  const bottomLeftPoint = createMemo(() =>
-    new DOMPoint(0, value().height).matrixTransform(transformOriginMatrix()),
-  )
-  const bottomRightPoint = createMemo(() =>
-    new DOMPoint(value().width, value().height).matrixTransform(transformOriginMatrix()),
-  )
-  const topPoint = createMemo(() =>
-    new DOMPoint(value().width / 2, 0).matrixTransform(transformOriginMatrix()),
-  )
-  const bottomPoint = createMemo(() =>
-    new DOMPoint(value().width / 2, value().height).matrixTransform(transformOriginMatrix()),
-  )
-  const leftPoint = createMemo(() =>
-    new DOMPoint(0, value().height / 2).matrixTransform(transformOriginMatrix()),
-  )
-  const rightPoint = createMemo(() =>
-    new DOMPoint(value().width, value().height / 2).matrixTransform(transformOriginMatrix()),
-  )
-  const transformedSize = createMemo(() => {
-    const start = new DOMPoint(0, 0).matrixTransform(
-      parentTransformMatrix().multiply(transformOriginMatrix()),
-    )
-    const right = new DOMPoint().matrixTransform(
-      parentTransformMatrix().multiply(transformOriginMatrix()).translate(value().width, 0),
-    )
-    const bottom = new DOMPoint().matrixTransform(
-      parentTransformMatrix().multiply(transformOriginMatrix()).translate(0, value().height),
-    )
-    return {
-      width: distance([start.x, start.y], [right.x, right.y]),
-      height: distance([start.x, start.y], [bottom.x, bottom.y]),
-    }
-  })
+  const topLeftPoint = createMemo(() => project(new DOMPoint(0, 0)))
+  const topRightPoint = createMemo(() => project(new DOMPoint(value().width, 0)))
+  const bottomLeftPoint = createMemo(() => project(new DOMPoint(0, value().height)))
+  const bottomRightPoint = createMemo(() => project(new DOMPoint(value().width, value().height)))
 
-  const getAxisRotate = (x: number, y: number) => {
-    const m = parentTransformMatrix().multiply(transformMatrix()).translate(x, y)
-    return radToDeg(Math.atan2(m.f, m.e))
+  const getRotate = (direction: ResizeDirection) => {
+    const point = {
+      top: topLeftPoint,
+      bottom: bottomLeftPoint,
+      right: topRightPoint,
+      left: topLeftPoint,
+      topLeft: bottomRightPoint,
+      topRight: bottomLeftPoint,
+      bottomLeft: topRightPoint,
+      bottomRight: topLeftPoint,
+    }[direction]
+    const point2 = {
+      top: topRightPoint,
+      bottom: bottomRightPoint,
+      right: bottomRightPoint,
+      left: bottomLeftPoint,
+      topLeft: topLeftPoint,
+      topRight: topRightPoint,
+      bottomLeft: bottomLeftPoint,
+      bottomRight: bottomRightPoint,
+    }[direction]
+
+    let extraAngle = 0
+    if (
+      direction === 'topLeft' ||
+      direction === 'topRight' ||
+      direction === 'bottomLeft' ||
+      direction === 'bottomRight'
+    ) {
+      extraAngle = Math.PI / 2
+    }
+
+    return Math.atan2(point().y - point2().y, point().x - point2().x) + extraAngle
   }
-  const xAxisRotate = createMemo(() => getAxisRotate(1, 0))
-  const yAxisRotate = createMemo(() => getAxisRotate(0, 1))
-
-  const directionRotateDict = createMemo(() => {
-    const top = yAxisRotate() - 90
-    const left = xAxisRotate() + 90
-    const bottomRight = getAxisRotate(value().width, value().height) - 90
-    const topRight = getAxisRotate(-value().width, value().height) + 90
-
-    return {
-      top,
-      bottom: top,
-      left,
-      right: left,
-      topLeft: bottomRight + 180,
-      bottomRight,
-      topRight,
-      bottomLeft: topRight + 180,
-    }
-  })
 
   const resizeArrowRotate = createMemo(() => {
-    const _resizeDirection = resizeDirection()
-    return _resizeDirection ? directionRotateDict()[_resizeDirection] : 0
+    const direction = resizeDirection()
+
+    if (!direction) return 0
+
+    return getRotate(direction)
   })
 
   const rotateArrowRotate = createMemo(() => {
-    const _rotateDirection = rotateDirection()
-    return _rotateDirection ? directionRotateDict()[_rotateDirection] + 45 : 0
+    const direction = rotateDirection()
+
+    if (!direction) return 0
+
+    return getRotate(direction) + Math.PI / 4
   })
 
   const getEdgeDom = (direction: 'top' | 'bottom' | 'right' | 'left') => {
     const point = {
-      top: topPoint,
-      bottom: bottomPoint,
-      right: rightPoint,
-      left: leftPoint,
+      top: topLeftPoint,
+      bottom: bottomLeftPoint,
+      right: topRightPoint,
+      left: topLeftPoint,
     }[direction]
+    const point2 = {
+      top: topRightPoint,
+      bottom: bottomRightPoint,
+      right: bottomRightPoint,
+      left: bottomLeftPoint,
+    }[direction]
+
     return (
-      <div
-        class={cs(
-          'w-[--edge-length] h-[--edge-width] cursor-none rounded-3px absolute pointer-events-initial',
-          'after:content-empty after:absolute after:left-0 after:right-0 after:top-1/2 after:-translate-y-1/2 after:h-1px after:bg-[--ant-color-primary]',
-        )}
-        {...getResizeHandlerProps(direction)}
-        style={{
-          '--edge-length':
-            direction === 'top' || direction === 'bottom' ? 'var(--width)' : 'var(--height)',
-          top: `calc(${point().y}px - var(--edge-width) / 2)`,
-          left: `calc(${point().x}px - var(--edge-length) / 2)`,
-          transform: inverseParentTransformMatrix()
-            .multiply(
-              new DOMMatrix().rotate(
-                direction === 'top' || direction === 'bottom' ? xAxisRotate() : yAxisRotate(),
-              ),
-            )
-            .toString(),
-        }}
-      />
+      <>
+        <line
+          x1={point().x}
+          y1={point().y}
+          x2={point2().x}
+          y2={point2().y}
+          stroke="var(--ant-color-primary)"
+          stroke-width={1}
+        />
+
+        <line
+          class="pointer-events-initial cursor-none"
+          x1={point().x}
+          y1={point().y}
+          x2={point2().x}
+          y2={point2().y}
+          opacity={0}
+          stroke="var(--ant-color-primary)"
+          stroke-width={3}
+          {...getResizeHandlerProps(direction)}
+        />
+      </>
     )
   }
 
   const getVertexDom = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
     const point = {
       topLeft: topLeftPoint,
-      bottomRight: bottomRightPoint,
       topRight: topRightPoint,
+      bottomRight: bottomRightPoint,
       bottomLeft: bottomLeftPoint,
     }[direction]
+    const point2 = {
+      topLeft: topRightPoint,
+      topRight: topLeftPoint,
+      bottomLeft: bottomRightPoint,
+      bottomRight: bottomLeftPoint,
+    }[direction]
+
+    const size = 32
+    const halfSize = size / 2
+    const innerSize = 8
+
+    const vertex = createMemo(
+      () =>
+        ({
+          topLeft: new DOMPoint(),
+          topRight: new DOMPoint(value().width, 0),
+          bottomRight: new DOMPoint(value().width, value().height),
+          bottomLeft: new DOMPoint(0, value().height),
+        })[direction],
+    )
+
+    const rotatePathD = createMemo(() => {
+      const tl = project(new DOMPoint(vertex().x - halfSize, vertex().y - halfSize))
+      const tr = project(new DOMPoint(vertex().x + halfSize, vertex().y - halfSize))
+      const bl = project(new DOMPoint(vertex().x - halfSize, vertex().y + halfSize))
+      const br = project(new DOMPoint(vertex().x + halfSize, vertex().y + halfSize))
+
+      return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
+    })
+
+    const resizePathD = createMemo(() => {
+      const tl = project(
+        new DOMPoint(
+          clamp(vertex().x - halfSize, 0, value().width),
+          clamp(vertex().y - halfSize, 0, value().height),
+        ),
+      )
+      const tr = project(
+        new DOMPoint(
+          clamp(vertex().x + halfSize, 0, value().width),
+          clamp(vertex().y - halfSize, 0, value().height),
+        ),
+      )
+      const bl = project(
+        new DOMPoint(
+          clamp(vertex().x - halfSize, 0, value().width),
+          clamp(vertex().y + halfSize, 0, value().height),
+        ),
+      )
+      const br = project(
+        new DOMPoint(
+          clamp(vertex().x + halfSize, 0, value().width),
+          clamp(vertex().y + halfSize, 0, value().height),
+        ),
+      )
+
+      return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
+    })
+
     return (
-      <div
-        class="w-[--vertex-size] h-[--vertex-size] absolute pointer-events-initial"
-        style={{
-          top: `calc(${point().y}px - var(--vertex-size) / 2`,
-          left: `calc(${point().x}px - var(--vertex-size) / 2`,
-          transform: inverseParentTransformMatrix()
-            .multiply(new DOMMatrix().rotate(xAxisRotate()))
-            .toString(),
-        }}
-      >
-        <div class="w-[--vertex-inner-size] h-[--vertex-inner-size] border-1px border-solid border-[--ant-color-primary] absolute top-1/2 left-1/2 -translate-1/2 pointer-events-none" />
-        <div
-          class="w-[--vertex-size] h-[--vertex-size] cursor-none absolute"
+      <>
+        <path
+          class="pointer-events-initial cursor-none"
+          d={rotatePathD()}
+          opacity={0}
+          fill="red"
           {...getRotateHandlerProps(direction)}
         />
-        <div
-          class={cs(
-            'w-[--vertex-resize-handler-size] h-[--vertex-resize-handler-size] cursor-none absolute',
-            direction === 'topLeft' && 'right-0 bottom-0',
-            direction === 'topRight' && 'left-0 bottom-0',
-            direction === 'bottomLeft' && 'right-0 top-0',
-            direction === 'bottomRight' && 'left-0 top-0',
-          )}
+
+        <rect
+          class="pointer-events-initial cursor-none"
+          x={point().x - innerSize / 2}
+          y={point().y - innerSize / 2}
+          width={innerSize}
+          height={innerSize}
+          fill="var(--ant-color-white)"
+          stroke="var(--ant-color-primary)"
+          style={{
+            'transform-origin': `${point().x}px ${point().y}px`,
+            transform: `rotate(${Math.atan2(point().y - point2().y, point().x - point2().x)}rad)`,
+          }}
           {...getResizeHandlerProps(direction)}
         />
-      </div>
+
+        <path
+          class="pointer-events-initial cursor-none"
+          d={resizePathD()}
+          opacity={0}
+          fill="blue"
+          {...getResizeHandlerProps(direction)}
+        />
+      </>
     )
   }
+
+  const transformOrigin = createMemo(() =>
+    project(parseTransformOrigin(value().width, value().height)),
+  )
 
   setRef(props, {
     enterMove: onMoveMouseDown,
@@ -706,43 +773,15 @@ const Transformer: Component<TransformerProps> = _props => {
   })
 
   return (
-    <Element class="relative">
-      <div
-        class="absolute"
-        style={{
-          width: `${value().width}px`,
-          height: `${value().height}px`,
-          transform: `translate(${value().x}px, ${value().y}px) rotate(${value().rotate}deg) scale(${props.scaleX},${props.scaleY}) skew(${props.skewX}deg,${props.skewY}deg)`,
-          'transform-origin': `${transformOrigin()[0]}px ${transformOrigin()[1]}px`,
-        }}
-        onMouseDown={onMoveMouseDown}
-      >
-        <div
-          ref={transformOriginRef}
-          class="absolute w-0px h-0px"
-          style={{
-            top: `${transformOrigin()[1]}px`,
-            left: `${transformOrigin()[0]}px`,
-          }}
+    <Element ref={ref} class="relative">
+      <svg class="absolute overflow-visible w-1px h-1px pointer-events-none">
+        <path
+          class="pointer-events-initial"
+          d={`M ${topLeftPoint().x},${topLeftPoint().y} L ${topRightPoint().x},${topRightPoint().y} L ${bottomRightPoint().x},${bottomRightPoint().y} L ${bottomLeftPoint().x},${bottomLeftPoint().y} Z`}
+          fill-opacity={0}
+          onMouseDown={onMoveMouseDown}
         />
-      </div>
 
-      <div
-        class="absolute"
-        style={{
-          '--ant-transformer-box-shadow':
-            '2px 2px 2px 0 rgba(0,0,0,.12),-2px -2px 2px 0 rgba(0,0,0,.12)',
-          '--vertex-size': '32px',
-          '--vertex-inner-size': '8px',
-          '--vertex-resize-handler-size':
-            'calc(var(--vertex-size) / 2 + var(--vertex-inner-size) / 2 + 4px)',
-          '--width': `calc(${transformedSize().width}px - var(--vertex-inner-size))`,
-          '--height': `calc(${transformedSize().height}px - var(--vertex-inner-size))`,
-          '--edge-width': '8px',
-          transform: `translate(${value().x}px, ${value().y}px)`,
-          'transform-origin': `${transformOrigin()[0]}px ${transformOrigin()[1]}px`,
-        }}
-      >
         {/* 边框 */}
         {getEdgeDom('top')}
         {getEdgeDom('bottom')}
@@ -754,19 +793,18 @@ const Transformer: Component<TransformerProps> = _props => {
         {getVertexDom('topRight')}
         {getVertexDom('bottomLeft')}
         {getVertexDom('bottomRight')}
+      </svg>
 
-        <Show when={props.transformOriginIcon}>
-          <CrosshairSvg
-            class="absolute [font-size:var(--size)] text-black pointer-events-none"
-            style={{
-              '--size': '14px',
-              top: `calc(${transformOrigin()[1]}px - var(--size) / 2)`,
-              left: `calc(${transformOrigin()[0]}px - var(--size) / 2)`,
-              transform: inverseParentTransformMatrix().toString(),
-            }}
-          />
-        </Show>
-      </div>
+      <Show when={props.transformOriginIcon}>
+        <CrosshairSvg
+          class="absolute [font-size:var(--size)] text-black pointer-events-none"
+          style={{
+            '--size': '14px',
+            top: `calc(${transformOrigin().y}px - var(--size) / 2)`,
+            left: `calc(${transformOrigin().x}px - var(--size) / 2)`,
+          }}
+        />
+      </Show>
 
       <Show when={!resizeDirection() && rotateDirection()}>
         <Portal>
@@ -775,7 +813,7 @@ const Transformer: Component<TransformerProps> = _props => {
             style={{
               top: `${rotateArrowPosition().y}px`,
               left: `${rotateArrowPosition().x}px`,
-              transform: `translate(-50%, -50%) rotate(${rotateArrowRotate()}deg)`,
+              transform: `translate(-50%, -50%) rotate(${rotateArrowRotate()}rad)`,
             }}
           />
         </Portal>
@@ -788,7 +826,7 @@ const Transformer: Component<TransformerProps> = _props => {
             style={{
               top: `${resizeArrowPosition().y}px`,
               left: `${resizeArrowPosition().x}px`,
-              transform: `translate(-50%, -50%) rotate(${resizeArrowRotate()}deg)`,
+              transform: `translate(-50%, -50%) rotate(${resizeArrowRotate()}rad)`,
             }}
           />
         </Portal>
