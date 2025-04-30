@@ -467,7 +467,6 @@ const Transformer: Component<TransformerProps> = props => {
 
     const transformOrigin = parseTransformOrigin(value().width, value().height)
 
-    const startValue = { ...value() }
     const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
     const startAngle = Math.atan2(
       startPoint.y - transformOrigin.y,
@@ -479,16 +478,12 @@ const Transformer: Component<TransformerProps> = props => {
     window.addEventListener(
       'mousemove',
       (_e: MouseEvent) => {
-        const currentPoint = unproject(
-          new DOMPoint(_e.clientX, _e.clientY),
-          startValue,
-          transformOrigin,
-        )
+        const currentPoint = unproject(new DOMPoint(_e.clientX, _e.clientY))
         const angle = Math.atan2(
           currentPoint.y - transformOrigin.y,
           currentPoint.x - transformOrigin.x,
         )
-        const rotate = startValue.rotate + radToDeg(angle - startAngle)
+        const rotate = value().rotate + radToDeg(angle - startAngle)
         setValue({
           ...value(),
           rotate,
