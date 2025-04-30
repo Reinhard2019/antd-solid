@@ -20,6 +20,6 @@ export function radToDeg(radian: number) {
  * @param p2
  * @returns
  */
-export function distance(p1: [number, number], p2: [number, number]) {
-  return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2))
+export function distance(p1: DOMPoint, p2: DOMPoint) {
+  return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2))
 }

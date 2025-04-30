@@ -5,7 +5,7 @@ import NP from 'number-precision'
 import createControllableValue from '../hooks/createControllableValue'
 import ResizeSvg from '../assets/svg/Resize'
 import Element from '../Element'
-import { radToDeg } from '../utils/math'
+import { distance, radToDeg } from '../utils/math'
 import RotateArrowSvg from '../assets/svg/RotateArrow'
 import CrosshairSvg from '../assets/svg/Crosshair'
 import { setRef } from '../utils/solid'
@@ -673,50 +673,42 @@ const Transformer: Component<TransformerProps> = props => {
     const halfSize = size / 2
     const innerSize = 8
 
-    const vertex = createMemo(
-      () =>
-        ({
-          topLeft: new DOMPoint(),
-          topRight: new DOMPoint(value().width, 0),
-          bottomRight: new DOMPoint(value().width, value().height),
-          bottomLeft: new DOMPoint(0, value().height),
-        })[direction],
-    )
+    const vertex = createMemo(() => {
+      const halfW = (value().width * halfSize) / distance(topLeftPoint(), topRightPoint())
+      const halfH = (value().height * halfSize) / distance(topLeftPoint(), bottomLeftPoint())
+
+      const v = {
+        topLeft: new DOMPoint(),
+        topRight: new DOMPoint(value().width, 0),
+        bottomRight: new DOMPoint(value().width, value().height),
+        bottomLeft: new DOMPoint(0, value().height),
+      }[direction]
+
+      return {
+        tl: new DOMPoint(v.x - halfW, v.y - halfH),
+        tr: new DOMPoint(v.x + halfW, v.y - halfH),
+        bl: new DOMPoint(v.x - halfW, v.y + halfH),
+        br: new DOMPoint(v.x + halfW, v.y + halfH),
+      }
+    })
 
     const rotatePathD = createMemo(() => {
-      const tl = project(new DOMPoint(vertex().x - halfSize, vertex().y - halfSize))
-      const tr = project(new DOMPoint(vertex().x + halfSize, vertex().y - halfSize))
-      const bl = project(new DOMPoint(vertex().x - halfSize, vertex().y + halfSize))
-      const br = project(new DOMPoint(vertex().x + halfSize, vertex().y + halfSize))
+      const tl = project(vertex().tl)
+      const tr = project(vertex().tr)
+      const bl = project(vertex().bl)
+      const br = project(vertex().br)
 
       return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
     })
 
+    const clampDOMPoint = (p: DOMPoint) =>
+      new DOMPoint(clamp(p.x, 0, value().width), clamp(p.y, 0, value().height))
+
     const resizePathD = createMemo(() => {
-      const tl = project(
-        new DOMPoint(
-          clamp(vertex().x - halfSize, 0, value().width),
-          clamp(vertex().y - halfSize, 0, value().height),
-        ),
-      )
-      const tr = project(
-        new DOMPoint(
-          clamp(vertex().x + halfSize, 0, value().width),
-          clamp(vertex().y - halfSize, 0, value().height),
-        ),
-      )
-      const bl = project(
-        new DOMPoint(
-          clamp(vertex().x - halfSize, 0, value().width),
-          clamp(vertex().y + halfSize, 0, value().height),
-        ),
-      )
-      const br = project(
-        new DOMPoint(
-          clamp(vertex().x + halfSize, 0, value().width),
-          clamp(vertex().y + halfSize, 0, value().height),
-        ),
-      )
+      const tl = project(clampDOMPoint(vertex().tl))
+      const tr = project(clampDOMPoint(vertex().tr))
+      const bl = project(clampDOMPoint(vertex().bl))
+      const br = project(clampDOMPoint(vertex().br))
 
       return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
     })
