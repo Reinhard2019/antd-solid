@@ -2,17 +2,17 @@ import { type Component, type JSX, For, mergeProps, createSelector } from 'solid
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import createControllableValue from '../hooks/createControllableValue'
-import { type StyleProps, type ComponentSize } from '../types'
+import { type StyleProps, type ComponentSize, type Key } from '../types'
 import Radio from '.'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 
 export interface RadioGroupProps extends StyleProps {
-  defaultValue?: string
-  value?: string
-  onChange?: JSX.ChangeEventHandler<HTMLInputElement, Event>
+  defaultValue?: Key
+  value?: Key
+  onChange?: (e: Parameters<JSX.ChangeEventHandler<HTMLInputElement, Event>>[0], value: Key) => void
   optionType?: 'default' | 'button'
-  options: Array<{ label: JSX.Element; value: string; disabled?: boolean }>
+  options: Array<{ label: JSX.Element; value: Key; disabled?: boolean }>
   block?: boolean
   disabled?: boolean
   size?: ComponentSize
@@ -25,7 +25,7 @@ const Group: Component<RadioGroupProps> = _props => {
     } as RadioGroupProps,
     _props,
   )
-  const [value, setValue] = createControllableValue<string>(props, {
+  const [value, setValue] = createControllableValue<Key>(props, {
     trigger: null,
   })
   const isChecked = createSelector(value)
@@ -49,8 +49,8 @@ const Group: Component<RadioGroupProps> = _props => {
             onChange={
               (e => {
                 setValue(option.value)
-                e.target.value = option.value
-                props.onChange?.(e)
+                e.target.value = option.value.toString()
+                props.onChange?.(e, option.value)
               }) as JSX.ChangeEventHandler<HTMLInputElement, Event>
             }
             size={size()}
