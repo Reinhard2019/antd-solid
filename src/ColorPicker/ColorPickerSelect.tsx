@@ -2,6 +2,7 @@ import { createMemo, useContext, type Component } from 'solid-js'
 import { clamp } from 'lodash-es'
 import ColorPickerContext from './context'
 import Color from './color'
+import { setupGlobalDrag } from '../utils/setupGlobalDrag'
 
 const ColorPickerSelect: Component = () => {
   let ref: HTMLDivElement | undefined
@@ -44,34 +45,17 @@ const ColorPickerSelect: Component = () => {
             'inset 0 0 1px 0 var(--ant-color-text-quaternary), 0 0 0 1px var(--ant-color-fill-secondary)',
         }}
         onMouseDown={() => {
-          const originUserSelect = document.body.style.userSelect
-          document.body.style.userSelect = 'none'
-
           let isDrag = false
 
-          const abortController = new AbortController()
-          window.addEventListener(
-            'mousemove',
-            e => {
+          setupGlobalDrag(
+            // eslint-disable-next-line solid/reactivity
+            (e: MouseEvent) => {
               setColor(e)
               isDrag = true
             },
-            {
-              signal: abortController.signal,
-              capture: true,
-            },
-          )
-
-          window.addEventListener(
-            'mouseup',
+            // eslint-disable-next-line solid/reactivity
             () => {
               if (isDrag) context?.setColor(color(), true)
-              document.body.style.userSelect = originUserSelect
-              abortController.abort()
-            },
-            {
-              once: true,
-              capture: true,
             },
           )
         }}

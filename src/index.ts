@@ -94,6 +94,8 @@ export { default as useVirtualList } from './hooks/useVirtualList'
 export { default as useCounter } from './hooks/useCounter'
 export { default as useMouse } from './hooks/useMouse'
 
+export { setupGlobalDrag } from './utils/setupGlobalDrag'
+
 export type { ComponentSize } from './types'
 
 export { default as enUS } from './locale/en_US'

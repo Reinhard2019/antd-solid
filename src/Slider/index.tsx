@@ -20,6 +20,7 @@ import useFocus from '../hooks/useFocus'
 import Element from '../Element'
 import { type StringOrJSXElement, type StyleProps } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import { setupGlobalDrag } from '../utils/setupGlobalDrag'
 
 export interface SliderProps extends StyleProps {
   defaultValue?: number | null
@@ -190,32 +191,18 @@ const Slider: Component<SliderProps> = _props => {
 
                 const handleWidth = handleRef!.offsetWidth
 
-                const abortController = new AbortController()
-
-                window.addEventListener(
-                  'mousemove',
+                setupGlobalDrag(
+                  // eslint-disable-next-line solid/reactivity
                   (_e: MouseEvent) => {
                     const moveX = _e.clientX - startX
                     setValue(
                       startValue + (moveX / (containerRef!.offsetWidth - handleWidth)) * gap(),
                     )
                   },
-                  {
-                    capture: true,
-                    signal: abortController.signal,
-                  },
-                )
-
-                window.addEventListener(
-                  'mouseup',
+                  // eslint-disable-next-line solid/reactivity
                   () => {
                     props.onChangeComplete?.(value())
                     setIsDragging(false)
-                    abortController.abort()
-                  },
-                  {
-                    capture: true,
-                    once: true,
                   },
                 )
               }}

@@ -9,6 +9,7 @@ import { distance, radToDeg } from '../utils/math'
 import RotateArrowSvg from '../assets/svg/RotateArrow'
 import CrosshairSvg from '../assets/svg/Crosshair'
 import { setRef } from '../utils/solid'
+import { setupGlobalDrag } from '../utils/setupGlobalDrag'
 
 export interface TransformValue {
   x: number
@@ -199,16 +200,11 @@ const Transformer: Component<TransformerProps> = props => {
     if (!isMainButton(e)) return
     e.stopPropagation()
 
-    const originUserSelect = document.body.style.userSelect
-    document.body.style.userSelect = 'none'
-
     const startValue = value()
     const startPoint = parentUnproject(new DOMPoint(e.clientX, e.clientY))
 
-    const abortController = new AbortController()
-
-    window.addEventListener(
-      'mousemove',
+    setupGlobalDrag(
+      // eslint-disable-next-line solid/reactivity
       (_e: MouseEvent) => {
         const currentMousePoint = parentUnproject(new DOMPoint(_e.clientX, _e.clientY))
         const changedValue = {
@@ -254,23 +250,10 @@ const Transformer: Component<TransformerProps> = props => {
         })
         props.onMove?.(changedValue)
       },
-      {
-        capture: true,
-        signal: abortController.signal,
-      },
-    )
-
-    window.addEventListener(
-      'mouseup',
+      // eslint-disable-next-line solid/reactivity
       () => {
-        document.body.style.userSelect = originUserSelect
         props.onTransformEnd?.()
         setAdsorbLine({})
-        abortController.abort()
-      },
-      {
-        capture: true,
-        once: true,
       },
     )
   }
@@ -280,11 +263,6 @@ const Transformer: Component<TransformerProps> = props => {
     if (!isMainButton(e)) return
     if (rotating) return
     e.stopPropagation()
-
-    const originUserSelect = document.body.style.userSelect
-    document.body.style.userSelect = 'none'
-    const originCursor = document.body.style.cursor
-    document.body.style.cursor = 'none'
 
     const startValue = { ...value() }
 
@@ -301,9 +279,10 @@ const Transformer: Component<TransformerProps> = props => {
     const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
     const startTransformOrigin = parseTransformOrigin(value().width, value().height)
 
-    const abortController = new AbortController()
-    window.addEventListener(
-      'mousemove',
+    resizing = true
+
+    setupGlobalDrag(
+      // eslint-disable-next-line solid/reactivity
       (_e: MouseEvent) => {
         const changedValue = value()
 
@@ -406,27 +385,13 @@ const Transformer: Component<TransformerProps> = props => {
 
         updateResizeArrowPosition(_e)
       },
-      {
-        capture: true,
-        signal: abortController.signal,
-      },
-    )
-
-    resizing = true
-    window.addEventListener(
-      'mouseup',
+      // eslint-disable-next-line solid/reactivity
       () => {
         resizing = false
         setResizeDirection(false)
         props.onTransformEnd?.()
-        document.body.style.userSelect = originUserSelect
-        document.body.style.cursor = originCursor
-        abortController.abort()
       },
-      {
-        capture: true,
-        once: true,
-      },
+      'none',
     )
   }
   const getResizeHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
@@ -460,10 +425,6 @@ const Transformer: Component<TransformerProps> = props => {
     e.stopPropagation()
 
     rotating = true
-    const originUserSelect = document.body.style.userSelect
-    document.body.style.userSelect = 'none'
-    const originCursor = document.body.style.cursor
-    document.body.style.cursor = 'none'
 
     const transformOrigin = parseTransformOrigin(value().width, value().height)
 
@@ -473,10 +434,8 @@ const Transformer: Component<TransformerProps> = props => {
       startPoint.x - transformOrigin.x,
     )
 
-    const abortController = new AbortController()
-
-    window.addEventListener(
-      'mousemove',
+    setupGlobalDrag(
+      // eslint-disable-next-line solid/reactivity
       (_e: MouseEvent) => {
         const currentPoint = unproject(new DOMPoint(_e.clientX, _e.clientY))
         const angle = Math.atan2(
@@ -492,26 +451,13 @@ const Transformer: Component<TransformerProps> = props => {
 
         updateRotateArrowPosition(_e)
       },
-      {
-        capture: true,
-        signal: abortController.signal,
-      },
-    )
-
-    window.addEventListener(
-      'mouseup',
+      // eslint-disable-next-line solid/reactivity
       () => {
         rotating = false
         setRotateDirection(false)
-        document.body.style.userSelect = originUserSelect
-        document.body.style.cursor = originCursor
         props.onTransformEnd?.()
-        abortController.abort()
       },
-      {
-        capture: true,
-        once: true,
-      },
+      'none',
     )
   }
   const getRotateHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
