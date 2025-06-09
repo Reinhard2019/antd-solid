@@ -17,7 +17,7 @@ export function setupGlobalDrag(
 
   const originalCursor = document.documentElement.style.cursor
   if (cursor) {
-    document.documentElement.style.cursor = 'ew-resize'
+    document.documentElement.style.cursor = cursor
   }
 
   const abortController = new AbortController()
