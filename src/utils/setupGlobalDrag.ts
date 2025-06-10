@@ -13,7 +13,6 @@ export function setupGlobalDrag(
   cursor?: string,
 ) {
   const originalPointerEvents = document.body.style.pointerEvents
-  document.body.style.pointerEvents = 'none' // 防止 mouseup 被 disabled 元素吞掉，以及拖拽时误选中文字等
 
   const originalCursor = document.documentElement.style.cursor
   if (cursor) {
@@ -22,10 +21,19 @@ export function setupGlobalDrag(
 
   const abortController = new AbortController()
 
-  window.addEventListener('mousemove', onMove, {
-    signal: abortController.signal,
-    capture: true,
-  })
+  window.addEventListener(
+    'mousemove',
+    e => {
+      // 延迟设置 document.body.style.pointerEvents，直到 mousemove 触发，这样才算 drag。避免影响自身及子元素的 click 事件
+      document.body.style.pointerEvents = 'none' // 防止 mouseup 被 disabled 元素吞掉，以及拖拽时误选中文字等
+
+      onMove(e)
+    },
+    {
+      signal: abortController.signal,
+      capture: true,
+    },
+  )
 
   window.addEventListener(
     'mouseup',
