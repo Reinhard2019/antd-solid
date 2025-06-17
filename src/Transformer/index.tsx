@@ -1,15 +1,17 @@
 import { type Ref, Show, createMemo, createSignal, type Component, type JSX } from 'solid-js'
-import { clamp, inRange } from 'lodash-es'
+import { inRange } from 'lodash-es'
 import { Portal } from 'solid-js/web'
 import NP from 'number-precision'
+import cs from 'classnames'
 import createControllableValue from '../hooks/createControllableValue'
 import ResizeSvg from '../assets/svg/Resize'
 import Element from '../Element'
-import { distance, radToDeg } from '../utils/math'
+import { radToDeg } from '../utils/math'
 import RotateArrowSvg from '../assets/svg/RotateArrow'
 import CrosshairSvg from '../assets/svg/Crosshair'
 import { setRef } from '../utils/solid'
 import { setupGlobalDrag } from '../utils/setupGlobalDrag'
+import { subDOMPoint } from '../utils/domPoint'
 
 export interface TransformValue {
   x: number
@@ -26,6 +28,19 @@ export interface TransformerInstance {
   enterResize: (e: MouseEvent) => void
   /** 手动进入旋转状态 */
   enterRotate: (e: MouseEvent) => void
+}
+
+export type LayoutPoint<T = DOMPoint> = T | null | [T | null, T | null]
+
+export interface Layout<T = LayoutPoint> {
+  topLeftPoint: T
+  topRightPoint: T
+  bottomLeftPoint: T
+  bottomRightPoint: T
+  // x 轴中心线
+  xCenterLine?: [DOMPoint, DOMPoint]
+  // y 轴中心线
+  yCenterLine?: [DOMPoint, DOMPoint]
 }
 
 export interface TransformerProps {
@@ -54,11 +69,11 @@ export interface TransformerProps {
    */
   adsorb?: {
     /**
-     * 吸附容器宽度
+     * 吸附容器（通常是父级）宽度
      */
     width: number
     /**
-     * 吸附容器高度
+     * 吸附容器（通常是父级）高度
      */
     height: number
     /**
@@ -67,14 +82,20 @@ export interface TransformerProps {
      */
     gap?: number
   }
-  project?: (point: DOMPoint, transformValue: TransformValue, transformOrigin: DOMPoint) => DOMPoint
-  unproject?: (
+  localToParentPoint?: (
     point: DOMPoint,
     transformValue: TransformValue,
     transformOrigin: DOMPoint,
-  ) => DOMPoint
-  parentProject?: (point: DOMPoint) => DOMPoint
-  parentUnproject?: (point: DOMPoint) => DOMPoint
+  ) => DOMPoint | undefined
+  parentToLocalPoint?: (
+    point: DOMPoint,
+    transformValue: TransformValue,
+    transformOrigin: DOMPoint,
+  ) => DOMPoint | undefined
+  parentToWorldPoint?: (point: DOMPoint) => DOMPoint | undefined
+  worldToParentPoint?: (point: DOMPoint) => DOMPoint | undefined
+  localToWorldLayout?: (value: Layout<DOMPoint>) => Layout
+  parentToWorldLayout?: (value: Layout<DOMPoint>) => Layout
   /**
    * 转换中心
    * 默认为 ['50%', '50%']
@@ -86,6 +107,12 @@ export interface TransformerProps {
    * 是否显示 transformOriginIcon
    */
   transformOriginIcon?: boolean
+  /**
+   * 设置 svg 的 viewBox
+   * 默认不需要设置，不设置时 svg 的宽高为 1*1，overflow 为 visible（此时显示范围不限制）
+   * 为什么要设置？某些极端情况下，如在 3d perspective 的情况下，某些点可能 x、y 值超级超级大，此时如果没有限制显示范围，显示会出现异常
+   */
+  viewBox?: DOMRect
 }
 
 type ResizeDirection =
@@ -136,15 +163,7 @@ const Transformer: Component<TransformerProps> = props => {
     )
   }
 
-  const project = (
-    point: DOMPoint,
-    transformValue?: TransformValue,
-    transformOrigin?: DOMPoint,
-  ) => {
-    point = parentProject(point, transformValue, transformOrigin)
-    return props.parentProject ? props.parentProject(point) : point
-  }
-  const parentProject = (
+  const localToParent = (
     point: DOMPoint,
     transformValue?: TransformValue,
     transformOrigin?: DOMPoint,
@@ -153,23 +172,32 @@ const Transformer: Component<TransformerProps> = props => {
     transformOrigin =
       transformOrigin ?? parseTransformOrigin(transformValue.width, transformValue.height)
 
-    if (props.project) {
-      return props.project(point, transformValue, transformOrigin)
+    if (props.localToParentPoint) {
+      return props.localToParentPoint(point, transformValue, transformOrigin)
     }
 
     return point.matrixTransform(getTransform(transformValue, transformOrigin))
   }
-  const parentUnproject = (point: DOMPoint) => {
+  const worldToParent = (point: DOMPoint) => {
     if (ref) {
       const rect = ref.getBoundingClientRect()
       point = new DOMPoint(point.x - rect.x, point.y - rect.y)
     }
 
-    if (props.parentUnproject) return props.parentUnproject(point)
+    if (props.worldToParentPoint) return props.worldToParentPoint(point)
 
     return point
   }
-  const unproject = (
+  const localToWorld = (
+    point: DOMPoint,
+    transformValue?: TransformValue,
+    transformOrigin?: DOMPoint,
+  ) => {
+    const newPoint = localToParent(point, transformValue, transformOrigin)
+    if (!newPoint) return
+    return props.parentToWorldPoint ? props.parentToWorldPoint(newPoint) : newPoint
+  }
+  const worldToLocal = (
     point: DOMPoint,
     transformValue?: TransformValue,
     transformOrigin?: DOMPoint,
@@ -178,13 +206,15 @@ const Transformer: Component<TransformerProps> = props => {
     transformOrigin =
       transformOrigin ?? parseTransformOrigin(transformValue.width, transformValue.height)
 
-    point = parentUnproject(point)
+    const newPoint = worldToParent(point)
 
-    if (props.unproject) {
-      return props.unproject(point, transformValue, transformOrigin)
+    if (!newPoint) return
+
+    if (props.parentToLocalPoint) {
+      return props.parentToLocalPoint(newPoint, transformValue, transformOrigin)
     }
 
-    return point.matrixTransform(getTransform(transformValue, transformOrigin).inverse())
+    return newPoint.matrixTransform(getTransform(transformValue, transformOrigin).inverse())
   }
 
   interface AdsorbLine {
@@ -197,16 +227,23 @@ const Transformer: Component<TransformerProps> = props => {
   }
   const [adsorbLine, setAdsorbLine] = createSignal<AdsorbLine>({})
   const onMoveMouseDown = (e: MouseEvent) => {
+    console.log('onMoveMouseDown')
     if (!isMainButton(e)) return
+
     e.stopPropagation()
 
     const startValue = value()
-    const startPoint = parentUnproject(new DOMPoint(e.clientX, e.clientY))
+    const startPoint = worldToParent(new DOMPoint(e.clientX, e.clientY))
+
+    if (!startPoint) return
 
     setupGlobalDrag(
       // eslint-disable-next-line solid/reactivity
       (_e: MouseEvent) => {
-        const currentMousePoint = parentUnproject(new DOMPoint(_e.clientX, _e.clientY))
+        const currentMousePoint = worldToParent(new DOMPoint(_e.clientX, _e.clientY))
+
+        if (!currentMousePoint) return
+
         const changedValue = {
           x: startValue.x + (currentMousePoint.x - startPoint.x),
           y: startValue.y + (currentMousePoint.y - startPoint.y),
@@ -265,6 +302,9 @@ const Transformer: Component<TransformerProps> = props => {
     e.stopPropagation()
 
     const startValue = { ...value() }
+    const startPoint = worldToLocal(new DOMPoint(e.clientX, e.clientY))
+
+    if (!startPoint) return
 
     const getVertex = (width: number, height: number): DOMPoint =>
       new DOMPoint(
@@ -275,8 +315,10 @@ const Transformer: Component<TransformerProps> = props => {
           ? 0
           : height,
       )
-    const startVertex = parentProject(getVertex(value().width, value().height))
-    const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
+    const startVertex = localToParent(getVertex(value().width, value().height))
+
+    if (!startVertex) return
+
     const startTransformOrigin = parseTransformOrigin(value().width, value().height)
 
     resizing = true
@@ -286,11 +328,14 @@ const Transformer: Component<TransformerProps> = props => {
       (_e: MouseEvent) => {
         const changedValue = value()
 
-        const currentPoint = unproject(
+        const currentPoint = worldToLocal(
           new DOMPoint(_e.clientX, _e.clientY),
           startValue,
           startTransformOrigin,
         )
+
+        if (!currentPoint) return
+
         const offsetX = currentPoint.x - startPoint.x
         const offsetY = currentPoint.y - startPoint.y
 
@@ -369,11 +414,14 @@ const Transformer: Component<TransformerProps> = props => {
         const endWidth = changedValue.width ?? value().width
         const endHeight = changedValue.height ?? value().height
         const endTransformOrigin = parseTransformOrigin(endWidth, endHeight)
-        const endVertex = parentProject(
+        const endVertex = localToParent(
           getVertex(endWidth, endHeight),
           startValue,
           endTransformOrigin,
         )
+
+        if (!endVertex) return
+
         changedValue.x = startValue.x + startVertex.x - endVertex.x
         changedValue.y = startValue.y + startVertex.y - endVertex.y
 
@@ -394,7 +442,10 @@ const Transformer: Component<TransformerProps> = props => {
       'none',
     )
   }
-  const getResizeHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
+  const getResizeHandlerProps = (
+    direction: ResizeDirection,
+    getMouseRotate: () => number,
+  ): JSX.HTMLAttributes<any> => {
     return {
       onMouseDown: e => {
         onResizeMouseDown(e, direction)
@@ -402,6 +453,7 @@ const Transformer: Component<TransformerProps> = props => {
       onMouseEnter: e => {
         if (resizing) return
         setResizeDirection(direction)
+        setMouseRotate(getMouseRotate())
         updateResizeArrowPosition(e)
       },
       onMouseMove: e => {
@@ -411,6 +463,7 @@ const Transformer: Component<TransformerProps> = props => {
       onMouseLeave: () => {
         if (resizing) return
         setResizeDirection(false)
+        setMouseRotate(0)
       },
     }
   }
@@ -428,7 +481,10 @@ const Transformer: Component<TransformerProps> = props => {
 
     const transformOrigin = parseTransformOrigin(value().width, value().height)
 
-    const startPoint = unproject(new DOMPoint(e.clientX, e.clientY))
+    const startPoint = worldToLocal(new DOMPoint(e.clientX, e.clientY))
+
+    if (!startPoint) return
+
     const startAngle = Math.atan2(
       startPoint.y - transformOrigin.y,
       startPoint.x - transformOrigin.x,
@@ -437,7 +493,10 @@ const Transformer: Component<TransformerProps> = props => {
     setupGlobalDrag(
       // eslint-disable-next-line solid/reactivity
       (_e: MouseEvent) => {
-        const currentPoint = unproject(new DOMPoint(_e.clientX, _e.clientY))
+        const currentPoint = worldToLocal(new DOMPoint(_e.clientX, _e.clientY))
+
+        if (!currentPoint) return
+
         const angle = Math.atan2(
           currentPoint.y - transformOrigin.y,
           currentPoint.x - transformOrigin.x,
@@ -460,7 +519,10 @@ const Transformer: Component<TransformerProps> = props => {
       'none',
     )
   }
-  const getRotateHandlerProps = (direction: ResizeDirection): JSX.HTMLAttributes<any> => {
+  const getRotateHandlerProps = (
+    direction: ResizeDirection,
+    getMouseRotate: () => number,
+  ): JSX.HTMLAttributes<any> => {
     return {
       onMouseDown: e => {
         onRotateMouseDown(e)
@@ -468,6 +530,7 @@ const Transformer: Component<TransformerProps> = props => {
       onMouseEnter: e => {
         if (rotating) return
         setRotateDirection(direction)
+        setMouseRotate(getMouseRotate())
         updateRotateArrowPosition(e)
       },
       onMouseMove: e => {
@@ -477,9 +540,12 @@ const Transformer: Component<TransformerProps> = props => {
       onMouseLeave: () => {
         if (rotating) return
         setRotateDirection(false)
+        setMouseRotate(0)
       },
     }
   }
+
+  const [mouseRotate, setMouseRotate] = createSignal(0)
 
   const [resizeDirection, setResizeDirection] = createSignal<ResizeDirection | false>(false)
   const [resizeArrowPosition, setResizeArrowPosition] = createSignal({
@@ -505,198 +571,86 @@ const Transformer: Component<TransformerProps> = props => {
     })
   }
 
-  const topLeftPoint = createMemo(() => project(new DOMPoint(0, 0)))
-  const topRightPoint = createMemo(() => project(new DOMPoint(value().width, 0)))
-  const bottomLeftPoint = createMemo(() => project(new DOMPoint(0, value().height)))
-  const bottomRightPoint = createMemo(() => project(new DOMPoint(value().width, value().height)))
+  const convertLayout = (
+    width: number,
+    height: number,
+    convertPoint: (point: DOMPoint) => DOMPoint | undefined,
+    _convertLayout: ((layout: Layout<DOMPoint>) => Layout) | undefined,
+  ): Layout => {
+    const topLeftPoint = new DOMPoint(0, 0)
+    const topRightPoint = new DOMPoint(width, 0)
+    const bottomRightPoint = new DOMPoint(width, height)
+    const bottomLeftPoint = new DOMPoint(0, height)
+    const leftCenterPoint = new DOMPoint(
+      (topLeftPoint.x + bottomLeftPoint.x) / 2,
+      (topLeftPoint.y + bottomLeftPoint.y) / 2,
+    )
+    const rightCenterPoint = new DOMPoint(
+      (topRightPoint.x + bottomRightPoint.x) / 2,
+      (topRightPoint.y + bottomRightPoint.y) / 2,
+    )
+    const xCenterLine: [DOMPoint, DOMPoint] = [leftCenterPoint, rightCenterPoint]
+    const topCenterPoint = new DOMPoint(
+      (topLeftPoint.x + topRightPoint.x) / 2,
+      (topLeftPoint.y + topRightPoint.y) / 2,
+    )
+    const bottomCenterPoint = new DOMPoint(
+      (bottomLeftPoint.x + bottomRightPoint.x) / 2,
+      (bottomLeftPoint.y + bottomRightPoint.y) / 2,
+    )
+    const yCenterLine: [DOMPoint, DOMPoint] = [topCenterPoint, bottomCenterPoint]
 
-  const getRotate = (direction: ResizeDirection) => {
-    const point = {
-      top: topLeftPoint,
-      bottom: bottomLeftPoint,
-      right: topRightPoint,
-      left: topLeftPoint,
-      topLeft: bottomRightPoint,
-      topRight: bottomLeftPoint,
-      bottomLeft: topRightPoint,
-      bottomRight: topLeftPoint,
-    }[direction]
-    const point2 = {
-      top: topRightPoint,
-      bottom: bottomRightPoint,
-      right: bottomRightPoint,
-      left: bottomLeftPoint,
-      topLeft: topLeftPoint,
-      topRight: topRightPoint,
-      bottomLeft: bottomLeftPoint,
-      bottomRight: bottomRightPoint,
-    }[direction]
-
-    let extraAngle = 0
-    if (
-      direction === 'topLeft' ||
-      direction === 'topRight' ||
-      direction === 'bottomLeft' ||
-      direction === 'bottomRight'
-    ) {
-      extraAngle = Math.PI / 2
+    const layoutValue: Layout<DOMPoint> = {
+      topLeftPoint,
+      topRightPoint,
+      bottomRightPoint,
+      bottomLeftPoint,
+      xCenterLine,
+      yCenterLine,
     }
 
-    return Math.atan2(point().y - point2().y, point().x - point2().x) + extraAngle
+    if (_convertLayout) return _convertLayout(layoutValue)
+
+    return {
+      topLeftPoint: convertPoint(layoutValue.topLeftPoint),
+      topRightPoint: convertPoint(layoutValue.topRightPoint),
+      bottomRightPoint: convertPoint(layoutValue.bottomRightPoint),
+      bottomLeftPoint: convertPoint(layoutValue.bottomLeftPoint),
+      xCenterLine: xCenterLine.map(point => convertPoint(point)),
+      yCenterLine: yCenterLine.map(point => convertPoint(point)),
+    } as Layout
   }
 
-  const resizeArrowRotate = createMemo(() => {
-    const direction = resizeDirection()
-
-    if (!direction) return 0
-
-    return getRotate(direction)
+  const layoutInWorld = createMemo(() => {
+    const { width, height } = value()
+    return convertLayout(width, height, localToWorld, props.localToWorldLayout)
   })
+
+  const parentToWorld = (point: DOMPoint) => {
+    return props.parentToWorldPoint ? props.parentToWorldPoint(point) : point
+  }
+
+  const parentLayoutInWorld = createMemo(() => {
+    const { width = 0, height = 0 } = props.adsorb ?? {}
+    return convertLayout(width, height, parentToWorld, props.parentToWorldLayout)
+  })
+
+  const pathD = createMemo(() => {
+    const { topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint } = layoutInWorld()
+    const points = [topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint].flatMap(
+      p => (Array.isArray(p) ? p : [p]).filter(v => v) as DOMPoint[],
+    )
+    return `${points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ')} Z`
+  })
+
+  const resizeArrowRotate = mouseRotate
 
   const rotateArrowRotate = createMemo(() => {
-    const direction = rotateDirection()
-
-    if (!direction) return 0
-
-    return getRotate(direction) + Math.PI / 4
+    return mouseRotate() + Math.PI / 4
   })
 
-  const getEdgeDom = (direction: 'top' | 'bottom' | 'right' | 'left') => {
-    const point = {
-      top: topLeftPoint,
-      bottom: bottomLeftPoint,
-      right: topRightPoint,
-      left: topLeftPoint,
-    }[direction]
-    const point2 = {
-      top: topRightPoint,
-      bottom: bottomRightPoint,
-      right: bottomRightPoint,
-      left: bottomLeftPoint,
-    }[direction]
-
-    return (
-      <>
-        <line
-          x1={point().x}
-          y1={point().y}
-          x2={point2().x}
-          y2={point2().y}
-          stroke="var(--ant-color-primary)"
-          stroke-width={1}
-        />
-
-        <line
-          class="pointer-events-initial cursor-none"
-          x1={point().x}
-          y1={point().y}
-          x2={point2().x}
-          y2={point2().y}
-          opacity={0}
-          stroke="var(--ant-color-primary)"
-          stroke-width={3}
-          {...getResizeHandlerProps(direction)}
-        />
-      </>
-    )
-  }
-
-  const getVertexDom = (direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft') => {
-    const point = {
-      topLeft: topLeftPoint,
-      topRight: topRightPoint,
-      bottomRight: bottomRightPoint,
-      bottomLeft: bottomLeftPoint,
-    }[direction]
-    const point2 = {
-      topLeft: topRightPoint,
-      topRight: topLeftPoint,
-      bottomLeft: bottomRightPoint,
-      bottomRight: bottomLeftPoint,
-    }[direction]
-
-    const size = 32
-    const halfSize = size / 2
-    const innerSize = 8
-
-    const vertex = createMemo(() => {
-      const halfW = (value().width * halfSize) / distance(topLeftPoint(), topRightPoint())
-      const halfH = (value().height * halfSize) / distance(topLeftPoint(), bottomLeftPoint())
-
-      const v = {
-        topLeft: new DOMPoint(),
-        topRight: new DOMPoint(value().width, 0),
-        bottomRight: new DOMPoint(value().width, value().height),
-        bottomLeft: new DOMPoint(0, value().height),
-      }[direction]
-
-      return {
-        tl: new DOMPoint(v.x - halfW, v.y - halfH),
-        tr: new DOMPoint(v.x + halfW, v.y - halfH),
-        bl: new DOMPoint(v.x - halfW, v.y + halfH),
-        br: new DOMPoint(v.x + halfW, v.y + halfH),
-      }
-    })
-
-    const rotatePathD = createMemo(() => {
-      const tl = project(vertex().tl)
-      const tr = project(vertex().tr)
-      const bl = project(vertex().bl)
-      const br = project(vertex().br)
-
-      return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
-    })
-
-    const clampDOMPoint = (p: DOMPoint) =>
-      new DOMPoint(clamp(p.x, 0, value().width), clamp(p.y, 0, value().height))
-
-    const resizePathD = createMemo(() => {
-      const tl = project(clampDOMPoint(vertex().tl))
-      const tr = project(clampDOMPoint(vertex().tr))
-      const bl = project(clampDOMPoint(vertex().bl))
-      const br = project(clampDOMPoint(vertex().br))
-
-      return `M ${tl.x},${tl.y} L ${tr.x},${tr.y} L ${br.x},${br.y} L ${bl.x},${bl.y} Z`
-    })
-
-    return (
-      <>
-        <path
-          class="pointer-events-initial cursor-none"
-          d={rotatePathD()}
-          opacity={0}
-          fill="red"
-          {...getRotateHandlerProps(direction)}
-        />
-
-        <rect
-          class="pointer-events-initial cursor-none"
-          x={point().x - innerSize / 2}
-          y={point().y - innerSize / 2}
-          width={innerSize}
-          height={innerSize}
-          fill="var(--ant-color-white)"
-          stroke="var(--ant-color-primary)"
-          style={{
-            'transform-origin': `${point().x}px ${point().y}px`,
-            transform: `rotate(${Math.atan2(point().y - point2().y, point().x - point2().x)}rad)`,
-          }}
-          {...getResizeHandlerProps(direction)}
-        />
-
-        <path
-          class="pointer-events-initial cursor-none"
-          d={resizePathD()}
-          opacity={0}
-          fill="blue"
-          {...getResizeHandlerProps(direction)}
-        />
-      </>
-    )
-  }
-
   const transformOrigin = createMemo(() =>
-    project(parseTransformOrigin(value().width, value().height)),
+    localToWorld(parseTransformOrigin(value().width, value().height)),
   )
 
   setRef(props, {
@@ -705,127 +659,435 @@ const Transformer: Component<TransformerProps> = props => {
     enterRotate: onRotateMouseDown,
   })
 
+  const viewBoxStr = createMemo(() => {
+    if (!props.viewBox) return
+    const { x, y, width, height } = props.viewBox
+    return [x, y, width, height].join(' ')
+  })
+
   return (
     <Element ref={ref} class="relative">
-      <svg class="absolute overflow-visible w-1px h-1px pointer-events-none">
+      <svg
+        class={cs('absolute pointer-events-none', !props.viewBox && 'overflow-visible w-1px h-1px')}
+        viewBox={viewBoxStr()}
+      >
         <path
           class="pointer-events-initial"
-          d={`M ${topLeftPoint().x},${topLeftPoint().y} L ${topRightPoint().x},${topRightPoint().y} L ${bottomRightPoint().x},${bottomRightPoint().y} L ${bottomLeftPoint().x},${bottomLeftPoint().y} Z`}
-          fill-opacity={0}
+          d={pathD()}
+          opacity="0"
           onMouseDown={onMoveMouseDown}
         />
 
         {/* 边框 */}
-        {getEdgeDom('top')}
-        {getEdgeDom('bottom')}
-        {getEdgeDom('left')}
-        {getEdgeDom('right')}
+        <Edge
+          direction="top"
+          layout={layoutInWorld()}
+          centerLine={layoutInWorld().yCenterLine}
+          getResizeHandlerProps={getResizeHandlerProps}
+        />
+        <Edge
+          direction="bottom"
+          layout={layoutInWorld()}
+          centerLine={layoutInWorld().yCenterLine}
+          getResizeHandlerProps={getResizeHandlerProps}
+        />
+        <Edge
+          direction="left"
+          layout={layoutInWorld()}
+          centerLine={layoutInWorld().xCenterLine}
+          getResizeHandlerProps={getResizeHandlerProps}
+        />
+        <Edge
+          direction="right"
+          layout={layoutInWorld()}
+          centerLine={layoutInWorld().xCenterLine}
+          getResizeHandlerProps={getResizeHandlerProps}
+        />
 
         {/* 顶点 */}
-        {getVertexDom('topLeft')}
-        {getVertexDom('topRight')}
-        {getVertexDom('bottomLeft')}
-        {getVertexDom('bottomRight')}
+        <Show when={layoutInWorld().topLeftPoint instanceof DOMPoint}>
+          <Vertex
+            direction="topLeft"
+            layout={layoutInWorld()}
+            getResizeHandlerProps={getResizeHandlerProps}
+            getRotateHandlerProps={getRotateHandlerProps}
+          />
+        </Show>
+        <Show when={layoutInWorld().topRightPoint instanceof DOMPoint}>
+          <Vertex
+            direction="topRight"
+            layout={layoutInWorld()}
+            getResizeHandlerProps={getResizeHandlerProps}
+            getRotateHandlerProps={getRotateHandlerProps}
+          />
+        </Show>
+        <Show when={layoutInWorld().bottomLeftPoint instanceof DOMPoint}>
+          <Vertex
+            direction="bottomLeft"
+            layout={layoutInWorld()}
+            getResizeHandlerProps={getResizeHandlerProps}
+            getRotateHandlerProps={getRotateHandlerProps}
+          />
+        </Show>
+        <Show when={layoutInWorld().bottomRightPoint instanceof DOMPoint}>
+          <Vertex
+            direction="bottomRight"
+            layout={layoutInWorld()}
+            getResizeHandlerProps={getResizeHandlerProps}
+            getRotateHandlerProps={getRotateHandlerProps}
+          />
+        </Show>
+
+        {/* 父级边框 */}
+        <Show when={adsorbLine()?.top}>
+          <ParentEdge direction="top" layout={parentLayoutInWorld()} />
+        </Show>
+        <Show when={adsorbLine()?.bottom}>
+          <ParentEdge direction="bottom" layout={parentLayoutInWorld()} />
+        </Show>
+        <Show when={adsorbLine()?.left}>
+          <ParentEdge direction="left" layout={parentLayoutInWorld()} />
+        </Show>
+        <Show when={adsorbLine()?.right}>
+          <ParentEdge direction="right" layout={parentLayoutInWorld()} />
+        </Show>
+
+        {/* 父级中心线 */}
+        <Show when={adsorbLine()?.centerX}>
+          <ParentCenterLine line={parentLayoutInWorld().xCenterLine} />
+        </Show>
+        <Show when={adsorbLine()?.centerY}>
+          <ParentCenterLine line={parentLayoutInWorld().yCenterLine} />
+        </Show>
+
+        <Show when={props.transformOriginIcon && transformOrigin()}>
+          <foreignObject class="overflow-visible">
+            <CrosshairSvg
+              class="absolute [font-size:var(--size)] text-black pointer-events-none"
+              style={{
+                '--size': '14px',
+                top: `calc(${transformOrigin()!.y}px - var(--size) / 2)`,
+                left: `calc(${transformOrigin()!.x}px - var(--size) / 2)`,
+              }}
+              innerColor="white"
+              outerColor="black"
+            />
+          </foreignObject>
+        </Show>
+
+        <Show when={!resizeDirection() && rotateDirection()}>
+          <Portal>
+            <RotateArrowSvg
+              class="absolute pointer-events-none text-24px"
+              style={{
+                top: `${rotateArrowPosition().y}px`,
+                left: `${rotateArrowPosition().x}px`,
+                transform: `translate(-50%, -50%) rotate(${rotateArrowRotate()}rad)`,
+              }}
+            />
+          </Portal>
+        </Show>
+
+        <Show when={resizeDirection()}>
+          <Portal>
+            <ResizeSvg
+              class="absolute pointer-events-none text-24px"
+              style={{
+                top: `${resizeArrowPosition().y}px`,
+                left: `${resizeArrowPosition().x}px`,
+                transform: `translate(-50%, -50%) rotate(${resizeArrowRotate()}rad)`,
+              }}
+            />
+          </Portal>
+        </Show>
       </svg>
-
-      <Show when={props.transformOriginIcon}>
-        <CrosshairSvg
-          class="absolute [font-size:var(--size)] text-black pointer-events-none"
-          style={{
-            '--size': '14px',
-            top: `calc(${transformOrigin().y}px - var(--size) / 2)`,
-            left: `calc(${transformOrigin().x}px - var(--size) / 2)`,
-          }}
-        />
-      </Show>
-
-      <Show when={!resizeDirection() && rotateDirection()}>
-        <Portal>
-          <RotateArrowSvg
-            class="absolute pointer-events-none text-24px"
-            style={{
-              top: `${rotateArrowPosition().y}px`,
-              left: `${rotateArrowPosition().x}px`,
-              transform: `translate(-50%, -50%) rotate(${rotateArrowRotate()}rad)`,
-            }}
-          />
-        </Portal>
-      </Show>
-
-      <Show when={resizeDirection()}>
-        <Portal>
-          <ResizeSvg
-            class="absolute pointer-events-none text-24px"
-            style={{
-              top: `${resizeArrowPosition().y}px`,
-              left: `${resizeArrowPosition().x}px`,
-              transform: `translate(-50%, -50%) rotate(${resizeArrowRotate()}rad)`,
-            }}
-          />
-        </Portal>
-      </Show>
-
-      <Show when={adsorbLine()?.left}>
-        <div
-          class="absolute bg-[--ant-color-primary]"
-          style={{
-            width: '1px',
-            transform: 'translateX(-50%)',
-            height: `${props.adsorb?.height ?? 0}px`,
-          }}
-        />
-      </Show>
-      <Show when={adsorbLine()?.right}>
-        <div
-          class="absolute -left-1px bg-[--ant-color-primary]"
-          style={{
-            width: '1px',
-            transform: `translateX(calc(${props.adsorb?.width ?? 0}px - 50%))`,
-            height: `${props.adsorb?.height ?? 0}px`,
-          }}
-        />
-      </Show>
-      <Show when={adsorbLine()?.centerX}>
-        <div
-          class="absolute bg-[--ant-color-primary]"
-          style={{
-            width: '1px',
-            transform: `translateX(calc(${(props.adsorb?.width ?? 0) / 2}px - 50%))`,
-            height: `${props.adsorb?.height ?? 0}px`,
-          }}
-        />
-      </Show>
-      <Show when={adsorbLine()?.top}>
-        <div
-          class="absolute bg-[--ant-color-primary]"
-          style={{
-            height: '1px',
-            transform: 'translateY(-50%)',
-            width: `${props.adsorb?.width ?? 0}px`,
-          }}
-        />
-      </Show>
-      <Show when={adsorbLine()?.bottom}>
-        <div
-          class="absolute bg-[--ant-color-primary]"
-          style={{
-            height: '1px',
-            transform: `translateY(calc(${props.adsorb?.height ?? 0}px - 50%))`,
-            width: `${props.adsorb?.width ?? 0}px`,
-          }}
-        />
-      </Show>
-      <Show when={adsorbLine()?.centerY}>
-        <div
-          class="absolute bg-[--ant-color-primary]"
-          style={{
-            height: '1px',
-            transform: `translateY(calc(${(props.adsorb?.height ?? 0) / 2}px - 50%))`,
-            width: `${props.adsorb?.width ?? 0}px`,
-          }}
-        />
-      </Show>
     </Element>
+  )
+}
+
+/**
+ * 根据 point 获取 angle
+ * @param point
+ * @returns
+ */
+const getAngleOfDOMPoint = (point: DOMPoint) => {
+  const angle = Math.atan2(point.y, point.x)
+  return angle < 0 ? Math.PI * 2 + angle : angle
+}
+
+const Edge: Component<{
+  layout: Layout
+  direction: 'top' | 'bottom' | 'right' | 'left'
+  /** 中心线 */
+  centerLine: [DOMPoint, DOMPoint] | undefined
+  getResizeHandlerProps: (
+    direction: ResizeDirection,
+    getMouseRotate: () => number,
+  ) => JSX.HTMLAttributes<any>
+}> = props => {
+  const startPoint = createMemo(() => {
+    const layout = props.layout
+    const p = {
+      top: layout.topLeftPoint,
+      right: layout.topRightPoint,
+      bottom: layout.bottomRightPoint,
+      left: layout.bottomLeftPoint,
+    }[props.direction]
+
+    return (Array.isArray(p) ? p[1] : p) ?? new DOMPoint()
+  })
+  const endPoint = createMemo(() => {
+    const layout = props.layout
+    const p = {
+      top: layout.topRightPoint,
+      right: layout.bottomRightPoint,
+      bottom: layout.bottomLeftPoint,
+      left: layout.topLeftPoint,
+    }[props.direction]
+
+    return (Array.isArray(p) ? p[0] : p) ?? new DOMPoint()
+  })
+
+  const getMouseRotate = () => {
+    const centerLine = props.centerLine
+    if (centerLine) {
+      return getAngleOfDOMPoint(subDOMPoint(centerLine[0], centerLine[1]))
+    }
+
+    return getAngleOfDOMPoint(subDOMPoint(endPoint(), startPoint()))
+  }
+
+  return (
+    <>
+      <path
+        d={`M ${startPoint().x},${startPoint().y} L ${endPoint().x},${endPoint().y}`}
+        stroke="var(--ant-color-primary)"
+        stroke-width={1}
+      />
+
+      <path
+        class="pointer-events-initial cursor-none"
+        d={`M ${startPoint().x},${startPoint().y} L ${endPoint().x},${endPoint().y}`}
+        opacity={0}
+        stroke="var(--ant-color-primary)"
+        stroke-width={3}
+        {...props.getResizeHandlerProps(props.direction, getMouseRotate)}
+      />
+    </>
+  )
+}
+
+const Vertex: Component<{
+  layout: Layout
+  direction: 'topLeft' | 'bottomRight' | 'topRight' | 'bottomLeft'
+  getRotateHandlerProps: (
+    direction: ResizeDirection,
+    getMouseRotate: () => number,
+  ) => JSX.HTMLAttributes<any>
+  getResizeHandlerProps: (
+    direction: ResizeDirection,
+    getMouseRotate: () => number,
+  ) => JSX.HTMLAttributes<any>
+}> = props => {
+  const prevPoint = createMemo(() => {
+    const layout = props.layout
+    const point = {
+      topLeft: layout.bottomLeftPoint,
+      topRight: layout.topLeftPoint,
+      bottomRight: layout.topRightPoint,
+      bottomLeft: layout.bottomRightPoint,
+    }[props.direction]
+
+    return (Array.isArray(point) ? point[1] : point) ?? new DOMPoint()
+  })
+  const nextPoint = createMemo(() => {
+    const layout = props.layout
+    const point = {
+      topLeft: layout.topRightPoint,
+      topRight: layout.bottomRightPoint,
+      bottomRight: layout.bottomLeftPoint,
+      bottomLeft: layout.topLeftPoint,
+    }[props.direction]
+
+    return (Array.isArray(point) ? point[0] : point) ?? new DOMPoint()
+  })
+  const currentPoint = createMemo(() => {
+    const layout = props.layout
+    const point = {
+      topLeft: layout.topLeftPoint,
+      topRight: layout.topRightPoint,
+      bottomRight: layout.bottomRightPoint,
+      bottomLeft: layout.bottomLeftPoint,
+    }[props.direction]
+
+    // 如果 point 不是 DOMPoint 对象，则本组件不需要显示
+    return point instanceof DOMPoint ? point : new DOMPoint()
+  })
+
+  const startAngle = createMemo(() => getAngleOfDOMPoint(subDOMPoint(nextPoint(), currentPoint())))
+
+  const _endAngle = createMemo(() => getAngleOfDOMPoint(subDOMPoint(prevPoint(), currentPoint())))
+  const endAngle = createMemo(() => {
+    return _endAngle() < startAngle() ? _endAngle() + Math.PI * 2 : _endAngle()
+  })
+
+  const centerAngle = createMemo(() => (startAngle() + endAngle()) / 2)
+
+  const getLayout = (size: number) => {
+    const gap = endAngle() - startAngle()
+    let _size = gap > Math.PI / 2 ? size / Math.tan(gap / 2) : size
+    let translate = {
+      x: Math.cos(centerAngle()) * _size,
+      y: Math.sin(centerAngle()) * _size,
+    }
+
+    const { x, y } = currentPoint()
+    const topLeftPoint = new DOMPoint(x + translate.x, y + translate.y)
+    const bottomRightPoint = new DOMPoint(x - translate.x, y - translate.y)
+
+    _size = gap > Math.PI / 2 ? size : size * Math.tan(gap / 2)
+    const angle = centerAngle() + Math.PI / 2
+    translate = {
+      x: Math.cos(angle) * _size,
+      y: Math.sin(angle) * _size,
+    }
+
+    const topRightPoint = new DOMPoint(x + translate.x, y + translate.y)
+    const bottomLeftPoint = new DOMPoint(x - translate.x, y - translate.y)
+
+    return {
+      topLeftPoint,
+      topRightPoint,
+      bottomRightPoint,
+      bottomLeftPoint,
+    }
+  }
+
+  const layoutToPathD = (_layout: Layout<DOMPoint>) => {
+    const { topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint } = _layout
+
+    return `M ${topLeftPoint.x},${topLeftPoint.y} L ${topRightPoint.x},${topRightPoint.y} L ${bottomRightPoint.x},${bottomRightPoint.y} L ${bottomLeftPoint.x},${bottomLeftPoint.y} Z`
+  }
+
+  const rotateSize = 24
+  // 旋转部份的 layout
+  const rotateLayout = createMemo(() => getLayout(rotateSize))
+
+  // 显示部份的 layout
+  const displayLayout = createMemo(() => getLayout(8))
+
+  // 调整尺寸部份的 layout
+  const reseizLayout = createMemo(() => {
+    const { topLeftPoint, topRightPoint, bottomRightPoint, bottomLeftPoint } = getLayout(
+      rotateSize / 2,
+    )
+    const _rotateLayout = rotateLayout()
+
+    const translate = subDOMPoint(_rotateLayout.bottomRightPoint, bottomRightPoint)
+
+    return {
+      topLeftPoint: subDOMPoint(topLeftPoint, translate),
+      topRightPoint: subDOMPoint(topRightPoint, translate),
+      bottomRightPoint: subDOMPoint(bottomRightPoint, translate),
+      bottomLeftPoint: subDOMPoint(bottomLeftPoint, translate),
+    }
+  })
+
+  const getMouseRotate = () => {
+    const layout = props.layout
+    // 相对的点
+    const oppositePoint = {
+      topLeft: layout.bottomRightPoint,
+      topRight: layout.bottomLeftPoint,
+      bottomRight: layout.topLeftPoint,
+      bottomLeft: layout.topRightPoint,
+    }[props.direction]
+
+    if (oppositePoint instanceof DOMPoint) {
+      return getAngleOfDOMPoint(subDOMPoint(oppositePoint, currentPoint())) + Math.PI / 2
+    }
+
+    return centerAngle() + Math.PI / 2
+  }
+
+  return (
+    <>
+      <path
+        class="pointer-events-initial cursor-none"
+        d={layoutToPathD(rotateLayout())}
+        opacity={0}
+        fill="red"
+        {...props.getRotateHandlerProps(props.direction, getMouseRotate)}
+      />
+
+      <path
+        class="pointer-events-initial cursor-none"
+        d={layoutToPathD(displayLayout())}
+        fill="var(--ant-color-white)"
+        stroke="var(--ant-color-primary)"
+        {...props.getResizeHandlerProps(props.direction, getMouseRotate)}
+      />
+
+      <path
+        class="pointer-events-initial cursor-none"
+        d={layoutToPathD(reseizLayout())}
+        opacity={0}
+        fill="blue"
+        {...props.getResizeHandlerProps(props.direction, getMouseRotate)}
+      />
+    </>
+  )
+}
+
+const ParentEdge: Component<{
+  layout: Layout
+  direction: 'top' | 'bottom' | 'right' | 'left'
+}> = props => {
+  const startPoint = createMemo(() => {
+    const layout = props.layout
+    const p = {
+      top: layout.topLeftPoint,
+      right: layout.topRightPoint,
+      bottom: layout.bottomRightPoint,
+      left: layout.bottomLeftPoint,
+    }[props.direction]
+
+    return (Array.isArray(p) ? p[1] : p) ?? new DOMPoint()
+  })
+  const endPoint = createMemo(() => {
+    const layout = props.layout
+    const p = {
+      top: layout.topRightPoint,
+      right: layout.bottomRightPoint,
+      bottom: layout.bottomLeftPoint,
+      left: layout.topLeftPoint,
+    }[props.direction]
+
+    return (Array.isArray(p) ? p[0] : p) ?? new DOMPoint()
+  })
+
+  return (
+    <path
+      d={`M ${startPoint().x},${startPoint().y} L ${endPoint().x},${endPoint().y}`}
+      stroke="var(--ant-color-primary)"
+      stroke-width={1}
+    />
+  )
+}
+
+const ParentCenterLine: Component<{
+  line: [DOMPoint, DOMPoint] | undefined
+}> = props => {
+  return (
+    <>
+      {props.line ? (
+        <path
+          d={`M ${props.line[0].x},${props.line[0].y} L ${props.line[1].x},${props.line[1].y}`}
+          stroke="var(--ant-color-primary)"
+          stroke-width={1}
+        />
+      ) : null}
+    </>
   )
 }
 

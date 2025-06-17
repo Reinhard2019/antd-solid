@@ -89,14 +89,14 @@ const App: Component = () => {
         <Transformer
           value={transformValue()}
           onChange={setTransformValue}
-          project={(point, _transformValue, transformOrigin) =>
+          localToParentPoint={(point, _transformValue, transformOrigin) =>
             point.matrixTransform(getTransform(_transformValue, transformOrigin))
           }
-          unproject={(point, _transformValue, transformOrigin) =>
+          parentToLocalPoint={(point, _transformValue, transformOrigin) =>
             point.matrixTransform(getTransform(_transformValue, transformOrigin).inverse())
           }
-          parentProject={point => point.matrixTransform(parentTransform)}
-          parentUnproject={point => point.matrixTransform(parentTransform.inverse())}
+          parentToWorldPoint={point => point.matrixTransform(parentTransform)}
+          worldToParentPoint={point => point.matrixTransform(parentTransform.inverse())}
         />
       </div>
     </div>

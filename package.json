@@ -68,7 +68,7 @@
     "prismjs": "^1.29.0",
     "solid-js": "^1.8.15",
     "solid-transition-group": "^0.2.3",
-    "yup": "^1.2.0"
+    "yup": "^1.6.1"
   },
   "lint-staged": {
     "**/*.{js,jsx,ts,tsx}": [
