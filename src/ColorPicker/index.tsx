@@ -44,6 +44,7 @@ export interface ColorPickerProps extends Pick<PopoverProps, 'placement'> {
   size?: ComponentSize
 }
 
+// TODO 超出范围
 const ColorPicker: Component<ColorPickerProps> = props => {
   const isControlled = () => Object.keys(props).includes('value')
 

@@ -227,7 +227,6 @@ const Transformer: Component<TransformerProps> = props => {
   }
   const [adsorbLine, setAdsorbLine] = createSignal<AdsorbLine>({})
   const onMoveMouseDown = (e: MouseEvent) => {
-    console.log('onMoveMouseDown')
     if (!isMainButton(e)) return
 
     e.stopPropagation()

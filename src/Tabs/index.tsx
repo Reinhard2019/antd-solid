@@ -17,7 +17,7 @@ import {
 import cs from 'classnames'
 import { Dynamic } from 'solid-js/web'
 import Segmented from '../Segmented'
-import { type StyleProps, type StringOrJSXElement, type ComponentSize } from '../types'
+import { type StyleProps, type StringOrJSXElement, type ComponentSize, type Key } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
 import DelayShow from '../DelayShow'
 import Element from '../Element'
@@ -25,7 +25,7 @@ import createControllableValue from '../hooks/createControllableValue'
 import useComponentSize from '../hooks/useComponentSize'
 
 export interface TabItem {
-  key: string
+  key: Key
   label: StringOrJSXElement
   children?: StringOrJSXElement
 }
@@ -52,7 +52,7 @@ export interface TabsProps extends StyleProps {
   /**
    * 当前激活 tab 面板的 key
    */
-  activeKey?: string
+  activeKey?: Key
   /**
    * 切换面板的回调
    * @param activeKey
@@ -82,7 +82,7 @@ const Tabs: Component<TabsProps> = _props => {
   )
 
   const size = useComponentSize(() => props.size)
-  const [activeKey, setActiveKey] = createControllableValue<string>(props, {
+  const [activeKey, setActiveKey] = createControllableValue<Key>(props, {
     defaultValuePropName: 'defaultActiveKey',
     valuePropName: 'activeKey',
     trigger: 'onChange',

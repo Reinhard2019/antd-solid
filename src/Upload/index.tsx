@@ -139,7 +139,7 @@ const Upload: Component<UploadProps> & {
         multiple={props.multiple}
         onInput={e => {
           const fileList: Array<Signal<UploadFile>> = []
-          for (const file of e.target.files ?? []) {
+          for (const file of Array.from(e.target.files ?? [])) {
             // eslint-disable-next-line solid/reactivity
             const uploadFileSignal = createSignal(createUploadFile(file))
             request(uploadFileSignal, props.customRequest)

@@ -236,6 +236,7 @@ const getMinorPlacement = (placement: TooltipPlacement): MinorPlacement => {
   return minorPlacement
 }
 
+// TODO 超出范围滚动
 const Tooltip: Component<TooltipProps> = _props => {
   const props = mergeProps(
     {

@@ -10,11 +10,10 @@ export interface SegmentedProps extends StyleProps {
   block?: boolean
   disabled?: boolean
   options: Array<
-  | string
-  | number
+  | Key
   | {
     label: StringOrJSXElement
-    value: string
+    value: Key
     disabled?: boolean
     onClick?: (
       e: MouseEvent & {

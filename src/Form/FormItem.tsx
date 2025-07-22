@@ -132,25 +132,27 @@ const FormItem = (props: FormItemProps) => {
                 : undefined,
           }}
         >
-          <Dynamic
-            component={props.component}
-            value={props.name ? formInstance?.getFieldValue(props.name) : undefined}
-            status={errMsg() ? 'error' : undefined}
-            onChange={(value: any) => {
-              if (!isNil(props.name)) formInstance?.setFieldValue(props.name, value)
+          <div>
+            <Dynamic
+              component={props.component}
+              value={props.name ? formInstance?.getFieldValue(props.name) : undefined}
+              status={errMsg() ? 'error' : undefined}
+              onChange={(value: any) => {
+                if (!isNil(props.name)) formInstance?.setFieldValue(props.name, value)
 
-              props.rules?.forEach(rule => {
-                rule
-                  .validate(value)
-                  .then(() => {
-                    setErrMsg('')
-                  })
-                  .catch(err => {
-                    setErrMsg(err.message)
-                  })
-              })
-            }}
-          />
+                props.rules?.forEach(rule => {
+                  rule
+                    .validate(value)
+                    .then(() => {
+                      setErrMsg('')
+                    })
+                    .catch(err => {
+                      setErrMsg(err.message)
+                    })
+                })
+              }}
+            />
+          </div>
 
           <Show when={errMsg()}>
             <div class="absolute top-[100%] text-[var(--ant-color-error)]">{errMsg()}</div>
