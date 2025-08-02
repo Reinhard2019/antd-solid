@@ -62,7 +62,7 @@ const FormItem = (props: FormItemProps) => {
     on(
       () => !props.hidden && layout() === 'horizontal',
       input => {
-        if (!input) return
+        if (!input || !label) return
 
         const resizeObserver = new ResizeObserver(entries => {
           const [entry] = entries
@@ -76,7 +76,7 @@ const FormItem = (props: FormItemProps) => {
           }))
         })
 
-        resizeObserver.observe(label!)
+        resizeObserver.observe(label)
 
         onCleanup(() => {
           setItemWidthDict?.(dict => {

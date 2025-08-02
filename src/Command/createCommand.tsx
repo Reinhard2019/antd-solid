@@ -27,16 +27,16 @@ export interface BaseCommandIntance<
  * @param contextHolder 如果为 true，则会返回 getContextHolder
  */
 function createCommand<P extends {} | undefined = undefined, R = void>(
-  component: Component<P>,
+  component: Component<P extends {} ? P : {}>,
 ): BaseCommandIntance<P, R>
 function createCommand<P extends {} | undefined = undefined, R = void>(
-  component: Component<P>,
+  component: Component<P extends {} ? P : {}>,
   contextHolder: true,
 ): BaseCommandIntance<P, R> & {
   getContextHolder: () => JSXElement
 }
 function createCommand<P extends {} | undefined = undefined, R = void>(
-  component: Component<P>,
+  component: Component<P extends {} ? P : {}>,
   contextHolder?: true,
 ):
   | BaseCommandIntance<P, R>
