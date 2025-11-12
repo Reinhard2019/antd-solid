@@ -108,9 +108,14 @@ const ColorPicker: Component<ColorPickerProps> = props => {
       onOpenChange={setOpen}
       trigger={props.disabled ? false : 'click'}
       content={getPopoverContent}
+      contentHTMLAttributes={{
+        class: 'ant-color-picker',
+      }}
       placement={props.placement ?? 'bottomLeft'}
     >
-      <Element class={cs('inline-block', props.disabled && 'cursor-not-allowed')}>
+      <Element
+        class={cs('ant-color-picker-trigger inline-block', props.disabled && 'cursor-not-allowed')}
+      >
         <div
           class={cs(
             'p-[calc(var(--ant-padding-xxs)-var(--border-width))] border-width-[--border-width] border-[--ant-color-border] border-solid rounded-[--ant-border-radius] cursor-pointer hover:border-[--ant-color-primary-hover]',

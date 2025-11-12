@@ -48,7 +48,9 @@ const Dropdown: Component<DropdownProps> = _props => {
           }}
         />
       )}
-      contentStyle={{ padding: 0 }}
+      contentHTMLAttributes={{
+        style: { padding: 0 },
+      }}
       {...popoverProps}
     >
       {resolvedChildren()}

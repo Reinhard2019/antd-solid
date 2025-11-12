@@ -167,8 +167,10 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
         trigger={false}
         placement="bottomLeft"
         arrow={false}
-        contentStyle={{
-          padding: 0,
+        contentHTMLAttributes={{
+          style: {
+            padding: 0,
+          },
         }}
         content={() => (
           <div

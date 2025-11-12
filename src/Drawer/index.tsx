@@ -147,6 +147,13 @@ const Drawer: Component<DrawerProps> = _props => {
             props.class,
             '[font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
             'inset-0 z-1000',
+            !props.mask &&
+              {
+                left: '!right-auto',
+                right: '!left-auto',
+                top: '!bottom-auto',
+                bottom: '!top-auto',
+              }[props.placement],
             isBody() ? 'fixed' : 'absolute',
           )}
           style={{

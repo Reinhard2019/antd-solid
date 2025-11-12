@@ -18,9 +18,13 @@ Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'prefix' 
   defaultValue?: string | null | undefined
   value?: string | null | undefined
   addonBefore?: JSXElement
+  addonBeforeHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   addonAfter?: JSXElement
+  addonAfterHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   prefix?: JSXElement
+  prefixHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   suffix?: JSXElement
+  suffixHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   /**
      * 仅供 InputNumber 使用
      */
@@ -40,6 +44,7 @@ Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'value' | 'onChange' | 'prefix' 
   onChange?: JSX.InputEventHandler<HTMLInputElement, InputEvent>
   onPressEnter?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
   onKeyDown?: JSX.EventHandler<HTMLInputElement, KeyboardEvent>
+  affixWrapperHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
 }
 
 export const statusClassDict = {
@@ -149,8 +154,10 @@ export function CommonInput(props: CommonInputProps) {
     >
       <Show when={!isNil(addonBefore())}>
         <div
+          {...props.addonBeforeHTMLAttributes}
           class={cs(
-            'ant-input-addon',
+            props.addonBeforeHTMLAttributes?.class,
+            'ant-input-addon ant-input-addon-before',
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-r-0',
           )}
         >
@@ -159,7 +166,9 @@ export function CommonInput(props: CommonInputProps) {
       </Show>
 
       <div
+        {...props.affixWrapperHTMLAttributes}
         class={cs(
+          props.affixWrapperHTMLAttributes?.class,
           'ant-input-affix-wrapper',
           'flex items-center w-full relative p:hover-child[input]:border-[--ant-color-primary] bg-[--ant-color-bg-container] p-[--ant-input-padding] border-1px border-solid',
           ['[--actions-display:none]', !props.disabled && 'hover:[--actions-display:block]'],
@@ -167,7 +176,12 @@ export function CommonInput(props: CommonInputProps) {
         )}
       >
         <Show when={!isNil(prefix())}>
-          <div class="mr-4px">{prefix()}</div>
+          <div
+            {...props.prefixHTMLAttributes}
+            class={cs(props.prefixHTMLAttributes?.class, 'mr-4px')}
+          >
+            {prefix()}
+          </div>
         </Show>
 
         <input
@@ -217,7 +231,12 @@ export function CommonInput(props: CommonInputProps) {
         </Show>
 
         <Show when={!isNil(suffix())}>
-          <div class="ml-4px">{suffix()}</div>
+          <div
+            {...props.suffixHTMLAttributes}
+            class={cs(props.suffixHTMLAttributes?.class, 'ml-4px')}
+          >
+            {suffix()}
+          </div>
         </Show>
 
         <Show when={!isNil(actions())}>
@@ -229,8 +248,10 @@ export function CommonInput(props: CommonInputProps) {
 
       <Show when={!isNil(addonAfter())}>
         <div
+          {...props.addonAfterHTMLAttributes}
           class={cs(
-            'ant-input-addon',
+            props.addonAfterHTMLAttributes?.class,
+            'ant-input-addon ant-input-addon-after',
             'shrink-0 flex justify-center items-center px-11px bg-[rgba(0,0,0,.02)] [border:1px_solid_var(--ant-color-border)] border-l-0',
           )}
         >

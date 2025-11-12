@@ -130,8 +130,10 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
                       />
                     </div>
                   )}
-                  contentStyle={{
-                    padding: 0,
+                  contentHTMLAttributes={{
+                    style: {
+                      padding: 0,
+                    },
                   }}
                 >
                   {getLabel({

@@ -48,8 +48,8 @@ export interface TooltipProps {
    * 默认: top
    */
   placement?: TooltipPlacement
-  contentStyle?: JSX.CSSProperties
   content?: JSXElement | ((close: () => void) => JSXElement)
+  contentHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   children?: JSXElement
   /**
    * 只有在 trigger 为 manual 时生效
@@ -588,16 +588,14 @@ const Tooltip: Component<TooltipProps> = _props => {
             }}
           >
             <div
+              {...props.contentHTMLAttributes}
               class={cs(
-                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto',
+                props.contentHTMLAttributes?.class,
+                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
                 props.plain
                   ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                   : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
               )}
-              style={{
-                transform: 'translate(var(--inner-translate-x), var(--inner-translate-y))',
-                ...props.contentStyle,
-              }}
             >
               <TooltipContext.Provider value={context}>
                 {unwrapContent(props.content, () => setOpen(false))}

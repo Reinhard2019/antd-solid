@@ -1,8 +1,7 @@
 import { type Accessor, type Component, For, type JSXElement } from 'solid-js'
-import { type TimelineItemProps as TimelineItemAntdProps } from 'antd'
 import Element from '../Element'
 
-interface TimelineItemProps extends Omit<TimelineItemAntdProps, 'children' | 'dot' | 'label'> {
+interface TimelineItemProps {
   dot?: JSXElement
   label?: JSXElement
   children?: Accessor<JSXElement>

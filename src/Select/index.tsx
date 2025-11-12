@@ -17,6 +17,7 @@ export interface SelectOption<T = Key> {
 export interface SelectProps<T = Key>
   extends Pick<
   SelectInputProps<T>,
+  | 'ref'
   | 'multiple'
   | 'allowClear'
   | 'class'
@@ -42,6 +43,7 @@ export interface SelectProps<T = Key>
 
 function Select<T = Key>(props: SelectProps<T>) {
   const [selectInputProps] = splitProps(props, [
+    'ref',
     'multiple',
     'allowClear',
     'class',
@@ -54,6 +56,9 @@ function Select<T = Key>(props: SelectProps<T>) {
     'suffixIcon',
     'placement',
     'getPopupContainer',
+    'defaultOpen',
+    'open',
+    'onOpenChange',
   ])
   const [value, setValue] = createControllableValue<T | T[] | undefined>(props)
   const valueArr = createMemo(() => toArray(value(), false) as T[])
@@ -66,6 +71,7 @@ function Select<T = Key>(props: SelectProps<T>) {
   return (
     <SelectInput<T>
       {...selectInputProps}
+      class={cs('ant-select', selectInputProps.class)}
       labelRender={v =>
         props.labelRender
           ? props.labelRender(optionDict().get(v), v)
@@ -82,6 +88,7 @@ function Select<T = Key>(props: SelectProps<T>) {
               {item => (
                 <div
                   class={cs(
+                    'ant-select-item',
                     'ellipsis box-content px-12px py-5px min-h-22px leading-22px hover:bg-[var(--ant-select-option-active-bg)] cursor-pointer rounded-[var(--ant-border-radius-sm)]',
                     selectedValue(item.value) ? '!bg-[var(--ant-select-option-selected-bg)]' : '',
                     item.class,

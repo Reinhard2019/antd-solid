@@ -35,6 +35,10 @@ export interface ButtonProps
    */
   loading?: boolean | 'auto'
   /**
+   * 当 loading 为 true 时，是否隐藏子元素
+   */
+  hideChildrenWhenLoading?: boolean
+  /**
    * 设置危险按钮
    */
   danger?: boolean
@@ -43,8 +47,7 @@ export interface ButtonProps
    * 将按钮宽度调整为其父宽度的选项
    */
   block?: boolean
-  contentClass?: string
-  contentStyle?: JSX.CSSProperties
+  contentHTMLAttributes?: JSX.HTMLAttributes<HTMLDivElement>
   icon?: StringOrJSXElement
 }
 
@@ -171,10 +174,10 @@ const Button: Component<ButtonProps> = _props => {
         <span class="i-ant-design:loading [vertical-align:-0.125em] keyframes-spin [animation:spin_1s_linear_infinite]" />
       </Show>
 
-      <Show when={resolvedChildren()}>
+      <Show when={resolvedChildren() && !(props.hideChildrenWhenLoading && loading())}>
         <span
-          class={cs('inline-block leading-inherit', props.contentClass)}
-          style={props.contentStyle}
+          {...props.contentHTMLAttributes}
+          class={cs('inline-block leading-inherit', props.contentHTMLAttributes?.class)}
         >
           {resolvedChildren()}
         </span>

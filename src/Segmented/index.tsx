@@ -65,6 +65,7 @@ const Segmented: Component<SegmentedProps> = props => {
         {item => (
           <div
             class={cs(
+              'ant-segmented-item',
               props.block && 'basis-0 grow-1',
               isDisabledValue(item) && 'cursor-not-allowed',
             )}

@@ -7,6 +7,7 @@ import {
   createMemo,
   mergeProps,
   useContext,
+  type Ref,
 } from 'solid-js'
 import cs from 'classnames'
 import { compact, isUndefined, pick } from 'lodash-es'
@@ -17,9 +18,11 @@ import { useClickAway } from '../hooks'
 import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 import CompactContext from '../Compact/context'
+import { setRef } from '../utils/solid'
 
 export interface SelectInputProps<T>
   extends Pick<TooltipProps, 'getPopupContainer' | 'defaultOpen' | 'open' | 'onOpenChange'> {
+  ref?: Ref<HTMLDivElement>
   multiple?: boolean
   defaultValue?: T[] | null
   value?: T[] | null
@@ -117,7 +120,10 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
 
   return (
     <Element
-      ref={select!}
+      ref={el => {
+        setRef(props, el)
+        select = el
+      }}
       class={cs(
         '!p[.ant-input-addon]:my--1px !p[.ant-input-addon]:mx--12px',
         'rounded-6px cursor-pointer inline-block text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
@@ -134,8 +140,11 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
         trigger={false}
         placement={props.placement}
         arrow={false}
-        contentStyle={{
-          padding: 0,
+        contentHTMLAttributes={{
+          class: 'ant-select-dropdown',
+          style: {
+            padding: 0,
+          },
         }}
         content={() => (
           <div
@@ -276,7 +285,10 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
             <Show
               when={showClearBtn()}
               fallback={
-                <Show when={isUndefined(props.suffixIcon)} fallback={props.suffixIcon}>
+                <Show
+                  when={isUndefined(props.suffixIcon) || props.suffixIcon === true}
+                  fallback={props.suffixIcon}
+                >
                   <span class="i-ant-design:down-outlined text-[var(--ant-color-text-quaternary)] text-12px" />
                 </Show>
               }

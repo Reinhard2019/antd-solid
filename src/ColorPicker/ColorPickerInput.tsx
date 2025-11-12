@@ -55,6 +55,7 @@ const ColorPickerInput: Component = () => {
       <Switch>
         <Match when={type() === 'HEX'}>
           <Input
+            class="ant-color-picker-hex-input"
             size="small"
             value={hexInputValue()}
             onChange={e => {
