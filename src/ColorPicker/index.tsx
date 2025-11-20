@@ -83,7 +83,7 @@ const ColorPicker: Component<ColorPickerProps> = props => {
           <div
             class="w-24px h-24px rounded-[--ant-border-radius-sm] relative overflow-hidden border-1px border-solid border-[--ant-color-split] cursor-pointer hover:border-[--ant-color-border]"
             onClick={() => {
-              setColor(new Color())
+              setColor(new Color(), true)
               close()
             }}
           >
