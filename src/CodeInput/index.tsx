@@ -71,7 +71,8 @@ const CodeInput: Component<CodeInputProps> = _props => {
               ref={el => {
                 inputRefDict[item] = el
               }}
-              class="!w-32px !text-center"
+              rootClass="!w-32px"
+              class="!text-center"
               value={value()[item]}
               onChange={e => {
                 const v = e.target.value
