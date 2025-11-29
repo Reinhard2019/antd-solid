@@ -21,6 +21,7 @@ export interface CursorIntance {
 export interface CursorProps extends ParentProps {
   ref?: Ref<CursorIntance>
   cursor: JSX.Element
+  disabled?: boolean
 }
 
 function createCursor(props: CursorProps) {
@@ -57,13 +58,15 @@ const Cursor: Component<CursorProps> & {
   }
 
   const onMouseMove = (e: MouseEvent) => {
+    setHover(true)
+
     setCursorPosition({
       x: e.clientX,
       y: e.clientY,
     })
   }
 
-  const onMouseLeave = (_: MouseEvent, _children: HTMLElement | SVGElement) => {
+  const onLeave = (_children: HTMLElement | SVGElement) => {
     setHover(false)
 
     if (originalCursor) {
@@ -74,6 +77,10 @@ const Cursor: Component<CursorProps> & {
     originalCursor = undefined
   }
 
+  const onMouseLeave = (_: MouseEvent, _children: HTMLElement | SVGElement) => {
+    onLeave(_children)
+  }
+
   setRef(props, {
     onMouseEnter,
     onMouseMove,
@@ -81,24 +88,25 @@ const Cursor: Component<CursorProps> & {
   })
 
   createEffect(() => {
+    if (props.disabled) return
+
     const _children = resolvedChildren()
     if (!(_children instanceof HTMLElement || _children instanceof SVGElement)) return
 
     const abortController = new AbortController()
 
+    // 注意：不能设置 capture 为 true，否则鼠标移入子元素时，子元素也会触发 mouseenter 事件
     _children.addEventListener(
       'mouseenter',
       (e: MouseEvent) => {
         onMouseEnter(e, _children)
       },
       {
-        capture: true,
         signal: abortController.signal,
       },
     )
 
     _children.addEventListener('mousemove', onMouseMove, {
-      capture: true,
       signal: abortController.signal,
     })
 
@@ -108,13 +116,13 @@ const Cursor: Component<CursorProps> & {
         onMouseLeave(e, _children)
       },
       {
-        capture: true,
         signal: abortController.signal,
       },
     )
 
     onCleanup(() => {
       abortController.abort()
+      onLeave(_children)
     })
   })
 

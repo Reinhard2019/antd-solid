@@ -100,12 +100,13 @@ const Slider: Component<SliderProps> = _props => {
         case 'ArrowDown':
           e.preventDefault()
           setValue(NP.minus(value(), props.step))
+          props.onChangeComplete?.(value())
           break
         case 'ArrowRight':
         case 'ArrowUp':
           e.preventDefault()
           setValue(NP.plus(value(), props.step))
-          e.preventDefault()
+          props.onChangeComplete?.(value())
           break
       }
     }
@@ -143,6 +144,7 @@ const Slider: Component<SliderProps> = _props => {
             containerRef!.offsetWidth - handleWidth,
           )
           setValue(props.min + (offsetX / (containerRef!.offsetWidth - handleWidth)) * gap())
+          props.onChangeComplete?.(value())
         }}
       >
         {/* 背景轨道 */}

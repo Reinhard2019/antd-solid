@@ -8,6 +8,7 @@ import {
   createMemo,
   splitProps,
   children,
+  useContext,
 } from 'solid-js'
 import cs from 'classnames'
 import './index.scss'
@@ -16,6 +17,7 @@ import Element from '../Element'
 import useComponentSize from '../hooks/useComponentSize'
 import { type StringOrJSXElement } from '../types'
 import { unwrapStringOrJSXElement } from '../utils/solid'
+import CompactContext from '../Compact/context'
 
 export interface ButtonProps
   extends ParentProps,
@@ -121,6 +123,7 @@ const Button: Component<ButtonProps> = _props => {
   )
   const resolvedChildren = children(() => props.children)
   const resolvedIcon = children(() => unwrapStringOrJSXElement(props.icon))
+  const { compact } = useContext(CompactContext)
 
   return (
     <Element<JSX.ButtonHTMLAttributes<HTMLButtonElement>>
@@ -138,6 +141,7 @@ const Button: Component<ButtonProps> = _props => {
         props.disabled && 'cursor-not-allowed',
         typeClassMap[props.type!](props.danger, props.disabled),
         loading() && 'opacity-65',
+        compact && 'ant-compact-item',
       )}
       style={{
         '--ant-button-border-radius': {

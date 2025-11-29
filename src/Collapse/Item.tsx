@@ -120,12 +120,12 @@ const CollapseItem: Component<CollapseItemProps> = _props => {
       >
         <span class="inline-flex items-center gap-[--ant-margin-sm]">
           {getExpandIcon('left')}
-          {unwrapStringOrJSXElement(props.label)}
+          <span>{unwrapStringOrJSXElement(props.label)}</span>
           {getExpandIcon('right')}
         </span>
 
         <span class="inline-flex items-center gap-[--ant-margin-sm]">
-          {unwrapStringOrJSXElement(props.extra)}
+          <span>{unwrapStringOrJSXElement(props.extra)}</span>
           {getExpandIcon('end')}
         </span>
       </div>
