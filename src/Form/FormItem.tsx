@@ -132,7 +132,7 @@ const FormItem = (props: FormItemProps) => {
                 : undefined,
           }}
         >
-          <div>
+          <div class="flex">
             <Dynamic
               component={props.component}
               value={props.name ? formInstance?.getFieldValue(props.name) : undefined}

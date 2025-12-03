@@ -45,7 +45,7 @@ function createControllableValue<T = any>(props: Props, options: Options<T> = {}
   const setValue = (v: ((prev: T) => T) | T | undefined) => {
     const _value = untrack(value)
     const newValue = typeof v === 'function' ? (v as (prev: T) => T)(_value! as T) : v
-    if (newValue === _value) return
+    if (newValue === _value) return newValue
 
     if (!isControlled()) {
       _setValue(newValue as any)

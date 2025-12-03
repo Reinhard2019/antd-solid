@@ -38,15 +38,6 @@ const Checkbox: Component<CheckboxProps> & {
         class={cs(
           'w-16px h-16px rounded-[var(--ant-border-radius-sm)] relative',
           (() => {
-            if (checked()) {
-              return [
-                'after:content-empty after:block after:absolute after:top-[calc(50%-1px)] after:left-1/2 after:-translate-1/2 after:-rotate-45 after:w-10px after:h-6px',
-                'after:border-solid after:border-2px after:border-t-0px after:border-r-0px',
-                props.disabled
-                  ? 'bg-[var(--ant-color-bg-container-disabled)] [border:1px_solid_var(--ant-color-border)] after:border-[var(--ant-color-text-disabled)]'
-                  : 'bg-[var(--ant-color-primary)] after:border-white',
-              ]
-            }
             if (props.indeterminate) {
               return [
                 '[border:1px_solid_var(--ant-color-border)]',
@@ -54,6 +45,15 @@ const Checkbox: Component<CheckboxProps> & {
                 props.disabled
                   ? 'after:bg-[var(--ant-color-text-disabled)]'
                   : 'after:bg-[var(--ant-color-primary)]',
+              ]
+            }
+            if (checked()) {
+              return [
+                'after:content-empty after:block after:absolute after:top-[calc(50%-1px)] after:left-1/2 after:-translate-1/2 after:-rotate-45 after:w-10px after:h-6px',
+                'after:border-solid after:border-2px after:border-t-0px after:border-r-0px',
+                props.disabled
+                  ? 'bg-[var(--ant-color-bg-container-disabled)] [border:1px_solid_var(--ant-color-border)] after:border-[var(--ant-color-text-disabled)]'
+                  : 'bg-[var(--ant-color-primary)] after:border-white',
               ]
             }
             return [
@@ -70,7 +70,7 @@ const Checkbox: Component<CheckboxProps> & {
           type="checkbox"
           onChange={e => {
             if (props.disabled) return
-            e.target.checked = setChecked(v => !v)
+            e.target.checked = props.indeterminate ? setChecked(true) : setChecked(v => !v)
             props.onChange?.(e)
           }}
         />
