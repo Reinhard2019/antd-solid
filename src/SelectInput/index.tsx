@@ -223,7 +223,7 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
           <Show
             when={valueArr().length}
             fallback={
-              <span class="block w-full h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] text-[var(--ant-color-text-placeholder)]">
+              <span class="block w-full h-[calc(var(--ant-select-input-height)-2px)] leading-[calc(var(--ant-select-input-height)-2px)] text-[var(--ant-color-text-placeholder)] ellipsis">
                 {props.placeholder}
 
                 {/* 防止为空的时候，与其它 inline 节点并排显示时不能对齐 */}
