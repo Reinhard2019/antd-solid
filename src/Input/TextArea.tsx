@@ -58,6 +58,8 @@ const TextArea: Component<TextAreaProps> = props => {
     trigger: null,
   })
 
+  let isComposition = false
+
   return (
     <Element
       class={cs(props.rootClass, 'flex')}
@@ -104,8 +106,14 @@ const TextArea: Component<TextAreaProps> = props => {
             }
           }
         }}
+        onCompositionStart={() => {
+          isComposition = true
+        }}
+        onCompositionEnd={() => {
+          isComposition = false
+        }}
         onKeyDown={e => {
-          if (e.key === 'Enter') {
+          if (e.key === 'Enter' && !isComposition) {
             props.onPressEnter?.(e)
           }
 

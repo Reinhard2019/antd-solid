@@ -119,6 +119,8 @@ export function CommonInput(props: CommonInputProps) {
   const suffix = createMemo(() => props.suffix)
   const actions = createMemo(() => props.actions)
 
+  let isComposition = false
+
   return (
     <Element
       block
@@ -206,8 +208,14 @@ export function CommonInput(props: CommonInputProps) {
               }
             }
           }}
+          onCompositionStart={() => {
+            isComposition = true
+          }}
+          onCompositionEnd={() => {
+            isComposition = false
+          }}
           onKeyDown={e => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !isComposition) {
               props.onPressEnter?.(e)
             }
 
