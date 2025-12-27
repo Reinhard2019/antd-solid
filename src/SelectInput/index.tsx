@@ -10,7 +10,7 @@ import {
   type Ref,
 } from 'solid-js'
 import cs from 'classnames'
-import { compact, isUndefined, pick } from 'lodash-es'
+import { compact, isNil, isUndefined, pick } from 'lodash-es'
 import { Dynamic } from 'solid-js/web'
 import Tooltip, { type TooltipProps } from '../Tooltip'
 import createControllableValue from '../hooks/createControllableValue'
@@ -24,8 +24,8 @@ export interface SelectInputProps<T>
   extends Pick<TooltipProps, 'getPopupContainer' | 'defaultOpen' | 'open' | 'onOpenChange'> {
   ref?: Ref<HTMLDivElement>
   multiple?: boolean
-  defaultValue?: T[] | null
-  value?: T[] | null
+  defaultValue?: T | T[] | null
+  value?: T | T[] | null
   onChange?: (value: T[]) => void
   labelRender?: (value: T) => JSXElement
   placeholder?: string
@@ -71,10 +71,14 @@ function SelectInput<T>(_props: SelectInputProps<T>) {
     _props,
   )
   const size = useComponentSize(() => props.size)
-  const [value, setValue] = createControllableValue<T[] | undefined>(props, {
+  const [value, setValue] = createControllableValue<T | T[] | undefined>(props, {
     defaultValue: [],
   })
-  const valueArr = createMemo(() => value() ?? [])
+  const valueArr = createMemo(() => {
+    const _value = value()
+    if (isNil(_value)) return []
+    return Array.isArray(_value) ? _value : [_value]
+  })
 
   const [open, setOpen] = createControllableValue(_props, {
     defaultValue: false,

@@ -3,8 +3,8 @@
   "version": "0.0.28",
   "description": "",
   "main": "dist/index.esm.js",
-  "module": "es/index.js",
-  "types": "es/index.d.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
   "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev docs",

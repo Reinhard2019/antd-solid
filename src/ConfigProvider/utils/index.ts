@@ -197,6 +197,8 @@ export function createCssVariables(
     '--ant-tree-node-selected-bg': aliasToken.controlItemBgActive,
     '--ant-tree-node-hover-bg': aliasToken.controlItemBgHover,
 
+    '--ant-date-picker-cell-hover-bg': aliasToken.controlItemBgHover,
+
     '--ant-alert-default-padding': '8px 12px',
 
     '--ant-tabs-card-bg': aliasToken.colorFillAlter,

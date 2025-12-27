@@ -36,6 +36,7 @@ export interface RangeInputProps<T> {
    * 设置校验状态
    */
   status?: 'error' | 'warning'
+  tooltipContentStyle?: JSX.CSSProperties
 }
 
 const statusClassDict = {
@@ -176,7 +177,7 @@ function RangeInput<T = string>(props: RangeInputProps<T>) {
           <div
             ref={tooltipContent}
             class="w-200px max-h-400px overflow-auto"
-            style={{ width: `${width()}px` }}
+            style={{ width: `${width()}px`, ...props.tooltipContentStyle }}
           >
             {props.content({
               currentFocusType,

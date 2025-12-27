@@ -248,7 +248,7 @@ const Modal: Component<ModalProps> & {
                             onClick={() => {
                               props.onCancel?.()
                             }}
-                            children={locale().Modal?.cancelText}
+                            children={locale().Modal.cancelText}
                             {...props.cancelButtonProps}
                           />
                           <Button
@@ -256,7 +256,7 @@ const Modal: Component<ModalProps> & {
                             loading="auto"
                             // eslint-disable-next-line solid/reactivity
                             onClick={async () => await props.onOk?.()}
-                            children={locale().Modal?.okText}
+                            children={locale().Modal.okText}
                             {...props.okButtonProps}
                           />
                         </div>
