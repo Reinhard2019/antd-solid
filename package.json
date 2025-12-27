@@ -1,6 +1,6 @@
 {
   "name": "antd-solid",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "",
   "main": "dist/index.esm.js",
   "module": "src/index.ts",
@@ -62,6 +62,7 @@
     "@ant-design/colors": "^7.0.2",
     "@ctrl/tinycolor": "^4.1.0",
     "classnames": "^2.3.2",
+    "dayjs": "^1.11.19",
     "lodash-es": "^4.17.21",
     "nanoid": "^5.0.1",
     "number-precision": "^1.6.0",

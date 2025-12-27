@@ -15,6 +15,7 @@
       "antd-solid": ["./src/index"],
     },
     "skipLibCheck": true,
+    "resolveJsonModule": true,
   },
   "include": [
     "src",
