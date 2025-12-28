@@ -1,7 +1,11 @@
 import { render } from 'solid-js/web'
 import Modal, { type ModalProps } from '.'
 
-export interface MethodProps extends Pick<ModalProps, 'title' | 'children' | 'onOk' | 'onCancel'> {}
+export interface MethodProps
+  extends Pick<
+  ModalProps,
+  'title' | 'children' | 'onOk' | 'onCancel' | 'okButtonProps' | 'cancelButtonProps'
+  > {}
 
 function warning(props: MethodProps) {
   const div = document.createElement('div')
@@ -15,7 +19,7 @@ function warning(props: MethodProps) {
         {...props}
         title={
           <div class="flex items-center gap-12px">
-            <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
+            <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)] shrink-0" />
             {props.title}
           </div>
         }

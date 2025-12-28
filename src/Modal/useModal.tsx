@@ -18,7 +18,7 @@ function useModal() {
       {...modalProps()}
       title={
         <div class="flex items-center gap-12px">
-          <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)]" />
+          <span class="i-ant-design:exclamation-circle text-22px text-[var(--ant-color-warning)] shrink-0" />
           {modalProps().title}
         </div>
       }
