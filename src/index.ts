@@ -94,6 +94,7 @@ export { default as useFocus } from './hooks/useFocus'
 export { default as useVirtualList } from './hooks/useVirtualList'
 export { default as useCounter } from './hooks/useCounter'
 export { default as useMouse } from './hooks/useMouse'
+export { default as useEllipsisLoading } from './hooks/useEllipsisLoading'
 
 export { setupGlobalDrag } from './utils/setupGlobalDrag'
 
