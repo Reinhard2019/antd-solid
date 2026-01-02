@@ -12,8 +12,12 @@ export default function useClickAway<T extends Event = Event>(
       onClickAway(event as T)
     }
   }
-  window.addEventListener('click', onClick)
+  window.addEventListener('click', onClick, {
+    capture: true,
+  })
   onCleanup(() => {
-    window.removeEventListener('click', onClick)
+    window.removeEventListener('click', onClick, {
+      capture: true,
+    })
   })
 }

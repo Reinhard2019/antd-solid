@@ -236,7 +236,6 @@ const getMinorPlacement = (placement: TooltipPlacement): MinorPlacement => {
   return minorPlacement
 }
 
-// TODO 超出范围滚动
 const Tooltip: Component<TooltipProps> = _props => {
   const props = mergeProps(
     {
@@ -346,8 +345,11 @@ const Tooltip: Component<TooltipProps> = _props => {
         _children.addEventListener('click', reverseOpen, {
           signal: abortController.signal,
         })
-        useClickAway(hide, () =>
-          compact([...Object.values(subPopupElements()), contentRef(), _children]),
+        useClickAway(
+          () => {
+            hide()
+          },
+          () => compact([...Object.values(subPopupElements()), contentRef(), _children]),
         )
         break
       case 'focus':
@@ -376,6 +378,10 @@ const Tooltip: Component<TooltipProps> = _props => {
   )
   const [reversedMainPlacement, setReversedMainPlacement] = createSignal<SinglePlacement>('top')
   const [reversedMinorPlacement, setReversedMinorPlacement] = createSignal<MinorPlacement>()
+  const [maxWidth, setMaxWidth] = createSignal<number>()
+  const [maxHeight, setMaxHeight] = createSignal<number>()
+  const [_translateX, setTranslateX] = createSignal(0)
+  const [_translateY, setTranslateY] = createSignal(0)
   const contentSize = useSize(contentRef)
   // 设置 content 显示时的 translate
   createEffect(() => {
@@ -435,15 +441,19 @@ const Tooltip: Component<TooltipProps> = _props => {
       switch (mainPlacement) {
         case 'top':
           translateY = _childrenRect.top - arrowOffset() - defaultOffset - _contentSize.height
+          setMaxHeight(translateY)
           break
         case 'bottom':
           translateY = _childrenRect.bottom + arrowOffset() + defaultOffset
+          setMaxHeight(window.innerHeight - translateY)
           break
         case 'left':
           translateX = _childrenRect.left - arrowOffset() - defaultOffset - _contentSize.width
+          setMaxWidth(translateX)
           break
         case 'right':
           translateX = _childrenRect.right + arrowOffset() + defaultOffset
+          setMaxWidth(window.innerWidth - translateX)
           break
       }
     }
@@ -470,12 +480,18 @@ const Tooltip: Component<TooltipProps> = _props => {
           }
           break
         case 'bottom':
-          if (translateY + _contentSize.height > window.innerHeight) {
+          if (
+            translateY > _contentSize.height &&
+            translateY + _contentSize.height > window.innerHeight
+          ) {
             reverseMainPlacement()
           }
           break
         case 'left':
-          if (translateX + _contentSize.width > window.innerWidth) {
+          if (
+            translateX > _contentSize.width &&
+            translateX + _contentSize.width > window.innerWidth
+          ) {
             reverseMainPlacement()
           }
           break
@@ -532,8 +548,8 @@ const Tooltip: Component<TooltipProps> = _props => {
       updateTranslateByMainPlacement(mainPlacement)
     }
 
-    _contentRef.style.setProperty('--translate-x', `${translateX}px`)
-    _contentRef.style.setProperty('--translate-y', `${translateY}px`)
+    setTranslateX(translateX)
+    setTranslateY(translateY)
 
     // placement 为 top 和 bottom 时，tooltip 超出可视区域时对 content 进行偏移矫正
     if (props.placement === 'top' || props.placement === 'bottom') {
@@ -575,49 +591,52 @@ const Tooltip: Component<TooltipProps> = _props => {
         <Portal mount={props.getPopupContainer()}>
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <AntdElement
-            ref={setPopupRef}
             class={cs(
-              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[var(--ant-color-text)] leading-[var(--ant-line-height)]',
+              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[--ant-color-text] leading-[--ant-line-height] overflow-auto',
               open() ? 'block' : 'hidden',
             )}
             style={{
-              transform: 'translate(var(--translate-x), var(--translate-y))',
+              transform: `translate(${_translateX()}px, ${_translateY()}px)`,
+              'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
+              'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
             }}
             onClick={e => {
               e.stopPropagation()
             }}
           >
-            <div
-              {...props.contentHTMLAttributes}
-              class={cs(
-                props.contentHTMLAttributes?.class,
-                'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
-                props.plain
-                  ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
-                  : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
-              )}
-            >
-              <TooltipContext.Provider value={context}>
-                {unwrapContent(props.content, () => setOpen(false))}
-              </TooltipContext.Provider>
-            </div>
-
-            <Show when={props.arrow}>
+            <div ref={setPopupRef} class="relative">
               <div
+                {...props.contentHTMLAttributes}
                 class={cs(
-                  'w-8px h-8px absolute border-transparent [box-shadow:var(--ant-box-shadow)]',
+                  props.contentHTMLAttributes?.class,
+                  'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
+                  props.plain
+                    ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
+                    : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',
                 )}
-                style={{
-                  'clip-path': 'polygon(-100% -100%, 200% -100%, 200% 200%)',
-                  'background-color': props.plain
-                    ? 'var(--ant-color-bg-container-tertiary)'
-                    : 'var(--ant-color-bg-spotlight)',
-                  ...ARROW_STYLE_DICT[
-                    mergePlacement(reversedMainPlacement(), reversedMinorPlacement())
-                  ],
-                }}
-              />
-            </Show>
+              >
+                <TooltipContext.Provider value={context}>
+                  {unwrapContent(props.content, () => setOpen(false))}
+                </TooltipContext.Provider>
+              </div>
+
+              <Show when={props.arrow}>
+                <div
+                  class={cs(
+                    'w-8px h-8px absolute border-transparent [box-shadow:var(--ant-box-shadow)]',
+                  )}
+                  style={{
+                    'clip-path': 'polygon(-100% -100%, 200% -100%, 200% 200%)',
+                    'background-color': props.plain
+                      ? 'var(--ant-color-bg-container-tertiary)'
+                      : 'var(--ant-color-bg-spotlight)',
+                    ...ARROW_STYLE_DICT[
+                      mergePlacement(reversedMainPlacement(), reversedMinorPlacement())
+                    ],
+                  }}
+                />
+              </Show>
+            </div>
           </AntdElement>
         </Portal>
       </Dynamic>
