@@ -441,7 +441,7 @@ const Tooltip: Component<TooltipProps> = _props => {
       switch (mainPlacement) {
         case 'top':
           translateY = _childrenRect.top - arrowOffset() - defaultOffset - _contentSize.height
-          setMaxHeight(translateY)
+          setMaxHeight(translateY + _contentSize.height)
           break
         case 'bottom':
           translateY = _childrenRect.bottom + arrowOffset() + defaultOffset
@@ -449,7 +449,7 @@ const Tooltip: Component<TooltipProps> = _props => {
           break
         case 'left':
           translateX = _childrenRect.left - arrowOffset() - defaultOffset - _contentSize.width
-          setMaxWidth(translateX)
+          setMaxWidth(translateX + _contentSize.width)
           break
         case 'right':
           translateX = _childrenRect.right + arrowOffset() + defaultOffset
@@ -592,21 +592,26 @@ const Tooltip: Component<TooltipProps> = _props => {
           {/* Portal 存在缺陷，onClick 依然会沿着 solid 的组件树向上传播，因此需要 stopPropagation */}
           <AntdElement
             class={cs(
-              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[--ant-color-text] leading-[--ant-line-height] overflow-auto',
+              'z-1000 fixed left-0 top-0 [font-size:var(--ant-font-size)] text-[--ant-color-text] leading-[--ant-line-height]',
               open() ? 'block' : 'hidden',
             )}
             style={{
               transform: `translate(${_translateX()}px, ${_translateY()}px)`,
-              'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
-              'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
             }}
             onClick={e => {
               e.stopPropagation()
             }}
           >
-            <div ref={setPopupRef} class="relative">
+            <div
+              class="relative overflow-auto"
+              style={{
+                'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
+                'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
+              }}
+            >
               <div
                 {...props.contentHTMLAttributes}
+                ref={setPopupRef}
                 class={cs(
                   props.contentHTMLAttributes?.class,
                   'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
@@ -619,24 +624,24 @@ const Tooltip: Component<TooltipProps> = _props => {
                   {unwrapContent(props.content, () => setOpen(false))}
                 </TooltipContext.Provider>
               </div>
-
-              <Show when={props.arrow}>
-                <div
-                  class={cs(
-                    'w-8px h-8px absolute border-transparent [box-shadow:var(--ant-box-shadow)]',
-                  )}
-                  style={{
-                    'clip-path': 'polygon(-100% -100%, 200% -100%, 200% 200%)',
-                    'background-color': props.plain
-                      ? 'var(--ant-color-bg-container-tertiary)'
-                      : 'var(--ant-color-bg-spotlight)',
-                    ...ARROW_STYLE_DICT[
-                      mergePlacement(reversedMainPlacement(), reversedMinorPlacement())
-                    ],
-                  }}
-                />
-              </Show>
             </div>
+
+            <Show when={props.arrow}>
+              <div
+                class={cs(
+                  'w-8px h-8px absolute border-transparent [box-shadow:var(--ant-box-shadow)]',
+                )}
+                style={{
+                  'clip-path': 'polygon(-100% -100%, 200% -100%, 200% 200%)',
+                  'background-color': props.plain
+                    ? 'var(--ant-color-bg-container-tertiary)'
+                    : 'var(--ant-color-bg-spotlight)',
+                  ...ARROW_STYLE_DICT[
+                    mergePlacement(reversedMainPlacement(), reversedMinorPlacement())
+                  ],
+                }}
+              />
+            </Show>
           </AntdElement>
         </Portal>
       </Dynamic>
