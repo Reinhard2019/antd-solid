@@ -95,6 +95,8 @@ export function CommonInput(props: CommonInputProps) {
     'prefix',
     'suffix',
     'allowClear',
+    'rootClass',
+    'rootStyle',
   ])
 
   let inputRef: HTMLInputElement | undefined

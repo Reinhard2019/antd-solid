@@ -1,4 +1,4 @@
-import { createMemo, useContext, type Component } from 'solid-js'
+import { useContext, type Component } from 'solid-js'
 import { clamp } from 'lodash-es'
 import ColorPickerContext from './context'
 import Color from './color'
@@ -6,8 +6,7 @@ import { setupGlobalDrag } from '../utils/setupGlobalDrag'
 
 const ColorPickerSelect: Component = () => {
   let ref: HTMLDivElement | undefined
-  const context = useContext(ColorPickerContext)
-  const color = createMemo(() => context?.color() ?? new Color())
+  const { color, setColor: _setColor, hsvColor } = useContext(ColorPickerContext)!
 
   const setColor = (e: MouseEvent, completed?: boolean) => {
     if (!ref) return
@@ -16,10 +15,10 @@ const ColorPickerSelect: Component = () => {
     const offsetX = e.clientX - rect.x
     const offsetY = e.clientY - rect.y
     const { clientWidth, clientHeight } = ref
-    const hsv = color().toHsv()
+    const hsv = hsvColor().toHsv()
     hsv.s = clamp(offsetX / clientWidth, 0, 1)
     hsv.v = clamp(1 - offsetY / clientHeight, 0, 1)
-    context?.setColor(new Color(hsv), completed)
+    _setColor(new Color(hsv), completed)
   }
 
   return (
@@ -27,7 +26,7 @@ const ColorPickerSelect: Component = () => {
       ref={ref}
       class="h-160px rounded-[--ant-border-radius-sm]  cursor-pointer relative overflow-hidden"
       style={{
-        'background-color': color().toHueRgbString(),
+        'background-color': hsvColor().toHueRgbString(),
         'background-image':
           'linear-gradient(0deg, rgb(0, 0, 0), transparent), linear-gradient(90deg, rgb(255, 255, 255), rgba(255, 255, 255, 0))',
       }}
@@ -55,7 +54,7 @@ const ColorPickerSelect: Component = () => {
             },
             // eslint-disable-next-line solid/reactivity
             () => {
-              if (isDrag) context?.setColor(color(), true)
+              if (isDrag) _setColor(color(), true)
             },
           )
         }}

@@ -603,7 +603,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             }}
           >
             <div
-              class="relative overflow-auto"
+              class="relative overflow-auto [box-shadow:--ant-box-shadow] rounded-[--ant-border-radius-lg]"
               style={{
                 'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
                 'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
@@ -614,7 +614,7 @@ const Tooltip: Component<TooltipProps> = _props => {
                 ref={setPopupRef}
                 class={cs(
                   props.contentHTMLAttributes?.class,
-                  'px-8px py-6px [box-shadow:var(--ant-box-shadow)] rounded-[var(--ant-border-radius-lg)] overflow-auto translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
+                  'px-8px py-6px translate-x-[--inner-translate-x] translate-y-[--inner-translate-y]',
                   props.plain
                     ? 'text-[var(--ant-color-text)] bg-[var(--ant-color-bg-container-tertiary)]'
                     : 'text-[var(--ant-color-text-light-solid)] bg-[var(--ant-color-bg-spotlight)]',

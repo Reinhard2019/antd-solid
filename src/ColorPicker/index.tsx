@@ -1,9 +1,10 @@
 import cs from 'classnames'
 import {
   type Component,
+  createComputed,
   createMemo,
-  createRenderEffect,
   createSignal,
+  on,
   Show,
   untrack,
 } from 'solid-js'
@@ -48,8 +49,8 @@ export interface ColorPickerProps extends Pick<PopoverProps, 'placement'> {
 const ColorPicker: Component<ColorPickerProps> = props => {
   const isControlled = () => Object.keys(props).includes('value')
 
-  const [innerColor, _setInnerColor] = createSignal(untrack(() => new Color(props.defaultValue)))
-  createRenderEffect(() => {
+  const [color, _setInnerColor] = createSignal(untrack(() => new Color(props.defaultValue)))
+  createComputed(() => {
     if (isControlled()) {
       _setInnerColor(new Color(props.value))
     }
@@ -68,14 +69,37 @@ const ColorPicker: Component<ColorPickerProps> = props => {
   }
   const [open, setOpen] = createSignal(false)
   const size = useComponentSize(() => props.size)
-  const color = createMemo(() => (isControlled() ? new Color(props.value) : innerColor()))
+
+  const [h, setH] = createSignal(0)
+  const hsvColor = createMemo(() => {
+    const hsv = color().toHsv()
+    return new Color({
+      h: h(),
+      s: hsv.s,
+      v: hsv.v,
+    })
+  })
+  // 只有在 hex 被修改时才更新
+  createComputed(
+    on(
+      () => color().toHex8String(),
+      (hex, prev) => {
+        if (hex === prev) return
+
+        setH(new Color(hex).toHsv().h)
+      },
+    ),
+  )
 
   const getPopoverContent = (close: () => void) => (
     <ColorPickerContext.Provider
       value={{
-        color: innerColor,
+        color,
         setColor,
         disabledAlpha,
+        h,
+        setH,
+        hsvColor,
       }}
     >
       <Show when={props.allowClear}>

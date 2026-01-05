@@ -1,4 +1,4 @@
-import { createMemo, Show, useContext, type Component } from 'solid-js'
+import { Show, useContext, type Component } from 'solid-js'
 import cs from 'classnames'
 import ColorPickerContext from './context'
 import Slider from '../Slider'
@@ -6,24 +6,24 @@ import Color from './color'
 import ColorPickUpSvg from '../assets/svg/ColorPickUp'
 
 const ColorPickerSlider: Component = () => {
-  const context = useContext(ColorPickerContext)
-  const color = createMemo(() => context?.color() ?? new Color())
+  const { color, setColor, h, setH, hsvColor, disabledAlpha } = useContext(ColorPickerContext)!
 
   return (
     <div class="flex gap-[--ant-margin-sm] items-center">
       <div class="flex flex-col gap-[--ant-margin-sm] w-full">
         <Slider
-          value={color().toHsv().h / 3.55}
+          value={h() / 3.55}
           onChange={v => {
             const hsv = color().toHsv()
             hsv.h = Math.round(v * 3.55)
-            context?.setColor(new Color(hsv))
+            setH(hsv.h)
+            setColor(new Color(hsv))
           }}
           onChangeComplete={() => {
-            context?.setColor(color(), true)
+            setColor(color(), true)
           }}
           tooltip={false}
-          handle={() => getSliderHandle(color().toHueRgbString())}
+          handle={() => getSliderHandle(hsvColor().toHueRgbString())}
           style={{
             '--ant-slider-rail-size': '8px',
             '--ant-slider-handle-size': '10px',
@@ -38,18 +38,18 @@ const ColorPickerSlider: Component = () => {
           }}
         />
 
-        <Show when={!context?.disabledAlpha()}>
+        <Show when={!disabledAlpha()}>
           <Slider
             value={color().a * 100}
             onChange={v => {
-              context?.setColor(
+              setColor(
                 color()
                   .clone()
                   .setAlpha(v / 100),
               )
             }}
             onChangeComplete={() => {
-              context?.setColor(color(), true)
+              setColor(color(), true)
             }}
             min={0}
             step={1}
@@ -101,7 +101,7 @@ const ColorPickerSlider: Component = () => {
             eyeDropper
               .open()
               .then(result => {
-                context?.setColor(new Color(result.sRGBHex as string), true)
+                setColor(new Color(result.sRGBHex as string), true)
               })
               .catch(console.error)
           }}

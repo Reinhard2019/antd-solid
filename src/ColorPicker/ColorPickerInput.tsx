@@ -55,7 +55,7 @@ const ColorPickerInput: Component = () => {
       <Switch>
         <Match when={type() === 'HEX'}>
           <Input
-            class="ant-color-picker-hex-input"
+            rootClass="ant-color-picker-hex-input"
             size="small"
             value={hexInputValue()}
             onChange={e => {
@@ -77,7 +77,7 @@ const ColorPickerInput: Component = () => {
               context?.setColor(color(), true)
             }}
             prefix={<span class="text-[--ant-color-text-placeholder]">#</span>}
-            style={{
+            rootStyle={{
               '--ant-input-font-size': '12px',
             }}
           />
@@ -98,7 +98,7 @@ const ColorPickerInput: Component = () => {
               min={0}
               max={359}
               precision={0}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
             <InputNumber
               size="small"
@@ -115,7 +115,7 @@ const ColorPickerInput: Component = () => {
               max={100}
               precision={0}
               formatter={value => `${value || 0}%`}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
             <InputNumber
               size="small"
@@ -132,7 +132,7 @@ const ColorPickerInput: Component = () => {
               max={100}
               precision={0}
               formatter={value => `${value || 0}%`}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
           </div>
         </Match>
@@ -152,7 +152,7 @@ const ColorPickerInput: Component = () => {
               min={0}
               max={255}
               precision={0}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
             <InputNumber
               size="small"
@@ -168,7 +168,7 @@ const ColorPickerInput: Component = () => {
               min={0}
               max={255}
               precision={0}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
             <InputNumber
               size="small"
@@ -184,7 +184,7 @@ const ColorPickerInput: Component = () => {
               min={0}
               max={255}
               precision={0}
-              style={InputNumberStyle}
+              rootStyle={InputNumberStyle}
             />
           </div>
         </Match>
@@ -208,7 +208,7 @@ const ColorPickerInput: Component = () => {
           max={100}
           precision={0}
           formatter={value => `${value || 0}%`}
-          style={{
+          rootStyle={{
             ...InputNumberStyle,
             'margin-left': 'var(--ant-margin-xxs)',
           }}
