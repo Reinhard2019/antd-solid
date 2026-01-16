@@ -1,6 +1,6 @@
 {
   "name": "antd-solid",
-  "version": "0.0.37",
+  "version": "0.0.38",
   "description": "",
   "main": "dist/index.esm.js",
   "module": "es/index.js",
