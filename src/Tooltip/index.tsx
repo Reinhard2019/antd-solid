@@ -605,7 +605,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             <div
               class="relative overflow-auto [box-shadow:--ant-box-shadow] rounded-[--ant-border-radius-lg]"
               style={{
-                'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
+                'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : '250px',
                 'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
               }}
             >

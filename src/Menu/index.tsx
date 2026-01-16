@@ -1,4 +1,5 @@
 import { createMemo, mergeProps } from 'solid-js'
+import cs from 'classnames'
 import { type StringOrJSXElement, type StyleProps } from '../types'
 import Element from '../Element'
 import InternalMenu from './InternalMenu'
@@ -96,7 +97,7 @@ function Menu<T = any>(_props: MenuProps<T>) {
   }))
 
   return (
-    <Element class={props.class} style={style()}>
+    <Element class={cs('p-[--ant-padding-xxs]', props.class)} style={style()}>
       <InternalMenu
         {...props}
         class={props.class}

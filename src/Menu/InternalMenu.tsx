@@ -50,7 +50,7 @@ function InternalMenu<T = any>(props: InternalMenuProps<T>) {
           <div class={cs(item.disabled && 'cursor-not-allowed')}>
             <div
               class={cs(
-                'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center m-[--ant-menu-item-margin] min-h-[--ant-menu-item-height]',
+                'relative rounded-[var(--ant-border-radius-lg)] cursor-pointer flex items-center min-h-[--ant-menu-item-height]',
                 item.disabled
                   ? 'text-[--ant-color-text-disabled]'
                   : props.selectedKeys.includes(item.key)
