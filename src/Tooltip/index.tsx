@@ -97,7 +97,17 @@ export interface TooltipProps {
 }
 
 export const unwrapContent = (content: TooltipProps['content'], close: () => void) => {
-  return typeof content === 'function' ? content(close) : content
+  return (
+    <>
+      {typeof content === 'function' ? (
+        content(close)
+      ) : typeof content === 'string' || typeof content === 'number' ? (
+        <div style={{ 'max-width': '250px' }}>{content}</div>
+      ) : (
+        content
+      )}
+    </>
+  )
 }
 
 const ARROW_STYLE_DICT: Record<TooltipPlacement, JSX.CSSProperties> = {
@@ -605,7 +615,7 @@ const Tooltip: Component<TooltipProps> = _props => {
             <div
               class="relative overflow-auto [box-shadow:--ant-box-shadow] rounded-[--ant-border-radius-lg]"
               style={{
-                'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : '250px',
+                'max-width': typeof maxWidth() === 'number' ? `${maxWidth()}px` : undefined,
                 'max-height': typeof maxHeight() === 'number' ? `${maxHeight()}px` : undefined,
               }}
             >
